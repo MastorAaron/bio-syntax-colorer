@@ -1,4 +1,5 @@
 {
+    "$schema": "vscode://schemas/color-theme",
     "type":"dark",
     "tokenColors":[
         {
@@ -48,7 +49,8 @@
             "name": "Any Nuke", 
             "scope": "source.fasta.ntN", 
             "settings": {
-                "foreground": "#E6DB74"
+                // "foreground": "#E6DB74"
+                "foreground": "#D8D6D6"
             }
         },  
         {
@@ -62,18 +64,19 @@
             "name": "Arginine OR Purine", 
             "scope": "source.fasta.ntR",
             "settings": {
-                "foreground": "#FFFE80"
+                "foreground": "#FF0000"
             }
         }, 
         {
             "scope": "source.fasta.symGap", 
             "settings":{
+                "foreground": "#474747"
             }
         },
         {
             "scope": "source.fasta.symStop", 
             "settings":{
-                "foreground": "#460202"
+                "foreground": "#474747"
             }
         },
         {

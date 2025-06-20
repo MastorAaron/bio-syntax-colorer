@@ -17,6 +17,10 @@
                     "match": "^>.*"
                 },
                 {
+                    "name": "fastq.title", 
+                    "match": "^@.*"
+                },
+                {
                     "name": "source.fasta.ntA", 
                     "match": "[Aa]+"
                 }, 
