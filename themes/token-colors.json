@@ -10,56 +10,56 @@
             }
         },
         {
-            "name:": "Adenine OR Alanine", 
+            "name": "Adenine OR Alanine", 
             "scope": "source.fasta.ntA", 
             "settings": {
                 "foreground": "#3ED132"
             }
         }, 
         {
-            "name:": "Cytosine or Cysteine", 
+            "name": "Cytosine OR Cysteine", 
             "scope": "source.fasta.ntC",
             "settings": {
                 "foreground": "#4192FF"
             }
         }, 
         {
-            "name:": "Guanine", 
+            "name": "Guanine OR Glycine", 
             "scope": "source.fasta.ntG", 
             "settings": {
                 "foreground": "#F09000"
             }
         },
         {
-            "name:": "Thymine", 
+            "name": "Thymine OR Threonine", 
             "scope": "source.fasta.ntT",
             "settings": {
                 "foreground": "#FF0000"
             }
         }, 
         {
-            "name:": "Uracil OR Selenocysteine", 
+            "name": "Uracil OR Selenocysteine", 
             "scope": "source.fasta.ntU",
             "settings": {
                 "foreground": "#FF00C8"
             }
         },
         {
-            "name:": "Any Nuke", 
+            "name": "Any Nuke", 
             "scope": "source.fasta.ntN", 
             "settings": {
                 "foreground": "#E6DB74"
             }
         },  
         {
-            "name:": "Tyrosine OR Pyrimidine", 
+            "name": "Tyrosine OR Pyrimidine", 
             "scope": "source.fasta.ntY", 
             "settings": {
                 "foreground": "#15A4A4"
             }
         },  
         {
-            "name:": "Arginine OR Purine", 
+            "name": "Arginine OR Purine", 
             "scope": "source.fasta.ntR",
             "settings": {
                 "foreground": "#FFFE80"
@@ -77,42 +77,42 @@
             }
         },
         {
-            "name:": "Asparagine OR not C", 
+            "name": "Asparagine OR not C", 
             "scope": "source.fasta.aaD",
             "settings":{
                 "foreground": "#8FC88E"
             }
         },
         {
-            "name:": "Glutamic acid", 
+            "name": "Glutamic acid", 
             "scope": "source.fasta.aaE",
             "settings":{
                 "foreground": "#12b9cf"
             }
         },
         {   
-            "name:": "Glutamine", 
+            "name": "Glutamine", 
             "scope": "source.fasta.aaQ",
             "settings":{
                 "foreground": "#00FF00"
             }
         },
         {   
-            "name:": "Glx: Gln or Glu", 
+            "name": "Glx: Gln or Glu", 
             "scope": "source.fasta.aaZ",
             "settings":{
                 "foreground": "#80A0F0"
             }
         }, 
         {
-            "name:": "Phenylalanine",
+            "name": "Phenylalanine",
             "scope": "source.fasta.aaF",
             "settings":{
                 "foreground": "#80A0F0"
             }
         },
         {
-            "name:": "Histidine OR not G",
+            "name": "Histidine OR not G",
             "scope": "source.fasta.aaH",
             "settings":{
                 "foreground": "#15A4A4"
@@ -120,91 +120,91 @@
         },
         
         {
-            "name:": "Lysine",
+            "name": "Lysine",
             "scope": "source.fasta.aaK",
             "settings":{
                 "foreground": "#91E69F"
             }
         }, 
         {
-            "name:": "Leucine",
+            "name": "Leucine",
             "scope": "source.fasta.aaL", 
             "settings":{
                 "foreground": "#91E69F"
             }
         },
         {
-            "name:": "Isoleucine",
+            "name": "Isoleucine",
             "scope": "source.fasta.aaI",
             "settings":{
                 "foreground": "#80A0F0"
             }
         }, 
         {   
-            "name:": "(Iso)leucine: L or I",
+            "name": "(Iso)leucine: L or I",
             "scope": "source.fasta.aaJ",
             "settings":{
                 "foreground": "#91E69F"
             }
         },
         {
-            "name:": "Methionine",
+            "name": "Methionine",
             "scope": "source.fasta.aaM", 
             "settings":{
                 "foreground": "#C048C0"
             }
         },
         {
-            "name:": "Proline",
+            "name": "Proline",
             "scope": "source.fasta.aaP",
             "settings":{
                 "foreground": "#FFFF00"
             }
         },
         {
-            "name:": "Serine",
+            "name": "Serine",
             "scope": "source.fasta.aaS", 
             "settings":{
                 "foreground": "#15A4A4"
             }
         },
         {
-            "name:": "Threonine",
+            "name": "Threonine",
             "scope": "source.fasta.aaT", 
             "settings":{
                 "foreground": "#4192FF"
             }
         }, 
         {
-            "name:": "Valine OR not T",
+            "name": "Valine OR not T",
             "scope": "source.fasta.aaV",
             "settings":{
                 "foreground": "#E69194"
             }
         }, 
         {
-            "name:": "Tryptophan",
+            "name": "Tryptophan",
             "scope": "source.fasta.aaW",  
             "settings":{
                 "foreground": "#91E69F"
             }
         },
         {
-            "name:": "Pyrrolysine",
+            "name": "Pyrrolysine",
             "scope": "source.fasta.aaO", 
             "settings":{
                 "foreground": "#80A0F0"
             }
         },
         {
-            "name:": "Asx: Asn or Asp OR not A",
+            "name": "Asx: Asn or Asp OR not A",
             "scope": "source.fasta.aaB", 
             "settings":{
                 "foreground": "#E69194"
             }
         },
         {
-            "name:": "Any Amino Acid",
+            "name": "Any Amino Acid",
             "scope": "source.fasta.aaX",
             "settings":{
                 "foreground": "#91E69F"
