@@ -1,0 +1,135 @@
+{
+    "patterns": [
+        {
+            "include": "#keywords"
+        }
+        
+    ],
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "scopeName": "source.fasta", 
+    "fileTypes": ["fasta", "fa"],
+    "name": "FASTA",
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "fasta.title", 
+                    "match": "^>.*"
+                },
+                {
+                    "name": "source.fasta.ntA", 
+                    "match": "[Aa]+"
+                }, 
+                {
+                    "name": "source.fasta.ntC", 
+                    "match": "[Cc]+"
+                },
+                {
+                    "name": "source.fasta.ntG", 
+                    "match": "[Gg]+"
+                }, 
+                {
+                    "name": "source.fasta.ntT", 
+                    "match": "[Tt]+"
+                }, 
+                {
+                    "name": "source.fasta.ntU", 
+                    "match": "[Uu]+"
+                }, 
+                {
+                    "name": "source.fasta.ntN", 
+                    "match": "[Nn]+"
+                }, 
+                {
+                    "name": "source.fasta.ntY", 
+                    "match": "[Yy]+"
+                }, 
+                {
+                    "name": "source.fasta.ntR", 
+                    "match": "[Rr]+"
+                }, 
+
+
+                {
+                    "name": "source.fasta.symGap", 
+                    "match": "[-]"
+                },
+                {
+                    "name": "source.fasta.symStop", 
+                    "match": "[*@.]"
+                },
+
+
+                {
+                    "name": "source.fasta.aaB", 
+                    "match": "[Bb]+"
+                }, 
+                {
+                    "name": "source.fasta.aaD", 
+                    "match": "[Dd]+"
+                }, 
+                {
+                    "name": "source.fasta.aaE", 
+                    "match": "[Ee]+"
+                }, 
+                {
+                    "name": "source.fasta.aaF", 
+                    "match": "[Ff]+"
+                }, 
+                {
+                    "name": "source.fasta.aaH", 
+                    "match": "[Hh]+"
+                },
+                {
+                    "name": "source.fasta.aaI", 
+                    "match": "[Ii]+"
+                }, 
+                {
+                    "name": "source.fasta.aaJ", 
+                    "match": "[Jj]+"
+                },
+                {
+                    "name": "source.fasta.aaK", 
+                    "match": "[Kk]+"
+                },
+                {
+                    "name": "source.fasta.aaM", 
+                    "match": "[Mm]+"
+                }, 
+                {
+                    "name": "source.fasta.aaO", 
+                    "match": "[Oo]+"
+                },
+                {
+                    "name": "source.fasta.aaP", 
+                    "match": "[Pp]+"
+                }, 
+                {
+                    "name": "source.fasta.aaQ", 
+                    "match": "[Qq]+"
+                }, 
+                {
+                    "name": "source.fasta.aaS", 
+                    "match": "[Ss]+"
+                }, 
+                {
+                    "name": "source.fasta.aaV", 
+                    "match": "[Vv]+"
+                },
+                {
+                    "name": "source.fasta.aaW", 
+                    "match": "[Ww]+"
+                },
+                {
+                    "name": "source.fasta.aaX", 
+                    "match": "[Xx]+"
+                },
+                {
+                    "name": "source.fasta.aaZ", 
+                    "match": "[Zz]+"
+                }
+            ]
+        }
+
+    }
+}
