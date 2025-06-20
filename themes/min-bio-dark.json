@@ -1,0 +1,209 @@
+{
+    "$schema": "vscode://schemas/color-theme",
+    "name": "Minimal Biosyntax Dark",
+    "include": "./themes/Default Dark Modern-color-theme.json",
+    "type":"dark",
+    "colors":{
+        "list.dropBackground": "#383b3d",
+        "editor.background": "#1E1E1E",
+        "editor.foreground": "#D4D4D4",
+		"editor.selectionHighlightBackground": "#add6ff26",
+		"editorIndentGuide.background1": "#404040",
+		"editorIndentGuide.activeBackground1": "#707070",
+		"activityBarBadge.background": "#007acc",
+		"sideBarTitle.foreground": "#bbbbbb"
+    },
+    "scope": [
+        "source.fasta",
+        "source.fastq"
+      ],
+    "tokenColors":[
+        // === HEADER  ===
+        {
+            "scope":"markup.heading.fasta",
+            "settings":{
+                "fontStyle":"bold",
+                "foreground":"#E6DB74"
+            }
+        },
+        // === NUCLEOTIDES ===
+        {
+            "scope": "ntA", //Adenine
+            "settings": {
+                "foreground": "#3ED132",
+            }
+        }, 
+        {
+            "scope": "ntC", //Cytosine
+            "settings": {
+                "foreground": "#4192FF",
+            }
+        }, 
+        {
+            "scope": "ntG", //Guanine
+            "settings": {
+                "foreground": "#F09000",
+            }
+        },
+        {
+            "scope": "ntT", //Thymine 
+            "settings": {
+                "foreground": "#FF0000",
+            }
+        }, 
+        {
+            "scope": "ntU", //Uracil and Selenocysteine 
+            "settings": {
+                "foreground": "#FF00C8",
+            }
+        },
+        {
+            "scope": "ntN", //Any Nuke
+            "settings": {
+                "foreground": "#E6DB74",
+            }
+        },  
+        {
+            "scope": "ntY", //Pyrimidines or Tyr
+            "settings": {
+                "foreground": "#15A4A4",
+            }
+        },  
+        {
+            "scope": "ntR", //Purines or R amino acid
+            "settings": {
+                "foreground": "#FFFE80",
+            }
+        }, 
+        // === SYMBOLS  ===
+        {
+            "scope": "symGap", 
+            "settings":{
+                // "foreground": "",
+            }
+        },
+        {
+            "scope": "symStop", 
+            "settings":{
+                "foreground": "#460202",
+            }
+        },
+        // === AMINO ACIDS ===
+        {
+            "scope": "aaD", //Asp, Asparagine
+            "settings":{
+                "foreground": "#8FC88E",
+            }
+        },
+        {
+            "scope": "aaE", //Glu, Glutamic acid
+            "settings":{
+                "foreground": "#12b9cf",
+            }
+        },
+        {
+            "scope": "aaQ", //Gln, Glutamine
+            "settings":{
+                "foreground": "#00FF00",
+            }
+        },
+        {
+            "scope": "aaZ", //Glx: Gln or Glu
+            "settings":{
+                "foreground": "#80A0F0",
+            }
+        }, 
+        {
+            "scope": "aaF", //Phe, Phenylalanine
+            "settings":{
+                "foreground": "#80A0F0",
+            }
+        },
+        {
+            "scope": "aaH", //His, Histidine
+            "settings":{
+                "foreground": "#15A4A4",
+            }
+        },
+
+        {
+            "scope": "aaK", //Lys, Lysine
+            "settings":{
+                "foreground": "#91E69F",
+            }
+        }, 
+        {
+            "scope": "aaL", //Leu, Leucine
+            "settings":{
+                "foreground": "#91E69F",
+            }
+        },
+        {
+            "scope": "aaI", //Ile, Isoleucine
+            "settings":{
+                "foreground": "#80A0F0",    
+            }
+        }, 
+        {
+            "scope": "aaJ", //L or I
+            "settings":{
+                "foreground": "#91E69F",
+            }
+        },
+        {
+            "scope": "aaM", //Met, Methionine
+            "settings":{
+                "foreground": "#C048C0",
+            }
+        },
+        {
+            "scope": "aaP", //Pro, Proline
+            "settings":{
+                "foreground": "#FFFF00",
+            }
+        },
+        {
+            "scope": "aaS", //Ser, Serine
+            "settings":{
+                "foreground": "#15A4A4",
+            }
+        },
+        {
+            "scope": "aaT", //Thr, Threonine
+            "settings":{
+                "foreground": "#4192FF",
+            }
+        }, 
+        {
+            "scope": "aaV", //Val, Valine
+            "settings":{
+                "foreground": "#E69194",
+            }
+        }, 
+        {
+            "scope": "aaW", //Trp, Tryptophan
+            "settings":{
+                "foreground": "#91E69F",
+            }
+        },
+        {
+            "scope": "aaO", //Pyr, Pyrrolysine 
+            "settings":{
+                "foreground": "#80A0F0",
+            }
+        },
+        {
+            "scope": "aaB", //Asx: Asn or Asp
+            "settings":{
+                "foreground": "#E69194",
+            }
+        },
+        {
+            "scope": "aaX", //Any Amino Acid
+            "settings":{
+                "foreground": "#91E69F",
+            }
+        }, 
+     
+    ]
+}

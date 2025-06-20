@@ -1,0 +1,135 @@
+{
+    "patterns": [
+        {
+            "include": "#keywords"
+        }
+        
+    ],
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "scopeName": "source.fasta", 
+    "fileTypes": ["fasta", "fa"],
+    "name": "FASTA",
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "markup.heading.fasta", 
+                    "match": "^>.*"
+                },
+                {
+                    "name": "ntA", 
+                    "match": "[Aa]++"
+                }, 
+                {
+                    "name": "ntC", 
+                    "match": "[Cc]++"
+                },
+                {
+                    "name": "ntG", 
+                    "match": "[Gg]++"
+                }, 
+                {
+                    "name": "ntT", 
+                    "match": "[Tt]++"
+                }, 
+                {
+                    "name": "ntU", 
+                    "match": "[Uu]++"
+                }, 
+                {
+                    "name": "ntN", 
+                    "match": "[Nn]++"
+                }, 
+                {
+                    "name": "ntY", 
+                    "match": "[Yy]++"
+                }, 
+                {
+                    "name": "ntR", 
+                    "match": "[Rr]++"
+                }, 
+
+
+                {
+                    "name": "symGap", 
+                    "match": "[-]"
+                },
+                {
+                    "name": "symStop", 
+                    "match": "[*@.]"
+                },
+
+
+                {
+                    "name": "aaB", 
+                    "match": "[Bb]++"
+                }, 
+                {
+                    "name": "aaD", 
+                    "match": "[Dd]++"
+                }, 
+                {
+                    "name": "aaE", 
+                    "match": "[Ee]++"
+                }, 
+                {
+                    "name": "aaF", 
+                    "match": "[Ff]++"
+                }, 
+                {
+                    "name": "aaH", 
+                    "match": "[Hh]++"
+                },
+                {
+                    "name": "aaI", 
+                    "match": "[Ii]++"
+                }, 
+                {
+                    "name": "aaJ", 
+                    "match": "[Jj]++"
+                },
+                {
+                    "name": "aaK", 
+                    "match": "[Kk]++"
+                },
+                {
+                    "name": "aaM", 
+                    "match": "[Mm]++"
+                }, 
+                {
+                    "name": "aaO", 
+                    "match": "[Oo]++"
+                },
+                {
+                    "name": "aaP", 
+                    "match": "[Pp]++"
+                }, 
+                {
+                    "name": "aaQ", 
+                    "match": "[Qq]++"
+                }, 
+                {
+                    "name": "aaS", 
+                    "match": "[Ss]++"
+                }, 
+                {
+                    "name": "aaV", 
+                    "match": "[Vv]++"
+                },
+                {
+                    "name": "aaW", 
+                    "match": "[Ww]++"
+                },
+                {
+                    "name": "aaX", 
+                    "match": "[Xx]++"
+                },
+                {
+                    "name": "aaZ", 
+                    "match": "[Zz]++"
+                }
+            ]
+        }
+
+    }
+}
