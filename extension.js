@@ -14,10 +14,12 @@ async function deactivate() {
     const config = vscode.workspace.getConfiguration();
     const current = config.get("editor.tokenColorCustomizations") || {};
 
-    const cleanedRules = (current.textMateRules || []).filter(rule =>  !rule.comment || !rule.comment.startsWith("bio-syntax-colorer")
-
-        return !rule.scope.startsWith("source.fasta.aa");
-    });
+    const cleanedRules = Array.isArray(current.textMateRules)
+    ? current.textMateRules.filter(rule => {
+        const comment = rule.comment || "";
+        return !comment.startsWith("bio-syntax-colorer@");
+      })
+    : [];
 
     const newConfig = {
         ...current,
