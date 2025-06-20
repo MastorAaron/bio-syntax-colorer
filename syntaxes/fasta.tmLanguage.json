@@ -97,6 +97,10 @@
                     "match": "[Kk]+"
                 },
                 {
+                    "name": "source.fasta.aaL", 
+                    "match": "[Ll]+"
+                }, 
+                {
                     "name": "source.fasta.aaM", 
                     "match": "[Mm]+"
                 }, 

@@ -1,11 +1,9 @@
-
-
 {
     "name": "bio-syntax-colorer",
     "displayName": "Minimal Biosyntax Colorer",
     "description": "Custom overlay inspired by BioSyntax Entension, however made in current VSC and not version 1 so there aren't global issues",
     "publisher": "The A177",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer",
@@ -16,23 +14,29 @@
     },
     "engines": {
         "vscode": "^1.85.0"
-        },
+    },
     "contributes": {
         "languages": [
             {
-                "id":"fasta",
-                "aliases":["FASTA"],
-                "extensions":[".fastq",".fasta",".fa"],
-                "configuration":"./language-configuration.json"
+                "id": "fasta",
+                "aliases": [
+                    "FASTA"
+                ],
+                "extensions": [
+                    ".fastq",
+                    ".fasta",
+                    ".fa"
+                ],
+                "configuration": "./language-configuration.json"
             }
         ],
         "grammars": [
             {
-                "language":"fasta",
-                "scopeName":"source.fasta",
-                "path":"./syntaxes/fasta.tmLanguage.json"
+                "language": "fasta",
+                "scopeName": "source.fasta",
+                "path": "./syntaxes/fasta.tmLanguage.json"
             }
-        ],  
+        ],
         "themes": [
             {
                 "label": "BioSyntax Overlay",
