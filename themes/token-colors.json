@@ -65,7 +65,8 @@
             "name": "Tyrosine OR Pyrimidine", 
             "scope": "source.fasta.ntY", 
             "settings": {
-                "foreground": "#FFC878"
+                "foreground": "#5A5A5A"
+                // "foreground": "#FFC878"
             }
         },  
         {
