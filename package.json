@@ -5,7 +5,7 @@
     "displayName": "Minimal Biosyntax Colorer",
     "description": "Custom overlay inspired by BioSyntax Entension, however made in current VSC and not version 1 so there aren't global issues",
     "publisher": "The A177",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer",
