@@ -7,7 +7,7 @@
     ],
     "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
     "scopeName": "source.fasta", 
-    "fileTypes": ["fasta", "fa"],
+    "fileTypes": ["fasta","fastq", "fa"],
     "name": "FASTA",
     "repository": {
         "keywords": {
