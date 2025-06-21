@@ -55,5 +55,17 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false
+  "C_Cpp_Runner.msvcSecureNoWarnings": false,
+  "bioNotation.enabled": false,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "source.fasta.ntG",
+        "settings": {
+          "foreground": "#00FF00"
+        }
+      }
+    ]
+  },
+  "editor.autoClosingQuotes": "always"
 }

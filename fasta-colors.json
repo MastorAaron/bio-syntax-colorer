@@ -72,13 +72,15 @@
                 "foreground": "#FF0000"
             }
         }, 
-        {
+        {   
+            "name": "Gap or Minus Sign", 
             "scope": "source.fasta.symGap", 
             "settings":{
                 "foreground": "#474747"
             }
         },
-        {
+        {   
+            "name": "Stop Codon", 
             "scope": "source.fasta.symStop", 
             "settings":{
                 "foreground": "#474747"
