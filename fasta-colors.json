@@ -1,7 +1,5 @@
 {
-    "$schema": "vscode://schemas/color-theme",
-    "type":"dark",
-    "tokenColors":[
+    "tokenColors": [
         {
             "name": "FASTA Header",
             "scope":"fasta.title",
@@ -57,7 +55,6 @@
             "name": "Any Nuke", 
             "scope": "source.fasta.ntN", 
             "settings": {
-                // "foreground": "#E6DB74"
                 "foreground": "#D8D6D6"
             }
         },  
@@ -66,7 +63,6 @@
             "scope": "source.fasta.ntY", 
             "settings": {
                 "foreground": "#5A5A5A"
-                // "foreground": "#FFC878"
             }
         },  
         {

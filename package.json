@@ -1,13 +1,25 @@
 {
-    "name": "bio-syntax-colorer",
-    "displayName": "Minimal Biosyntax Colorer",
-    "description": "Custom overlay inspired by BioSyntax Entension, however made in current VSC and not version 1 so there aren't global issues",
+    "name": "bio-colorer",
+    "displayName": "Colored BioNotation",
+    "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.11",
+    "version": "0.0.17",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
     },
+    "files": [
+        "extension.js",
+        "patch.js",
+        "fasta.tmLanguage.json",
+        "fasta-colors.json",
+        "syntaxes/language-configuration.json"
+    ],
+    "exclude": [
+        ".vscode/",
+        ".git/",
+        "README.md"
+    ],
     "main": "./extension.js",
     "activationEvents": [
         "onLanguage:fasta"
@@ -19,7 +31,7 @@
         "languages": [
             {
                 "id": "fasta",
-                "aliases": ["FASTA"],
+                "aliases": ["FASTA","fasta"],
                 "extensions": [
                     ".fastq",
                     ".fasta",
