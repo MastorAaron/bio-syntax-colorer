@@ -36,13 +36,6 @@
                 "scopeName": "source.fasta",
                 "path": "./syntaxes/fasta.tmLanguage.json"
             }
-        ],
-        "themes": [
-            {
-                "label": "BioSyntax Overlay",
-                "uiTheme": "vs-dark",
-                "path": "./themes/token-colors.json"
-            }
         ]
     }
 }
