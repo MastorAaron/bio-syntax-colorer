@@ -32,6 +32,30 @@ async function patchTokenColors(context) {
     }
 }
 
+async function removeTokenColors() { 
+    const config = vscode.workspace.getConfiguration();
+    const current = config.get("editor.tokenColorCustomizations") || {};
+
+    const cleanedRules = Array.isArray(current.textMateRules)
+    ? current.textMateRules.filter(rule => {
+        const comment = rule.comment || "";
+        return !comment.startsWith("bio-colorer@");
+      })
+    : [];
+
+    if (current.textMateRules && cleanedRules.length === current.textMateRules.length) {
+        return; // No bio-colorer rules to remove
+    }
+
+    const newConfig = {
+        ...current,
+        textMateRules: cleanedRules
+    };
+
+    await config.update("editor.tokenColorCustomizations", newConfig, vscode.ConfigurationTarget.Workspace);
+}
+
 module.exports = {
-    patchTokenColors
+    patchTokenColors,
+    removeTokenColors
 };
