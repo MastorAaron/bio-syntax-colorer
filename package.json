@@ -3,7 +3,7 @@
     "displayName": "Minimal Biosyntax Colorer",
     "description": "Custom overlay inspired by BioSyntax Entension, however made in current VSC and not version 1 so there aren't global issues",
     "publisher": "The A177",
-    "version": "0.0.9",
+    "version": "0.0.10",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer",
@@ -35,6 +35,13 @@
                 "language": "fasta",
                 "scopeName": "source.fasta",
                 "path": "./syntaxes/fasta.tmLanguage.json"
+            }
+        ],
+        "themes": [ //SubTheme 
+            {
+                "label": "FASTA BioSyntax",
+                "uiTheme": "vs-dark",
+                "path": "./fasta-colors.json"
             }
         ]
     }
