@@ -2,9 +2,10 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 const { version } = require("./package.json");
+const { version } = require("./package.json");
 
 function patchTokenColors(context) {
-    const tokenColorPath = path.join(context.extensionPath, "themes", "token-colors.json");
+    const tokenColorPath = path.join(context.extensionPath, "themes", "fasta-colors.json");
 
     try {
         const data = JSON.parse(fs.readFileSync(tokenColorPath, "utf8"));
