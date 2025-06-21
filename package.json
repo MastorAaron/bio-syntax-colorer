@@ -6,12 +6,12 @@
     "version": "0.0.10",
     "repository": {
         "type": "git",
-        "url": "https://github.com/MastorAaron/bio-syntax-colorer",
-        "main": "./extension.js",
-        "activationEvents": [
-            "*"
-        ]
+        "url": "https://github.com/MastorAaron/bio-syntax-colorer"
     },
+    "main": "./extension.js",
+    "activationEvents": [
+        "onLanguage:fasta"
+    ],
     "engines": {
         "vscode": "^1.85.0"
     },
@@ -19,9 +19,7 @@
         "languages": [
             {
                 "id": "fasta",
-                "aliases": [
-                    "FASTA"
-                ],
+                "aliases": ["FASTA"],
                 "extensions": [
                     ".fastq",
                     ".fasta",
@@ -37,7 +35,7 @@
                 "path": "./syntaxes/fasta.tmLanguage.json"
             }
         ],
-        "themes": [ //SubTheme 
+        "themes": [
             {
                 "label": "FASTA BioSyntax",
                 "uiTheme": "vs-dark",
