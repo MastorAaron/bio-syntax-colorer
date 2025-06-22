@@ -1,14 +1,12 @@
 const vscode = require("vscode");
 const { patchTokenColors, removeTokenColors } = require("./patch");
 
-
-
 async function updateEnabledFlag(value){   
     await vscode.workspace.getConfiguration().update("bioNotation.enabled", value, vscode.ConfigurationTarget.Workspace);
 }
 
 async function applyBioNotation(context){
-    await removeTokenColors(); // always clean first
+    // await removeTokenColors(); // always clean first
     await patchTokenColors(context);
     await updateEnabledFlag(true);
     vscode.window.showInformationMessage("BioNotation colors applied.");
@@ -40,25 +38,47 @@ function DefineCommands(context){
     const toggleCommand = vscode.commands.registerCommand(
         "bioNotation.toggleColors", async () => {
             await toggleBioNotation(context);
+            console.log("BioNotation Toggled.");
         }
     );
     
     const clearCommand = vscode.commands.registerCommand(
         "bioNotation.clearColors", async () => {
-            await clearBioNotation(context); // not toggle
+            await clearBioNotation(context); 
             console.log("BioNotation forcibly cleared.");
         }
     );
-    context.subscriptions.push(toggleCommand, clearCommand);
+    
+    const applyCommand = vscode.commands.registerCommand(
+        "bioNotation.applyColors", async () => {
+            await applyBioNotation(context); 
+            console.log("BioNotation forcibly applied.");
+        }
+    );
+    context.subscriptions.push(toggleCommand, clearCommand, applyCommand);
 }
 
 async function activate(context){
     DefineCommands(context);
 
-    await patchTokenColors(context);
-    console.log("BioNotation colors auto-applied on activation.");
-
+    if(await isActive()){ 
+        // toggleBioNotation(context);
+        await patchTokenColors(context); // Only apply if enabled
+        console.log("BioNotation colors auto-applied on activation.");
+    }
 }
+
+async function deactivate() {
+    // toggleBioNotation(context);
+    await removeTokenColors(); // Always remove
+    await updateEnabledFlag(false); // Clear flag
+    console.log("BioNotation colors removed on deactivation.");
+}
+
+module.exports = {
+    activate,
+    deactivate
+};
 
 // async function activate(context){
     // const toggleCommand = vscode.commands.registerCommand("bioNotation.toggleColors", async () =>{
@@ -88,14 +108,3 @@ async function activate(context){
     //     console.log("BioNotation colors auto-applied on activation.");
     // }
 // }
-
-async function deactivate() {
-    await removeTokenColors();
-    await updateEnabledFlag(false);
-    console.log("BioNotation colors removed on deactivation.");
-}
-
-module.exports = {
-    activate,
-    deactivate
-};
