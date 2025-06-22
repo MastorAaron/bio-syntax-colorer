@@ -45,36 +45,46 @@ const { version } = require("./package.json");
 //     }
 // }
 
-function tagRules(data){
-    return data.tokenColors.map(rule => ({
+function mappingRule(rule){
+    return{
         ...rule,
-        name: rule.name?.startsWith("bio-colorer@")
-            ? rule.name
-            : `bio-colorer@${version}: ${rule.name || "unnamed"}`
-    }));
+        name: rule.name?.startsWith("bio-colorer@")?
+        rule.name:
+        `bio-colorer@${version}: ${rule.name || "unnamed"}`
+    }
 }
 
-function loadRules(context){
-    const colorPath = path.join(context.extensionPath, "fasta-colors.json")
-    const data = JSON.parse(fs.readFileSync(colorPath, "utf8"));
+function isAlreadyTagged(rule){
+    const name = rule.name;
+    return typeof name === "string" && name.startsWith("bio-colorer@");
+}
 
-    return tagRules(data)
+function isScoped(rule){
+    const scope = rule.scope || "";
+    return typeof scope === "string" && scope.startsWith("source.fasta.");
+}
+
+function tagColorsGenRules(colors){
+    return colors.tokenColors.map(rule =>{
+        return isAlreadyTagged(rule)? rule : mappingRule(rule);
+        }
+    );
+}
+
+function loadColors(context){
+    const colorPath = path.join(context.extensionPath, "fasta-colors.json")
+    const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
+
+    return colors
 }
 
 function mergeRules(newRules){
-    const config = vscode.workspace.getConfiguration("editor");
-    const customization = config.get("tokenColorCustomizations") || {};
+    const customization = currCustomization(editorConfig());
 
     const existing = customization.textMateRules || [];
+    // Keep rules that aren't from source.fasta.* OR are clearly tagged by this extension
     const filtered = existing.filter(rule => {
-        // Keep rules that aren't from source.fasta.* OR are clearly tagged by this extension
-            const scope = rule.scope || "";
-            const name = rule.name || "";
-
-            const isFastaScope = typeof scope === "string" && scope.startsWith("source.fasta.");
-            const isTagged = name.startsWith("bio-colorer@");
-
-            return !isFastaScope || isTagged
+            return !isScoped(rule) || isAlreadyTagged(rule);
         }
     );
     return {
@@ -84,28 +94,15 @@ function mergeRules(newRules){
 }
 
 async function applyCustomTokens(customization){
-    await vscode.workspace.getConfiguration("editor").update(
+    await editorConfig().update(
         "tokenColorCustomizations",
         customization,
         vscode.ConfigurationTarget.Global
     );
 }
 
-async function patchTokenColors(context){
-    try{
-        const rules = loadRules(context);
-        const updatedRules = mergeRules(rules);
-
-        await applyCustomTokens(updatedRules);
-        console.log("BioNotation patch applied.");
-    }catch(err){
-        console.error("Failed to apply BioNotation patch: ", err)
-    }
-    
-}
-
-function containsTag(cate){
-    return typeof cate === "string" && /^bio(-syntax)?-colorer@/.test(cate)  
+function containsTag(category){
+    return typeof category === "string" && /^bio(-syntax)?-colorer@/.test(category)  
     // return comment.startsWith("bio-colorer@") || comment.startsWith("bio-syntax-colorer@");
     // return /^bio(-syntax)?-colorer@/.test(name || ""); 
 
@@ -129,29 +126,49 @@ function isManualG(rule) {
   return rule.scope === "source.fasta.ntG" && !rule.name;
 }
 
+function editorConfig(){
+    return vscode.workspace.getConfiguration("editor");
+}
+
+function currCustomization(config){
+    return config.get("editor.tokenColorCustomizations") || {};
+}
+
 async function removeTokenColors() { 
-    const config = vscode.workspace.getConfiguration();
-    const current = config.get("editor.tokenColorCustomizations") 
-    || {};
+    const config = editorConfig();
+    const customization = currCustomization(config);
 
     const textMateRules = 
-        Array.isArray(current.textMateRules)? 
-        current.textMateRules : [];
-    const cleanedRules = textMateRules.filter(
-        rule => !containsLegacyTag(rule) && !isManualG(rule)
-    );
+        Array.isArray(customization.textMateRules)? 
+        customization.textMateRules : [];
+        const cleanedRules = textMateRules.filter(
+            rule => !containsLegacyTag(rule) && !isManualG(rule)
+        );
 
-    if(cleanedRules.length === current.textMateRules.length) return; // No bio-colorer rules to remove
+    if(cleanedRules.length === customization.textMateRules.length) return; // No bio-colorer rules to remove
 
     const newConfig = {
-        ...current,
+        ...customization,
         textMateRules: cleanedRules
     };
 
-    await config.update("editor.tokenColorCustomizations", newConfig, vscode.ConfigurationTarget.Global);
     await config.update("editor.tokenColorCustomizations", newConfig, vscode.ConfigurationTarget.Workspace);
-    // await patchTokenColors(context); // <- Must be here
+    await config.update("editor.tokenColorCustomizations", newConfig, vscode.ConfigurationTarget.Global);
 }
+
+async function patchTokenColors(context){
+    try{
+        let rules = loadColors(context);
+        let taggedRules = tagColorsGenRules(rules)
+        const updatedRules = mergeRules(taggedRules);
+
+        await applyCustomTokens(updatedRules);
+        console.log("BioNotation patch applied.");
+    }catch(err){
+        console.error("Failed to apply BioNotation patch: ", err)
+    }
+}
+
 
 module.exports = {
     patchTokenColors,
