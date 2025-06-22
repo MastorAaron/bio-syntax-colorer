@@ -3,7 +3,7 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.37",
+    "version": "0.0.45",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
@@ -40,7 +40,7 @@
             "properties": {
                 "bioNotation.enabled": {
                 "type": "boolean",
-                "default": true,
+                "default": false,
                 "description": "Controls whether BioNotation Syntax colors are applied."
                 }
             }
