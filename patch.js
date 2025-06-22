@@ -26,7 +26,7 @@ function editorConfig(){
 }
 
 function currCustomization(config){
-    return config.get("editor.tokenColorCustomizations") || {};
+    return config.get("tokenColorCustomizations") || {};
 }
 
 function isScoped(rule){
@@ -70,11 +70,11 @@ function mergeRules(newRules){
 }
 
 async function applyCustomTokens(customization){
-    const config = globalConfig();
+    const config = editorConfig();
 
     console.log("Writing customization to editor.tokenColorCustomizations:",  customization);
     await config.update(
-        "editor.tokenColorCustomizations", 
+        "tokenColorCustomizations", 
         customization,
         vscode.ConfigurationTarget.Workspace
     );
