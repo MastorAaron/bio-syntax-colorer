@@ -93,13 +93,31 @@ function mergeRules(newRules){
     };
 }
 
+
 async function applyCustomTokens(customization){
-    await editorConfig().update(
+    const config = editorConfig();
+    await config.update(
+        "tokenColorCustomizations",
+        customization,
+        vscode.ConfigurationTarget.Workspace
+    );
+    await config.update(
+        "bioNotation.enabled",
+        true,
+        vscode.ConfigurationTarget.Workspace
+    );
+    await config.update(
         "tokenColorCustomizations",
         customization,
         vscode.ConfigurationTarget.Global
     );
+    await config.update(
+        "bioNotation.enabled",
+        true,
+        vscode.ConfigurationTarget.Global
+    );
 }
+
 
 function containsTag(category){
     return typeof category === "string" && /^bio(-syntax)?-colorer@/.test(category)  
@@ -139,12 +157,16 @@ async function removeTokenColors() {
     const customization = currCustomization(config);
 
     const textMateRules = 
-        Array.isArray(customization.textMateRules)? 
-        customization.textMateRules : [];
+        Array.isArray(customization.textMateRules)
+        ?customization.textMateRules 
+        :[];
+
         const cleanedRules = textMateRules.filter(
             rule => !containsLegacyTag(rule) && !isManualG(rule)
         );
 
+    // If no changes are needed, exit early
+    if(textMateRules.length === 0 || textMateRules.length === cleanedRules.length) return;
     if(cleanedRules.length === customization.textMateRules.length) return; // No bio-colorer rules to remove
 
     const newConfig = {
