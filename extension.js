@@ -75,9 +75,14 @@ async function deactivate() {
     console.log("BioNotation colors removed on deactivation.");
 }
 
+function isFastaFile(filename) {
+    return /\.(fa|fasta|fastq)$/i.test(filename);
+}
+
 module.exports = {
     activate,
-    deactivate
+    deactivate,
+    isFastaFile
 };
 
 // async function activate(context){

@@ -64,5 +64,17 @@
                 "path": "./syntaxes/fasta.tmLanguage.json"
             }
         ]
+    },
+    "scripts": {
+        "test": "jest"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0"
+    },
+    "jest": {
+        "moduleDirectories": [
+            "node_modules",
+            "__tests__/__mocks__"
+        ]
     }
 }
