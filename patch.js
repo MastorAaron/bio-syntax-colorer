@@ -101,16 +101,19 @@ async function applyCustomTokens(customization){
         customization,
         vscode.ConfigurationTarget.Workspace
     );
+
     await config.update(
         "bioNotation.enabled",
         true,
         vscode.ConfigurationTarget.Workspace
     );
+
     await config.update(
         "tokenColorCustomizations",
         customization,
         vscode.ConfigurationTarget.Global
     );
+    
     await config.update(
         "bioNotation.enabled",
         true,
