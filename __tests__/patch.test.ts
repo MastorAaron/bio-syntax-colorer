@@ -3,9 +3,9 @@ jest.mock('vscode');
 import { 
     isAlreadyTagged, globalConfig, editorConfig, 
    isObj, isNull, hasNameStr, hasSettings 
-}  from '../patch';
+}  from '../src/patch';
 
-import type { ColorRule } from '../patch';
+import type { ColorRule } from '../src/patch';
 
 const completeRule: ColorRule = {
     "name": "bio-colorer@0.0.45: FASTA Header",

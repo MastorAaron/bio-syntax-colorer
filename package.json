@@ -3,30 +3,31 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.45",
+    "version": "0.0.46",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
     },
-    "files": [
-        "extension.js",
-        "patch.js",
-        "fasta.tmLanguage.json",
-        "fasta-colors.json",
-        "syntaxes/language-configuration.json"
-    ],
+ 
     "exclude": [
         ".vscode/",
         ".git/",
         "README.md"
     ],
-    "main": "./extension.js",
-    "activationEvents": [
-        "onLanguage:fasta",
-        "onCommand:bioNotation.toggleColors"
+    "main": "./dist/extension.js",
+    "files": [
+        "dist/extension.js",
+        "dist/patch.js",
+        "fasta-colors.json",
+        "syntaxes/fasta.tmLanguage.json",
+        "language-configuration.json"
     ],
+        "activationEvents": [
+            "onLanguage:fasta",
+            "onCommand:bioNotation.toggleColors"
+        ],
     "engines": {
-        "vscode": "^1.85.0"
+        "vscode": "^1.101.0"
     },
     "contributes": {
         "commands": [
