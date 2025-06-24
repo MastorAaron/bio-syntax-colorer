@@ -1,6 +1,7 @@
 jest.mock('vscode', () => ({}));
 
 const { isFastaFile } = require('../extension');
+const { isAlreadyTagged } = require('../patch');
 
 describe('isFastaFile', () => {
     test('recognizes .fa files', () => {
@@ -16,3 +17,4 @@ describe('isFastaFile', () => {
         expect(isFastaFile('test.txt')).toBe(false);
     });
 });
+
