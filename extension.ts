@@ -1,26 +1,26 @@
-const vscode = require("vscode");
-const { patchTokenColors, removeTokenColors } = require("./patch");
+import * as vscode from "vscode";
+import { patchTokenColors, removeTokenColors } from "./patch";
 
-async function updateEnabledFlag(value){   
+export async function updateEnabledFlag(value : boolean): Promise<void> {   
     await vscode.workspace.getConfiguration().update("bioNotation.enabled", value, vscode.ConfigurationTarget.Workspace);
 }
 
-async function applyBioNotation(context){
+export async function applyBioNotation(context: { extensionPath: string }): Promise<void> {
     // await removeTokenColors(); // always clean first
     await patchTokenColors(context);
     await updateEnabledFlag(true);
     vscode.window.showInformationMessage("BioNotation colors applied.");
 }
 
-async function clearBioNotation(context){
-    await removeTokenColors(context);
+export async function clearBioNotation(){
+    await removeTokenColors();
     await updateEnabledFlag(false);
     vscode.window.showInformationMessage("BioNotation colors cleared.");
 }
 
-async function toggleBioNotation(context){
+export async function toggleBioNotation(context: { extensionPath: string }): Promise<void> {
     if(await isActive()){
-        await clearBioNotation(context);
+        await clearBioNotation();
         console.log("BioNotation deactivated via toggle.");
     }else{
         await applyBioNotation(context);
@@ -28,13 +28,13 @@ async function toggleBioNotation(context){
     }
 }
 
-async function isActive(){
+export async function isActive(): Promise<boolean> {
     const config = vscode.workspace.getConfiguration();
     return config.get("bioNotation.enabled") === true; 
     // Only treat *true* as active
 }
 
-function DefineCommands(context){
+export function DefineCommands(context: vscode.ExtensionContext): void {
     const toggleCommand = vscode.commands.registerCommand(
         "bioNotation.toggleColors", async () => {
             await toggleBioNotation(context);
@@ -44,7 +44,7 @@ function DefineCommands(context){
     
     const clearCommand = vscode.commands.registerCommand(
         "bioNotation.clearColors", async () => {
-            await clearBioNotation(context); 
+            await clearBioNotation(); 
             console.log("BioNotation forcibly cleared.");
         }
     );
@@ -58,7 +58,7 @@ function DefineCommands(context){
     context.subscriptions.push(toggleCommand, clearCommand, applyCommand);
 }
 
-async function activate(context){
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     DefineCommands(context);
 
     if(await isActive()){ 
@@ -68,24 +68,24 @@ async function activate(context){
     }
 }
 
-async function deactivate() {
+export async function deactivate(): Promise<void> {
     // toggleBioNotation(context);
     await removeTokenColors(); // Always remove
     await updateEnabledFlag(false); // Clear flag
     console.log("BioNotation colors removed on deactivation.");
 }
 
-function isFastaFile(filename) {
+export function isFastaFile(filename: string): boolean {
     return /\.(fa|fasta|fastq)$/i.test(filename);
 }
 
-module.exports = {
-    activate,
-    deactivate,
-    isFastaFile
-};
+// module.exports = {
+//     activate,
+//     deactivate,
+//     isFastaFile
+// };
 
-// async function activate(context){
+// export async function activate(context){
     // const toggleCommand = vscode.commands.registerCommand("bioNotation.toggleColors", async () =>{
     //     const config = vscode.workspace.getConfiguration();
     //     if(await isActive()){

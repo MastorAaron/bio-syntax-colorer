@@ -1,0 +1,35 @@
+
+Recap Please:
+    1. Recap the current state of your code or context every few turns, so I don’t lose track of what’s working and what’s not.
+    Every few turns, remind me what’s currently working and what’s broken so I stay aligned with your progress.
+
+Bundle related changes:
+    2. Bundle related changes together into a single request or diff, rather than one‐line tweaks spread across multiple messages.
+    Group related tweaks into one request or diff instead of scattering one-line fixes across messages.
+
+Root Cause 1st if possible:    
+    3. Highlight the root problem or error you’re seeing, rather than symptoms, so I can address the underlying issue directly.
+    Tell me the underlying error or issue you’re seeing—don’t just describe the symptoms.
+
+Concise ex.s of bugs or intended behavior:
+    4. Share concise, focused code snippets or screenshots illustrating the exact behavior you want or the bug you encounter.
+
+Suggest style preferences upfront:    
+    Keep helper functions
+    current Naming
+    5. Point out your naming and style preferences up front, and note any constraints (e.g., 'keep existing helper names').
+
+Clear labels of files:    
+    6. Use clear labels when you swap in new file versions (e.g., 'here’s the updated patch.js'), to avoid ambiguity.
+
+Show what did work:
+    7. When something works, share the final output or screenshot so I can verify and suggest potential refinements.
+
+Call out bad behavior
+    8. Feel free to call out if my suggestions aren’t aligning with your workflow or preferred style—feedback speeds course‐correction.
+
+Ask for summaries:
+    9. Ask for summaries or next‐step lists to keep the high‐level roadmap clear when we tackle larger feature sets.
+
+Specify Generate vs Suggest:
+    10. Indicate which parts you’d like me to generate (e.g., drafts, scaffolds, JSON manifests) versus what you’ll implement yourself.
