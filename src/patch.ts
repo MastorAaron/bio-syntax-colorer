@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
-import { version } from "./package.json";
+import { version } from "../package.json";
 
 export interface ColorRule {
     name: string;      //optional Name
