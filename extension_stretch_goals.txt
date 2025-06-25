@@ -21,3 +21,12 @@ Optional Rich UI (Webview) for batch editing:
   • Build a Webview Panel with HTML/CSS/JS
   • Render table of scopes and color pickers
   • Post messages back to extension to save/apply changes
+
+  Refactor into a Class:
+    class BioColorer {
+      constructor(private context: vscode.ExtensionContext) {}
+
+      loadColors(filename: string) {
+          const colorPath = path.join(this.context.extensionPath, filename);
+      }
+  }
