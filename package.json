@@ -3,7 +3,7 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.46",
+    "version": "0.0.47",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
@@ -72,7 +72,9 @@
     "scripts": {
         "test": "jest",
         "test:watch": "jest --watchAll",
-        "tsc": "tsc --noEmit"
+        "tsc": "tsc",
+        "build": "tsc -p tsconfig.build.json",
+        "package": "tsc -p tsconfig.build.json && npx vsce package"
     },
     "devDependencies": {
         "@types/jest": "^30.0.0",

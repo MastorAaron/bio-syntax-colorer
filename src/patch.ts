@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { version } from "../package.json";
 
+const DEFAULT_PALETTE = "fasta-colors.json";
 export interface ColorRule {
     name: string;      //optional Name
     scope: string;     //optional Scope
@@ -66,9 +67,14 @@ interface TokenCustomization {
     [key: string]: unknown;
 }
 
+export function vscCOUT(outStr: string): void {
+    vscode.window.showInformationMessage(outStr);
+}
+
 export function globalConfig(): vscode.WorkspaceConfiguration{
     return vscode.workspace.getConfiguration() || {};
 }
+
 export function editorConfig(): vscode.WorkspaceConfiguration{
     return vscode.workspace.getConfiguration("editor") || {};
 }
@@ -86,15 +92,23 @@ export function tagColorsGenRules(colors: ColorRule[]): ColorRule[]{
     const tagged = colors.map(rule =>
         isAlreadyTagged(rule)? rule : mappingRule(rule)
     );
-    console.log(`Tagged rules: ${tagged}`);   
+    vscCOUT(`Tagged rules: ${tagged}`);   
     return tagged;     
 }
 
-export function loadColors(context: { extensionPath: string }): ColorRule[]{
-    const colorPath = path.join(context.extensionPath, "fasta-colors.json")
+export function loadColors(context: { extensionPath: string }, filename = DEFAULT_PALETTE): ColorRule[]{
+    const colorPath = path.isAbsolute(filename)
+    ? filename
+    : path.join(context.extensionPath, filename);
+
+    // path.join(context.extensionPath, "fasta-colors.json")
+    if (!fs.existsSync(colorPath)) {
+        throw new Error(`Color file not found: ${colorPath}`);
+    }
     const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
     
-    console.log(`Loaded colors: ${colors.tokenColors}`);
+    vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
+    vscCOUT(`Loaded colors: ${colors.tokenColors}`);
     return colors.tokenColors
 }
 
@@ -110,7 +124,7 @@ export function mergeRules(newRules : Array<ColorRule>){
         // not !isScoped(rule) || 
         !isAlreadyTagged(rule)
     );
-    // console.log("Final rules to apply:", updatedRules);
+    // vscCOUT("Final rules to apply:", updatedRules);
     return {
         ...customization,
         textMateRules: filtered.concat(newRules)
@@ -120,13 +134,13 @@ export function mergeRules(newRules : Array<ColorRule>){
 export async function applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
     const config = editorConfig();
 
-    console.log(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
+    vscCOUT(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
     await config.update(
         "tokenColorCustomizations", 
         customization,
         vscode.ConfigurationTarget.Workspace
     );
-    console.log("Custom token colors applied.");
+    vscCOUT("Custom token colors applied.");
 }
 
 export function containsTag(category : ColorRule | string): boolean {
@@ -144,14 +158,14 @@ export function isManualG(rule : ColorRule): boolean {
     return rule.scope === "source.fasta.ntG" && !rule.name;
 }
 
-export async function patchTokenColors(context: { extensionPath: string }): Promise<void> {
+export async function patchTokenColors(context: { extensionPath: string }, fileName : string= DEFAULT_PALETTE): Promise<void> {
     try{
-        let rules    = loadColors(context);
+        let rules    = loadColors(context,fileName);
         let tagged   = tagColorsGenRules(rules)
         const merged = mergeRules(tagged);
         
         await applyCustomTokens(merged);
-        console.log("BioNotation patch applied.");
+        vscCOUT("BioNotation patch applied.");
     }catch(err){
         console.error(`Failed to apply BioNotation patch: ${err}`)
     }
