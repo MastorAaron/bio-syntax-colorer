@@ -86,7 +86,7 @@ export function tagColorsGenRules(colors: ColorRule[]): ColorRule[]{
     const tagged = colors.map(rule =>
         isAlreadyTagged(rule)? rule : mappingRule(rule)
     );
-    console.log("Tagged rules:", tagged);   
+    console.log(`Tagged rules: ${tagged}`);   
     return tagged;     
 }
 
@@ -94,7 +94,7 @@ export function loadColors(context: { extensionPath: string }): ColorRule[]{
     const colorPath = path.join(context.extensionPath, "fasta-colors.json")
     const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
     
-    console.log("Loaded colors:", colors.tokenColors);
+    console.log(`Loaded colors: ${colors.tokenColors}`);
     return colors.tokenColors
 }
 
@@ -120,7 +120,7 @@ export function mergeRules(newRules : Array<ColorRule>){
 export async function applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
     const config = editorConfig();
 
-    console.log("Writing customization to editor.tokenColorCustomizations:",  customization);
+    console.log(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
     await config.update(
         "tokenColorCustomizations", 
         customization,
@@ -128,33 +128,6 @@ export async function applyCustomTokens(customization: Record<string,unknown>): 
     );
     console.log("Custom token colors applied.");
 }
-    // const payload = {
-        //     textMateRules: customization.textMateRules || []
-        // };
-    // try{
-    //     await config.update(
-    //         "tokenColorCustomizations",
-    //         payload,
-    //         vscode.ConfigurationTarget.Workspace
-    //     );
-    //     console.log("Custom token colors applied.");
-    // }catch(err){
-    //     console.error("Failed to update config:", err);
-    // }
-
-    // await config.update(
-    //     "tokenColorCustomizations",
-    //     customization,
-    //     vscode.ConfigurationTarget.Global
-    // );
-    
-    // await config.update(
-        //     "bioNotation.enabled",
-    //     true,
-    //     vscode.ConfigurationTarget.Global
-    // );
-// }
-
 
 export function containsTag(category : ColorRule | string): boolean {
     return typeof category === "string" && /^bio(-syntax)?-colorer@/.test(category)  
@@ -180,7 +153,7 @@ export async function patchTokenColors(context: { extensionPath: string }): Prom
         await applyCustomTokens(merged);
         console.log("BioNotation patch applied.");
     }catch(err){
-        console.error("Failed to apply BioNotation patch: ", err)
+        console.error(`Failed to apply BioNotation patch: ${err}`)
     }
 }
 
@@ -207,57 +180,8 @@ export async function removeTokenColors(): Promise<void> {
     };
 
     await config.update(
-        "editor.tokenColorCustomizations",
+        "tokenColorCustomizations",
         newConfig,
         vscode.ConfigurationTarget.Workspace
     );
 }
-
-// module.exports = {
-//     patchTokenColors,
-//     removeTokenColors,
-//     isAlreadyTagged
-// };
-
-// module.exports = exports;
-
-// async function patchTokenColors(context) {
-//     const colorPath = path.join(context.extensionPath, "fasta-colors.json");
-
-//     try {
-//         const data = JSON.parse(fs.readFileSync(colorPath, "utf8"));
-//         let rules = data.tokenColors;
-
-//         // Inject version comment into each rule
-//         rules = rules.map(rule => ({
-//             ...rule,
-//             name: rule.name?.startsWith("bio-colorer@") 
-//                 ? rule.name 
-//                 : `bio-colorer@${version}: ${rule.name || "unnamed"}`
-//         }))
-
-//         //mergeWithFilteredExistingRules
-//         const config = vscode.workspace.getConfiguration("editor");
-//         const customization = vscode.workspace.getConfiguration("editor").get("tokenColorCustomizations") || {};
-//         customization.textMateRules = (customization.textMateRules || []).filter(rule => {
-//         // Keep rules that aren't from source.fasta.* OR are clearly tagged by this extension
-//             const scope = rule.scope || "";
-//             const name = rule.name || "";
-
-//             const isFastaScope = typeof scope === "string" && scope.startsWith("source.fasta.");
-//             const isTagged = name.startsWith("bio-colorer@");
-
-//             return !isFastaScope || isTagged;
-//         }).concat(rules);
-
-//             await vscode.workspace.getConfiguration().update(
-//             "editor.tokenColorCustomizations", //Wrong
-//             customization,
-//             vscode.ConfigurationTarget.Global
-//         );
-        
-//         console.log("BioNotation patch applied.");
-//     }catch(err){
-//         console.error("Failed to apply BioNotation patch: ", err)
-//     }
-// }
