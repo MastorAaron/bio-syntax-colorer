@@ -34,6 +34,10 @@
             {
                 "command": "bioNotation.toggleColors",
                 "title": "Toggle BioNotation Colors"
+            },
+            {
+                "command": "bioNotation.selectPalette",
+                "title": "Select BioNotation Color Palette"
             }
         ],
         "configuration": {
