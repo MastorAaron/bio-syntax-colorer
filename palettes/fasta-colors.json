@@ -1,4 +1,3 @@
-"$schema": "vscode://schemas/color-theme",
 {
     "name": "Default: Warm Palette Colors",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",

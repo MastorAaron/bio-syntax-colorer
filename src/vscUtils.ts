@@ -8,7 +8,8 @@ interface TokenCustomization {
 }
 
 export namespace vscUtils{
-    export function vscCOUT(outStr: string): void {
+    export function vscCOUT(out: unknown): void {
+        const outStr = typeof out === "string" ? out : JSON.stringify(out, null, 2);
         vscode.window.showInformationMessage(outStr);
     }
     
