@@ -14,11 +14,6 @@ export class PatchColors{
     private globalConfig = vscUtils.globalConfig;
     private editorConfig = vscUtils.editorConfig;
     private currCustomization = vscUtils.currCustomization;
-    private isScoped = vscUtils.isScoped;
-    
-    private isAlreadyTagged = boolUtils.isAlreadyTagged;
-    private isValidRule = boolUtils.isValidRule;
-    private isValidColor = boolUtils.isValidColor;
 
     constructor(private context: vscode.ExtensionContext) {
         this.vscCOUT(`PatchColors initialized with context: {this.context.extensionPath}`);
@@ -34,20 +29,17 @@ export class PatchColors{
     }
 
     public tagColorsGenRules(colors: def.ColorRule[]): def.ColorRule[]{
-        const { isAlreadyTagged, mappingRule, vscCOUT } = this;
-        
         const tagged = colors.map(rule =>
-            isAlreadyTagged(rule)? rule : mappingRule(rule)
+            boolUtils.isAlreadyTagged(rule)? rule : this.mappingRule(rule)
         );
         this.vscCOUT(`Tagged rules: ${tagged}`);   
         return tagged;     
     }
 
     public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
-        const { vscCOUT, context } = this; 
         const colorPath = path.isAbsolute(filename)
         ? filename
-        : path.join(context.extensionPath, "palettes", filename);
+        : path.join(this.context.extensionPath, "palettes", path.basename(filename));
     
         // path.join(context.extensionPath, "fasta-colors.json")
         if (!fs.existsSync(colorPath)) {
@@ -55,15 +47,14 @@ export class PatchColors{
         }
         const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
         
-        vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
-        vscCOUT(`Loaded colors: ${colors.tokenColors}`);
+        this.vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
+        this.vscCOUT(`Loaded colors: ${colors.tokenColors}`);
         return colors.tokenColors
     }
     
     public editColorRule(rule: def.ColorRule, newColor: string): def.ColorRule {
-        const { vscCOUT, isValidRule } = this; 
-        if (!isValidRule(rule)){ 
-            vscCOUT("Invalid rule provided for editing.");
+        if (!boolUtils.isValidRule(rule)){ 
+            this.vscCOUT("Invalid rule provided for editing.");
             return rule;
         }
         const updatedRule: def.ColorRule = {
@@ -78,15 +69,14 @@ export class PatchColors{
     }
    
     public toggleHighlight(rule: def.ColorRule){
-        const { isValidColor, isValidRule, vscCOUT } = this;
-        if (!isValidRule(rule)) {
-            vscCOUT("Invalid rule provided for toggling highlight.");
+        if (!boolUtils.isValidRule(rule)) {
+            this.vscCOUT("Invalid rule provided for toggling highlight.");
             return rule;
         }
         
         let currColor = rule.settings?.foreground || "#000000"; // Default to black if no color set
-        if (!isValidColor(currColor)) {
-            vscCOUT(`Invalid color: ${currColor}. Defaulting to red highlight.`);
+        if (!boolUtils.isValidColor(currColor)) {
+            this.vscCOUT(`Invalid color: ${currColor}. Defaulting to red highlight.`);
             currColor = "#FF0000"; // Default to red if current color is invalid
         }
     
@@ -100,13 +90,12 @@ export class PatchColors{
             }
         };
         
-        vscCOUT(`Toggled highlight for rule: ${updatedRule.name}`);
+        this.vscCOUT(`Toggled highlight for rule: ${updatedRule.name}`);
         return updatedRule;
     }
     
     private mergeRules(newRules : Array<def.ColorRule>){
-        const { isAlreadyTagged, currCustomization, globalConfig } = this;
-        const customization = currCustomization(globalConfig());
+        const customization = this.currCustomization(this.globalConfig());
         
         const existing = Array.isArray(customization.textMateRules)
         ? customization.textMateRules
@@ -115,7 +104,7 @@ export class PatchColors{
         const filtered = 
         existing.filter(rule  => 
             // not !isScoped(rule) || 
-            !isAlreadyTagged(rule)
+            !boolUtils.isAlreadyTagged(rule)
         );
         // vscCOUT("Final rules to apply:", updatedRules);
         return {
@@ -125,36 +114,33 @@ export class PatchColors{
     }
     
     private async applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
-        const { vscCOUT, editorConfig } = this;
-        const config = editorConfig();
+        const config = this.editorConfig();
         
-        vscCOUT(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
+        this.vscCOUT(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
         await config.update(
             "tokenColorCustomizations", 
             customization,
             vscode.ConfigurationTarget.Workspace
         );
-        vscCOUT("Custom token colors applied.");
+        this.vscCOUT("Custom token colors applied.");
     }
 
     public async patchTokenColors(fileName : string= DEFAULT_PALETTE): Promise<void> {
-        const { loadColors, tagColorsGenRules, mergeRules, applyCustomTokens, vscCOUT } = this; 
         try{
-            let rules    = loadColors(fileName);
-            let tagged   = tagColorsGenRules(rules)
-            const merged = mergeRules(tagged);
+            let rules    = this.loadColors(fileName);
+            let tagged   = this.tagColorsGenRules(rules)
+            const merged = this.mergeRules(tagged);
             
-            await applyCustomTokens(merged);
-            vscCOUT("BioNotation patch applied.");
+            await this.applyCustomTokens(merged);
+            this.vscCOUT("BioNotation patch applied.");
         }catch(err){
-            console.error(`Failed to apply BioNotation patch: ${err}`)
+            this.vscCOUT(`Failed to apply BioNotation patch: ${err}`)
         }
     }
     
     public async removeTokenColors(): Promise<void> { 
-        const { editorConfig, currCustomization, isAlreadyTagged } = this; 
-        const config = editorConfig();
-        const customization = currCustomization(config);
+        const config = this.editorConfig();
+        const customization = this.currCustomization(config);
         // const customization = config.get("editor.tokenColorCustomizations") || {};
         
         const rules = 
@@ -162,7 +148,7 @@ export class PatchColors{
             ?customization.textMateRules 
             :[];
         
-            const cleanedRules = rules.filter((rule: def.ColorRule) => !isAlreadyTagged(rule));
+            const cleanedRules = rules.filter((rule: def.ColorRule) => !boolUtils.isAlreadyTagged(rule));
             // not ! containsLegacyTag(rule) && !isManualG(rule)
             // not!rule.name?.startsWith("bio-colorer@")
         
