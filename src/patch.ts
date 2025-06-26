@@ -48,7 +48,7 @@ export class PatchColors{
         const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
         
         this.vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
-        this.vscCOUT(`Loaded colors: ${colors.tokenColors}`);
+        this.vscCOUT(colors.tokenColors);
         return colors.tokenColors
     }
     
