@@ -18,9 +18,9 @@
     "files": [
         "dist/extension.js",
         "dist/patch.js",
-        "fasta-colors.json",
-        "syntaxes/fasta.tmLanguage.json",
-        "language-configuration.json"
+        "src/palettes/fasta-colors.json",
+        "src/syntaxes/fasta.tmLanguage.json",
+        "src/syntaxes/language-configuration.json"
     ],
         "activationEvents": [
             "onLanguage:fasta",
@@ -62,23 +62,23 @@
                     ".fasta",
                     ".fa"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./src/syntaxes/language-configuration.json"
             }
         ],
         "grammars": [
             {
                 "language": "fasta",
                 "scopeName": "source.fasta",
-                "path": "./syntaxes/fasta.tmLanguage.json"
+                "path": "./src/syntaxes/fasta.tmLanguage.json"
             }
         ]
     },
     "scripts": {
         "test": "jest",
         "test:watch": "jest --watchAll",
-        "tsc": "tsc",
-        "build": "tsc -p tsconfig.build.json",
-        "package": "tsc -p tsconfig.build.json && npx vsce package"
+        "tsc":      "tsc -p configs/tsconfig.json",
+        "build":    "tsc -p configs/tsconfig.build.json",
+        "package":  "tsc -p configs/tsconfig.build.json && npx vsce package"
     },
     "devDependencies": {
         "@types/jest": "^30.0.0",
