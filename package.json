@@ -3,7 +3,7 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.48",
+    "version": "0.0.53",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
@@ -16,15 +16,14 @@
     ],
     "main": "./dist/extension.js",
     "files": [
-        "dist/extension.js",
-        "dist/patch.js",
-        "src/palettes/fasta-colors.json",
-        "src/syntaxes/fasta.tmLanguage.json",
-        "src/syntaxes/language-configuration.json"
+        "dist",
+        "palettes",
+        "syntaxes"
     ],
         "activationEvents": [
             "onLanguage:fasta",
-            "onCommand:bioNotation.toggleColors"
+            "onCommand:bioNotation.toggleColors",
+            "onCommand:bioNotation.selectPalette"
         ],
     "engines": {
         "vscode": "^1.101.0"
@@ -50,6 +49,14 @@
                 }
             }
         },
+
+        "bio-colorer.notationMode": {
+            "type": "string",
+            "default": "mixed",
+            "enum": ["mixed", "nucleotide", "amino"],
+            "description": "Controls how ambiguous symbols in FASTA files are interpreted: mixed (default), nucleotide, or amino acid."
+        },
+
         "languages": [
             {
                 "id": "fasta",
@@ -74,11 +81,12 @@
         ]
     },
     "scripts": {
-        "test": "jest",
-        "test:watch": "jest --watchAll",
-        "tsc":      "tsc -p configs/tsconfig.json",
-        "build":    "tsc -p configs/tsconfig.build.json",
-        "package":  "tsc -p configs/tsconfig.build.json && npx vsce package"
+        "test": "jest --config ./jest.config.ts",
+        "test:watch": "jest --config ./jest.config.ts --watch",
+        "tsc":      "tsc -p tsconfig.json",
+        "build":    "tsc -p tsconfig.build.json",
+        "package":  "npm run build && npx vsce package",
+        "clean": "rm -rf dist"
     },
     "devDependencies": {
         "@types/jest": "^30.0.0",

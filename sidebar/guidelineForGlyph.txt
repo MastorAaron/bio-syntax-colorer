@@ -1,0 +1,18 @@
+# Read existing suggestions and append the new guideline
+file_path = '/mnt/data/chat_interaction_suggestions.txt'
+with open(file_path, 'r') as f:
+    lines = f.read().splitlines()
+
+# Define the new guideline
+new_guideline = "11. Respect naming conventions and avoid aesthetic-only changes: 
+only rename identifiers when it improves logic, aims to avoid keyword conflicts (or close to it), or corrects bad practice."
+
+# Check if the guideline already exists
+if new_guideline not in lines:
+    lines.append(new_guideline)
+
+# Write updated suggestions back to the file
+with open(file_path, 'w') as f:
+    f.write("\n".join(lines))
+
+file_path

@@ -1,0 +1,9 @@
+npm run build
+npm run package
+npx vsce package
+code --install-extension bio-colorer-0.0.XX.vsix
+code --install-extension bio-colorer-$(node -p "require('./package.json').version").vsix
+
+Add the following line to view color palletes
+"$schema": "vscode://schemas/color-theme",
+Remove after to make sure to not define the Extension as a Theme

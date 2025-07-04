@@ -1,44 +1,51 @@
 import * as def from "./definitions";
 
 export class boolUtils{
-    static isFastaFile(filename: string): boolean {
-        return /\.(fa|fasta|fastq)$/i.test(filename);
+    static isFastaFile(fileName: string): boolean {
+        return /\.(fa|fna|faa|fasta|fastq)$/i.test(fileName);
     }
-    static isGFFFile(filename: string): boolean {
-        return /\.(gff|gff3)$/i.test(filename);
+    
+    static isFna(fileName: string): boolean {
+        return /\.fna$/i.test(fileName);
     }
-    static isBEDFile(filename: string): boolean {
-        return /\.(bed)$/i.test(filename);
+    static isFaa(fileName: string): boolean {
+        return /\.faa$/i.test(fileName);
     }
-    static isGenBankFile(filename: string): boolean {
-        return /\.(gb|gbk)$/i.test(filename);
+    static isGFFFile(fileName: string): boolean {
+        return /\.(gff|gff3)$/i.test(fileName);
     }
-    static isVCFFile(filename: string): boolean {
-        return /\.(vcf|vcf.gz)$/i.test(filename);
+    static isBEDFile(fileName: string): boolean {
+        return /\.(bed)$/i.test(fileName);
     }
-    static isSAMFile(filename: string): boolean {
-        return /\.(sam|bam)$/i.test(filename);
+    static isGenBankFile(fileName: string): boolean {
+        return /\.(gb|gbk)$/i.test(fileName);
     }
-    static isBAMFile(filename: string): boolean {
-        return /\.(bam)$/i.test(filename);
+    static isVCFFile(fileName: string): boolean {
+        return /\.(vcf|vcf.gz)$/i.test(fileName);
     }
-    static isBigWigFile(filename: string): boolean {
-        return /\.(bw|bigwig)$/i.test(filename);
+    static isSAMFile(fileName: string): boolean {
+        return /\.(sam|bam)$/i.test(fileName);
     }
-    static isBigBedFile(filename: string): boolean {
-        return /\.(bb|bigbed)$/i.test(filename);
+    static isBAMFile(fileName: string): boolean {
+        return /\.(bam)$/i.test(fileName);
     }
-    static isGTFFile(filename: string): boolean {
-        return /\.(gtf|gff)$/i.test(filename);
+    static isBigWigFile(fileName: string): boolean {
+        return /\.(bw|bigwig)$/i.test(fileName);
+    }
+    static isBigBedFile(fileName: string): boolean {
+        return /\.(bb|bigbed)$/i.test(fileName);
+    }
+    static isGTFFile(fileName: string): boolean {
+        return /\.(gtf|gff)$/i.test(fileName);
     }
 
 
-    static isSequenceFile(filename: string): boolean {
-        return this.isFastaFile(filename) || this.isGenBankFile(filename) || this.isGFFFile(filename) || this.isBEDFile(filename);
+    static isSequenceFile(fileName: string): boolean {
+        return this.isFastaFile(fileName) || this.isGenBankFile(fileName) || this.isGFFFile(fileName) || this.isBEDFile(fileName);
     }
 
-    static isAnnotationFile(filename: string): boolean {
-        return this.isGFFFile(filename) || this.isBEDFile(filename) || this.isGTFFile(filename) || this.isVCFFile(filename);
+    static isAnnotationFile(fileName: string): boolean {
+        return this.isGFFFile(fileName) || this.isBEDFile(fileName) || this.isGTFFile(fileName) || this.isVCFFile(fileName);
     }           
 
     static isNull(value: unknown): boolean {

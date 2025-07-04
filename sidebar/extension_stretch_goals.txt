@@ -1,0 +1,63 @@
+Support additional bio-file syntaxes (FASTQ, GenBank, GFF3, VCF):
+  • Add new tmLanguage grammar files and register in package.json
+  • Create per-syntax palette JSONs and extend patch.js to load based on languageId
+  
+FASTQ Read Quality highlighting
+    Low,    Mid     High
+  • Bronze, Silver, Gold
+  • Red, Yellow, Green
+  • Green, Blue, Purple
+  • Blue, Purple, Gold
+
+   Add grammars for:
+
+  FASTQ (separate if desired)
+  GenBank
+  GFF3
+  VCF
+
+Element Symbols for AlphaFold files pdb. 
+
+Invert / cool-mode palettes:
+  • Generate separate JSON palettes (warm, inverted, complementary)
+  • Add a user setting `bio-colorer.colorScheme`
+  • Modify loadColors to choose palette and watch for changes
+
+Separate nucleotide vs. amino-acid highlighting: -> HoverOver
+  • Fork FASTA grammar into `fasta-nt` and `fasta-aa` grammars
+  • Associate with distinct file extensions (.fna/.faa)
+  • Load and patch based on the specific languageId
+
+Palette selection and customization commands:
+  • QuickPick to choose palette JSON
+      `bio-colorer.selectPalette` 
+  • QuickPick + InputBox to adjust a single token
+      `bio-colorer.customizeColor` 
+  • `bio-colorer.savePaletteAs` (InputBox + fs.copyFile to clone palette)
+  • Sanger color Palette, Illumina, Oxford Nanopore, PacBio. etc
+
+Manual Color Override UI:
+  • Add QuickPick to select token (nucleotide, amino acid, category)
+  • Use InputBox with color slider to set custom foreground
+  • Inject manual rule with "bio-colorer@UserAdded" tag
+  • Manual rules added at end of textMateRules for natural override
+  • Toggle-off cleans manual rules by tag
+  • Keeps palette JSON untouched for easy reset
+
+  UI should live in patch.ts
+
+Optional Rich UI (Webview) for batch editing:
+  • Build a Webview Panel with HTML/CSS/JS
+  • Render table of scopes and color pickers
+  • Post messages back to extension to save/apply changes
+
+  Refactor into a Class:
+    class BioColorer {
+      constructor(private context: vscode.ExtensionContext) {}
+
+      loadColors(filename: string) {
+          const colorPath = path.join(this.context.extensionPath, filename);
+      }
+  }
+
+  Publish to VSCode
