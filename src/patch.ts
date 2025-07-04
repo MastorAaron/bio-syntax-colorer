@@ -5,6 +5,8 @@ import { boolUtils } from "./booleans";
 import * as def from "./definitions";
 import { vscUtils } from "./vscUtils";
 import { version } from "../package.json";
+import hoverOver from "./hoverOver";
+
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 

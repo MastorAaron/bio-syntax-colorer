@@ -1,0 +1,107 @@
+import * as vscode from "vscode";
+import * as def from "./definitions";
+import { boolUtils } from "./booleans";
+import { vscUtils } from "./vscUtils";
+import { Position } from "vscode";
+
+const path = require('path');
+
+// tokenDescription
+
+export class HoverObj{ 
+    private static instance: HoverObj;
+    
+    private vscCOUT = vscUtils.vscCOUT;
+    private currMode: def.alphabet = "Mixed"; // Default mode
+    private activeToken: def.ColorRule | undefined;
+    
+    constructor() {
+        this.vscCOUT("HoverObj initialized");
+    }
+
+    public static getInstance(): HoverObj {
+        if (!HoverObj.instance) {
+            HoverObj.instance = new HoverObj();
+        }
+        return HoverObj.instance;
+    }
+
+    private onHover(contents: string, pos: Position): vscode.Hover | undefined {
+        const x = pos.line;    
+        const y = pos.character;
+        
+        if(!contents) return;
+
+        return new vscode.Hover({
+            language: "bio-syntax-colorer",
+            value: Array.isArray(contents) ? contents.join('\n'): contents
+            },
+            pos ? new vscode.Range(pos, new vscode.Position(x, y + 1)) : undefined
+        );
+    }
+    
+    public registerProvider(): void {
+        vscode.languages.registerHoverProvider('fasta', {
+            provideHover: (doc : vscode.TextDocument, pos: Position): vscode.Hover | undefined => { // provideHover(document, position/*, token*/) {//Token should only be used for async hovers which allow cancellation of hover logic
+                try{
+                    // const word = doc.getText(doc.getWordRangeAtPosition(pos));
+                    const line = doc.lineAt(pos.line).text;
+                    const letter = line[pos.character].toUpperCase(); // const letter = word[pos.character];
+                    if (!letter) return;
+                    
+                    const description = this.arrayToStr(this.getDescription(letter, doc.fileName));
+                    return this.onHover(description, pos);
+                }catch(err){
+                    this.vscCOUT("Error in hoverOver.ts: " + err);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error("Error: Not in AminoMap", err);
+                    }
+                    return;
+                }
+            }
+        });
+    }
+
+    public async toggleNotationMode() {
+        const options = ["Mixed", "Nucleotides", "Aminos"];
+        const selection = await vscode.window.showQuickPick(options, { placeHolder: "Select Notation Mode\nAminos\nNucleotides" });
+
+        if (selection === "Mixed" || selection === "Nucleotides" || selection === "Aminos") {
+            this.currMode = selection;
+            await vscode.workspace.getConfiguration().update("bio-colorer.notationMode", selection, vscode.ConfigurationTarget.Workspace);
+            vscode.window.showInformationMessage(`BioNotation mode set to: ${selection}`);
+        }
+    }
+
+    private arrayToStr(strArr : Array<string> | string): string{
+        if(typeof strArr === "string") {
+            return strArr;
+        }
+
+        let newStr="";
+        for(const each of strArr){
+            newStr+=each+'\n';
+        }
+        return newStr;
+    }
+
+    public getDescription(letter: string, fileName: string): Array<string> | string{
+        if (this.currMode === "Nucleotides" || boolUtils.isFna(fileName)) {
+            return def.nukeInfoMap[letter as def.nukes] || letter;
+        } 
+        if (this.currMode === "Aminos" ||  boolUtils.isFaa(fileName)) {
+            return def.aminoInfoMap[letter as def.aa] || letter;
+        } // Mixed mode, show raw or dual-name
+
+        // return conflictInfoMap[letter as conflicts] || nukeInfoMap[letter as nukes] || aminoInfoMap[letter as aminos] || [letter]; 
+        const conflict = def.conflictInfoMap[letter as def.conflicts];
+        if (conflict) return conflict;
+        const nuke = def.nukeInfoMap[letter as def.nukes];
+        if (nuke) return nuke;
+        const amino = def.aminoInfoMap[letter as def.aminos];
+        if (amino) return amino;
+        return letter;
+    }
+}
+
+export default HoverObj.getInstance();
