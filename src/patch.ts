@@ -3,7 +3,8 @@ import * as path from "path";
 import * as fs from "fs";
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
-import { vscUtils } from "./vscUtils";
+import { vscUtils, themeUtils } from "./vscUtils";
+import colorMath from "./ColorInverter";
 import { version } from "../package.json";
 import hoverOver from "./hoverOver";
 
@@ -16,6 +17,8 @@ export class PatchColors{
     private globalConfig = vscUtils.globalConfig;
     private editorConfig = vscUtils.editorConfig;
     private currCustomization = vscUtils.currCustomization;
+     private colorUtil = new colorMath(this.context);
+
 
     constructor(private context: vscode.ExtensionContext) {
         this.vscCOUT(`PatchColors initialized with context: {this.context.extensionPath}`);
@@ -54,6 +57,40 @@ export class PatchColors{
         return colors.tokenColors
     }
 
+
+    public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
+        const palette = this.loadColors(palettePath);
+        const scope = def.tokenMap[tokenName.toUpperCase()];
+        if (!scope) {
+            this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
+            return null;
+        }
+        return palette.find(rule => rule.scope === scope) || null;
+    }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
+    //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
+        
+        public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
+            if(!rule || !rule.settings) return null;
+            
+    
+            const config = vscUtils.editorConfig();
+            const defaultFg = themeUtils.defaultTextColor();  // Adjustable for themes
+    
+            const textColor  = rule.settings.background || defaultFg 
+            const fg = rule.settings.foreground || this.colorUtil.complementaryHex(textColor) || "#FFFFFF";
+    
+            return {
+                ...rule,
+                name: `${rule.name || "highlighted-rule"}`,
+                settings: {
+                    ...rule.settings,
+                    foreground: textColor ,
+                    background: fg,
+                    fontStyle: "bold underline"
+                }
+            };
+        }
+
     
     public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
         if (!boolUtils.isValidRule(rule)){ 
@@ -71,31 +108,31 @@ export class PatchColors{
         return updatedRule;
     }
    
-    public toggleHighlight(rule: def.ColorRule){
-        if (!boolUtils.isValidRule(rule)) {
-            this.vscCOUT("Invalid rule provided for toggling highlight.");
-            return rule;
-        }
+    // public toggleHighlight(rule: def.ColorRule){
+    //     if (!boolUtils.isValidRule(rule)) {
+    //         this.vscCOUT("Invalid rule provided for toggling highlight.");
+    //         return rule;
+    //     }
         
-        let currColor = rule.settings?.foreground || "#000000"; // Default to black if no color set
-        if (!boolUtils.isValidColor(currColor)) {
-            this.vscCOUT(`Invalid color: ${currColor}. Defaulting to red highlight.`);
-            currColor = "#FF0000"; // Default to red if current color is invalid
-        }
+    //     let currColor = rule.settings?.foreground || "#000000"; // Default to black if no color set
+    //     if (!boolUtils.isValidColor(currColor)) {
+    //         this.vscCOUT(`Invalid color: ${currColor}. Defaulting to red highlight.`);
+    //         currColor = "#FF0000"; // Default to red if current color is invalid
+    //     }
     
-        const updatedRule: def.ColorRule = {
-            ...rule,
-            settings: {
-                ...rule.settings,
-                foreground: rule.settings?.foreground === "#FF0000" // Toggle between red and original color
-                    ? rule.settings?.foreground // Keep original color
-                    : "#FF0000" // Highlight with red
-            }
-        };
+    //     const updatedRule: def.ColorRule = {
+    //         ...rule,
+    //         settings: {
+    //             ...rule.settings,
+    //             foreground: rule.settings?.foreground === "#FF0000" // Toggle between red and original color
+    //                 ? rule.settings?.foreground // Keep original color
+    //                 : "#FF0000" // Highlight with red
+    //         }
+    //     };
         
-        this.vscCOUT(`Toggled highlight for rule: ${updatedRule.name}`);
-        return updatedRule;
-    }
+    //     this.vscCOUT(`Toggled highlight for rule: ${updatedRule.name}`);
+    //     return updatedRule;
+    // }
     
     private mergeRules(newRules : Array<def.ColorRule>){
         const customization = this.currCustomization(this.globalConfig());

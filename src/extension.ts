@@ -2,7 +2,7 @@
 import * as vscode from "vscode";
 import { vscUtils, themeUtils } from "./vscUtils";
 import {PatchColors} from "./patch";
-import colorMath from "./ColorInverter";
+
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
 
@@ -43,8 +43,7 @@ export class BioNotation{
     private patcher: PatchColors;
     private targetConfigWorkspace = vscode.ConfigurationTarget.Workspace;
     private activePalette: def.PaletteFilePath;
-    private colorUtil = new colorMath(this.context);
-
+   
     
 
     
@@ -108,39 +107,6 @@ export class BioNotation{
         // Only treat *true* as active
     }
 
-    public async pullRule(tokenName: string): Promise<def.ColorRule | null> {
-        const palettePath = this.activePalette;
-        const palette = await this.patcher.loadColors(palettePath);
-        const scope = def.tokenMap[tokenName.toUpperCase()];
-        if (!scope) {
-            this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
-            return null;
-        }
-        return palette.find(rule => rule.scope === scope) || null;
-    }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
-    //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
-    
-    public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
-        if(!rule || !rule.settings) return null;
-        
-
-        const config = vscUtils.editorConfig();
-        const defaultFg = themeUtils.defaultTextColor();  // Adjustable for themes
-
-        const textColor  = rule.settings.background || defaultFg 
-        const fg = rule.settings.foreground || this.colorUtil.complementaryHex(textColor) || "#FFFFFF";
-
-        return {
-            ...rule,
-            name: `${rule.name || "highlighted-rule"}`,
-            settings: {
-                ...rule.settings,
-                foreground: textColor ,
-                background: fg,
-                fontStyle: "bold underline"
-            }
-        };
-    }
     
 
 
