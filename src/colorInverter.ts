@@ -146,3 +146,5 @@ export class colorMath{
         ];
     }
 }
+
+export default colorMath;

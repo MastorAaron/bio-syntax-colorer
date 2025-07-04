@@ -1,7 +1,8 @@
 // import { patchTokenColors, removeTokenColors, loadColors, vscCOUT } from "./patch";
 import * as vscode from "vscode";
-import { vscUtils } from "./vscUtils";
+import { vscUtils, themeUtils } from "./vscUtils";
 import {PatchColors} from "./patch";
+import colorMath from "./ColorInverter";
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
 
@@ -14,8 +15,7 @@ export type PaletteName =
 "Cold" | 
 "Cool" | 
 "CoolComp" |
-"CoolInvert"
-;
+"CoolInvert";
 
 const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
     // "Default": "fasta-colors.json"as def.PaletteFilePath,
@@ -43,11 +43,17 @@ export class BioNotation{
     private patcher: PatchColors;
     private targetConfigWorkspace = vscode.ConfigurationTarget.Workspace;
     private activePalette: def.PaletteFilePath;
+    private colorUtil = new colorMath(this.context);
 
+    
 
+    
     private vscCOUT = vscUtils.vscCOUT;
     private patchTokenColors: (fileName?: string) => Promise<void>;
     private removeTokenColors: () => Promise<void>;
+
+
+   
 
     constructor(private context: vscode.ExtensionContext) {
         this.patcher = new PatchColors(context);
@@ -62,8 +68,6 @@ export class BioNotation{
         this.clearBioNotation = this.clearBioNotation.bind(this);
         this.applyBioNotation = this.applyBioNotation.bind(this);
 
-
-       
         this.registerCommands();
         hoverOver.registerProvider();
 
@@ -76,52 +80,11 @@ export class BioNotation{
             vscode.commands.registerCommand("bioNotation.clearColors", this.clearBioNotation),
             vscode.commands.registerCommand("bioNotation.applyColors", this.applyBioNotation)
         );
-}
+    }
             
-            
-// private registerCommands(): void {
-//         const { context, 
-//             applyBioNotation, 
-//             toggleColorOverlay,
-//             clearBioNotation, 
-//             selectPalette,
-//             vscCOUT
-//         } = this;
-        
-//         const toggleCommand = vscode.commands.registerCommand(
-//             "bioNotation.toggleColors", async () => {
-//                 await toggleColorOverlay();
-//                 vscCOUT("BioNotation Toggled.");
-//             }
-//         );
-
-//         const clearCommand = vscode.commands.registerCommand(
-//             "bioNotation.clearColors", async () => {
-//                 await clearBioNotation(); 
-//                 vscCOUT("BioNotation forcibly cleared.");
-//             }
-//         );
-        
-//         const applyCommand = vscode.commands.registerCommand(
-//             "bioNotation.applyColors", async () => {
-//                 await applyBioNotation(); 
-//                 vscCOUT("BioNotation forcibly applied.");
-//             }
-//         );
-
-//         const pickCommand = vscode.commands.registerCommand(
-//             "bioNotation.selectPalette", async () => {
-//                 await selectPalette();
-//                 console.log("BioNotation palette selection triggered.");
-//             }
-//         );
-//         context.subscriptions.push(toggleCommand, clearCommand, applyCommand, pickCommand);
-//     }
-
     private async updateEnabledFlag(value : boolean): Promise<void> {   
         await vscode.workspace.getConfiguration().update("bioNotation.enabled", value, this.targetConfigWorkspace);
     }
-
 
     public async clearBioNotation(): Promise<void> {
         await this.removeTokenColors();
@@ -145,17 +108,41 @@ export class BioNotation{
         // Only treat *true* as active
     }
 
-    public async pullRule(tokenName: string): Promise<def.ColorRule | undefined> {
+    public async pullRule(tokenName: string): Promise<def.ColorRule | null> {
         const palettePath = this.activePalette;
         const palette = await this.patcher.loadColors(palettePath);
-        const scope = def.tokenMap[tokenName];
+        const scope = def.tokenMap[tokenName.toUpperCase()];
         if (!scope) {
             this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
-            return undefined;
+            return null;
         }
-        return palette.rules.find(rule => rule.scope === scope);
+        return palette.find(rule => rule.scope === scope) || null;
     }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
-        //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
+    //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
+    
+    public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
+        if(!rule || !rule.settings) return null;
+        
+
+        const config = vscUtils.editorConfig();
+        const defaultFg = themeUtils.defaultTextColor();  // Adjustable for themes
+
+        const textColor  = rule.settings.background || defaultFg 
+        const fg = rule.settings.foreground || this.colorUtil.complementaryHex(textColor) || "#FFFFFF";
+
+        return {
+            ...rule,
+            name: `${rule.name || "highlighted-rule"}`,
+            settings: {
+                ...rule.settings,
+                foreground: textColor ,
+                background: fg,
+                fontStyle: "bold underline"
+            }
+        };
+    }
+    
+
 
     public async applyBioNotation(fileName: string= this.activePalette ): Promise<void> {
         await this.patchTokenColors(fileName);

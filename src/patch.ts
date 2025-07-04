@@ -53,8 +53,9 @@ export class PatchColors{
         this.vscCOUT(colors.tokenColors);
         return colors.tokenColors
     }
+
     
-    public editColorRule(rule: def.ColorRule, newColor: string): def.ColorRule {
+    public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
         if (!boolUtils.isValidRule(rule)){ 
             this.vscCOUT("Invalid rule provided for editing.");
             return rule;
