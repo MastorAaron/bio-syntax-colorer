@@ -15,9 +15,7 @@ const config: Config.InitialOptions = {
     moduleFileExtensions: ['ts','js', 'json', 'node'],
     testPathIgnorePatterns: ['/node_modules/', '/dist/'],
     testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-    globals: {
-        
-    },
+    globals: { },
 };
 
 export default config;

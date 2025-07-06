@@ -1,27 +1,36 @@
-jest.mock('vscode', () => ({}));
+jest.mock('vscode', () => ({
+    window: { showInformationMessage: jest.fn() },
+    workspace: {
+        getConfiguration: jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue({
+                textMateRules: []
+            }),
+            update: jest.fn()
+        })
+    }
+}));
 
-import { isFastaFile } from '../src/extension';
-import { isAlreadyTagged } from '../src/patch';
+import { boolUtils } from '../src/booleans';
 
 describe('isFastaFile', () => {
     test('recognizes .fa files', () => {
-        expect(isFastaFile('test.fa')).toBe(true);
+        expect(boolUtils.isFastaFile('test.fa')).toBe(true);
     });
     test('recognizes .fna files', () => {
-        expect(isFastaFile('test.fna')).toBe(false);
+        expect(boolUtils.isFastaFile('test.fna')).toBe(true);
     });
     
     test('recognizes .faa files', () => {
-        expect(isFastaFile('test.faa')).toBe(false);
+        expect(boolUtils.isFastaFile('test.faa')).toBe(true);
     });
     test('recognizes .fasta files', () => {
-        expect(isFastaFile('test.fasta')).toBe(true);
+        expect(boolUtils.isFastaFile('test.fasta')).toBe(true);
     });
     test('recognizes .fastq files', () => {
-        expect(isFastaFile('test.fastq')).toBe(true);
+        expect(boolUtils.isFastaFile('test.fastq')).toBe(true);
     });
     test('rejects non-fasta files', () => {
-        expect(isFastaFile('test.txt')).toBe(false);
+        expect(boolUtils.isFastaFile('test.txt')).toBe(false);
     });
 });
 

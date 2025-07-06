@@ -6,13 +6,11 @@ import { Position } from "vscode";
 
 const path = require('path');
 
-// tokenDescription
-
 export class HoverObj{ 
     private static instance: HoverObj;
     
     private vscCOUT = vscUtils.vscCOUT;
-    private currMode: def.alphabet = "Mixed"; // Default mode
+    private currMode: def.alphabet = "Ambigious"; // Default mode
     private activeToken: def.ColorRule | undefined;
     
     constructor() {
@@ -62,14 +60,11 @@ export class HoverObj{
         });
     }
 
-    public async toggleNotationMode() {
-        const options = ["Mixed", "Nucleotides", "Aminos"];
-        const selection = await vscode.window.showQuickPick(options, { placeHolder: "Select Notation Mode\nAminos\nNucleotides" });
-
-        if (selection === "Mixed" || selection === "Nucleotides" || selection === "Aminos") {
+    public async toggleNotationMode(selection: def.alphabet) {
+        if (selection === "Ambigious" || selection === "Nucleotides" || selection === "Aminos") {
             this.currMode = selection;
             await vscode.workspace.getConfiguration().update("bio-colorer.notationMode", selection, vscode.ConfigurationTarget.Workspace);
-            vscode.window.showInformationMessage(`BioNotation mode set to: ${selection}`);
+            this.vscCOUT(`BioNotation alphabet mode set to: ${selection}`);
         }
     }
 

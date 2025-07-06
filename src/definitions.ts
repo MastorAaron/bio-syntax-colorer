@@ -1,59 +1,96 @@
 export type colorHex = `#${string}`;
 
+export type fastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
+export type fastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
+
+export type tokenScope = fastAScope | fastQScope;
+export type headerScope = `fast${'a' | 'q'}.title`;
+export type nameScope = tokenScope | headerScope; 
+
+
 export interface ColorRule {
     name: string;      //optional Name
-    scope: string;     //optional Scope
+    scope: nameScope;     //optional Scope
     comment?: string;     //optional Comment
-    settings?: {
+    settings: {
         foreground: colorHex;
         background?: colorHex; //optional Background color
         fontStyle?: string; //optional Font style
     };
 }
+export interface PatternRule {
+name: nameScope;      
+    match: string; //optional Font style
+}
 
-export const aaAliphatic = ['L','I','M','V','A','P','I','G'];
-export const aaPolar     = ['S','T','N','C','Q','U']; //U?
-export const aaAromatic  = ['W','Y','F'];
-export const aaRinged    = ['W','Y','F','H','P'];
-export const aaPositive  = ['K','R','H','O']; //O is from Archae
-export const aaNegative  = ['E', 'D']; 
+export const aaProperty  = ['N','P','A','R','+','-'] as const;//'R' Ringed
 
-export const aaProperty  = ['N','P','A','R','+','-'];//'R' Ringed
+export const aaAliphatic = ['L','I','M','V','A','P','I','G'] as const;
+export const aaPolar     = ['S','T','N','C','Q','U'] as const; //U?
+export const aaAromatic  = ['W','Y','F'] as const;
+export const aaRinged    = ['W','Y','F','H','P'] as const;
+export const aaPositive  = ['K','R','H','O'] as const; //O is from Archae
+export const aaNegative  = ['E', 'D'] as const; 
 
-export const aaCatches   = ['O','U']; //UGA  for U
-export const aaExtended  = ['B', 'Z', 'X', 'J'];
 
-export const nucleotides    = ['A','C','G','T','U'];
-export const symNukes       = ['-', '*'];//TODO: Stop Codon is Amino not Nuke
-export const extendedNukes  = ['N',
-                        'R', 'Y', 
-                        'S', 'W', 
-                        'K', 'M',
-                        'B', 'D', 'H', 'V'
-                    ];
+export const aaRecoded   = ['O','U'] as const; //UGA  for U
+export const aaDrifts    = ['B', 'Z', 'J'] as const;
+export const aaWild      = ['X'] as const;
 
-export type negAA      = (typeof aaNegative)[number];
-export type posAA      = (typeof aaPositive)[number];
-export type aroAA      = (typeof aaAromatic)[number];
-export type ringAA     = (typeof aaRinged)[number];
-export type polarAA    = (typeof aaPolar)[number];
-export type nonPolarAA = (typeof aaAliphatic)[number];
+export const nucleotides     = ['A','C','G','T','U'] as const;
+export const symbols         = ['-', '*'] as const;//TODO: Stop Codon is Amino not Nuke
+
+export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
+export const nukeBondStrgth  = ['S', 'W'] as const;
+export const functGroupNukes = ['K', 'M'] as const;
+export const ringStructNukes = ['R', 'Y'] as const; 
+export const nukeWild        = ['N'] as const;
+
+export const extendedNukes = [
+    ...nukeNots,
+    ...nukeBondStrgth,
+    ...functGroupNukes,
+    ...ringStructNukes,
+    ...nukeWild
+] as const;
 
 export type typesAA = (typeof aaProperty)[number];//'R' Ringed
 
+export type nonPolarAA = (typeof aaAliphatic)[number];
+export type polarAA    = (typeof aaPolar)[number];
+export type aroAA      = (typeof aaAromatic)[number];
+export type ringAA     = (typeof aaRinged)[number];
+export type posAA      = (typeof aaPositive)[number]; 
+export type negAA      = (typeof aaNegative)[number];
+
+export type recodedAA = (typeof aaRecoded)[number];
+export type driftsAA = (typeof aaDrifts)[number];
+export type wildAA = (typeof aaWild)[number];
+
 
 export type aa = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
-export type aaExtd = (typeof aaExtended)[number];
-export type aminos = aa | aaExtd;
+export type aaAmbig = driftsAA | wildAA;
+export type aaExtd = aaAmbig | recodedAA;
 
-// export type AminoDescript = [string]
+export type Syms = (typeof symbols)[number];
+
+export type aminos = aa | aaExtd | Syms;
 
 
 export type nt     = (typeof nucleotides)[number];
-export type ntExtd = (typeof extendedNukes)[number];
-export type ntSyms = (typeof symNukes)[number];
-export type nukes = nt | ntExtd | ntSyms;
 
+export type ntNots = (typeof nukeNots)[number];
+export type ntStrgth = (typeof nukeBondStrgth)[number];
+export type ntFunct = (typeof functGroupNukes)[number];
+export type ntRingQt = (typeof ringStructNukes)[number];
+
+export type ntWild = (typeof nukeWild)[number];
+
+export type ntExtd = ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ; 
+
+export type nukes  = nt | ntExtd  | Syms;
+
+// export type AminoDescript = [string]
 export const nukeInfoMap : Record<nukes,Array<string>>= {
     'A':["Adenine","Purine","A"],
     'C':["Cytosine","Pyrimidine","C"],
@@ -85,15 +122,16 @@ export const nukeInfoMap : Record<nukes,Array<string>>= {
 // - is Acidic Amino Acids
 
 
-export const aminoInfoMap : Record<aminos,Array<string>>= {
+export const aminoInfoMap : Partial<Record<aminos,Array<string>>>= {
+    'K':["Lys","Lysine","Positively Charged","pKa = 10.7"],
+    'R':["Arg","Arginine","Positively Charged","pKa = 12.1"],
+    
     'H':["His","Histidine","Positively Charged","pKa = 6.0"],
+    
     'P':["Pro","Proline","Nonpolar","Aliphatic"],
     'W':[ "Trp", "Tryptophan", "Aromatic", "Hydrophobic" ],
     'Y':["Tyr","Tyrosine","Aromatic","Hydrophobic","pKa = 10.0"],
     'F':["Phe","Phenylalanine","Aromatic","Hydrophobic"],
-    
-    'K':["Lys","Lysine","Positively Charged","pKa = 10.7"],
-    'R':["Arg","Arginine","Positively Charged","pKa = 12.1"],
     
     
     'E':["Glu","Glutamic Acid","Negatively Charged","pKa = 4.2"],
@@ -124,8 +162,6 @@ export const aminoInfoMap : Record<aminos,Array<string>>= {
     'X':["Any Amino Acid"],
 }
 
-
-
 export type conflicts = nukes;
 
 export const conflictInfoMap : Partial<Record<conflicts,string>>= {
@@ -154,9 +190,48 @@ export const conflictInfoMap : Partial<Record<conflicts,string>>= {
     '-': "Gap or Minus Sign"
 }
 
-export type alphabet = "Nucleotides" | "Aminos" | "Mixed" ;
+export type alphabet = "Nucleotides" | "Aminos" | "Ambigious" ;
+export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
 
-export const tokenMap : Record<aminos,string>= {
+export const aminoPropertyRegExMap : Record<typesAA,string>= {
+    'N': "[LIMVAPIG]",
+    'P': "[STNCQU]",
+    'A': "[WYF]",
+    'R': "[HPWYF]",
+    '+': "[KRHO]",
+    '-': "[ED]",
+}
+
+export const aminoRegExMap : Record<aaAmbig,string>= {
+    'B': "[BND]",
+    'Z': "[ZQE]",
+    'J': "[JLI]",
+    'X': "[XKRHOPWYFEDSTNCQUOLIMVAGBZJX-*]",
+}
+
+export const nukeRegExMap : Record<ntExtd,string>= {
+    'N': "[NRYSWKMBDHVACGTU-*]",
+
+    'R': "[RAG]",
+    'Y': "[YTCU]",
+
+    'S': "[SGC]",
+    'W': "[WTAU]",
+
+    'K': "[KTUG]",
+    'M': "[NAC]",
+
+    'B': "[BCGTU]",
+    'D': "[DAGTU]",
+    'H': "[HACTU]",
+    'V': "[VACG]",
+}
+
+export const fileTypes = ["aTitle","qTitle"] as const
+export type fileTitles = (typeof fileTypes)[number];
+export type tokenType = aminos | fileTitles; 
+
+export const tokenMap : Record<tokenType,string>= {
     "aTitle":"fasta.title",
     "qTitle":"fastq.title",
     'A': "source.fasta.ntA",
@@ -222,7 +297,7 @@ export function isNonPolar(value: unknown): value is nonPolarAA {
     return isMemberOf(value, aaAliphatic);
 }
 
-export function isPurine(value: unknown): boolean {
+export function isPurine(value: unknown): boolean { //TODO: Make Purine Type?
     return isMemberOf(value, ['R','A','G']);
 }
 
@@ -231,10 +306,10 @@ export function isPyrim(value: unknown): boolean {
 }
 
 export function isNuke(value: unknown): value is nukes {
-    return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, symNukes);
+    return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, symbols);
 }
 
-export function isMemberOf<Template extends string>(value: unknown, group: readonly Template[]): value is Template {
+export function isMemberOf<Template extends string | ColorRule | PatternRule>(value: unknown, group: readonly Template[]): value is Template {
     return typeof value === "string" && group.includes(value as Template);
 }
 
