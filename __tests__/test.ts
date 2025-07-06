@@ -1,4 +1,16 @@
-function add(a : number,b : number): number {
+jest.mock('vscode', () => ({
+    window: { showInformationMessage: jest.fn() },
+    workspace: {
+        getConfiguration: jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue({
+                textMateRules: []
+            }),
+            update: jest.fn()
+        })
+    }
+}));
+
+export function add(a : number,b : number): number {
     return a + b;
 }
 

@@ -10,12 +10,12 @@ import hoverOver from './hoverOver';
 const DEFAULT_PALETTE = "fasta-colors.json";
 
 export type PaletteName = 
-// "Default" |
-"Warm" |
-"Cold" | 
-"Cool" | 
-"CoolComp" |
-"CoolInvert";
+    // "Default" |
+    "Warm" |
+    "Cool" | 
+    "Cold" | 
+    "CoolComp" |
+    "CoolInvert";
 
 const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
     // "Default": "fasta-colors.json"as def.PaletteFilePath,
@@ -44,15 +44,9 @@ export class BioNotation{
     private targetConfigWorkspace = vscode.ConfigurationTarget.Workspace;
     private activePalette: def.PaletteFilePath;
    
-    
-
-    
     private vscCOUT = vscUtils.vscCOUT;
     private patchTokenColors: (fileName?: string) => Promise<void>;
     private removeTokenColors: () => Promise<void>;
-
-
-   
 
     constructor(private context: vscode.ExtensionContext) {
         this.patcher = new PatchColors(context);
@@ -76,6 +70,7 @@ export class BioNotation{
         this.context.subscriptions.push(
             vscode.commands.registerCommand("bioNotation.selectPalette", this.selectPalette),
             vscode.commands.registerCommand("bioNotation.toggleColors", this.toggleColorOverlay),
+            vscode.commands.registerCommand("bioNotation.toggleAlphabet", this.toggleAlphabet),
             vscode.commands.registerCommand("bioNotation.clearColors", this.clearBioNotation),
             vscode.commands.registerCommand("bioNotation.applyColors", this.applyBioNotation)
         );
@@ -100,15 +95,36 @@ export class BioNotation{
             this.vscCOUT("BioNotation activated via toggle.");
         }
     }
+    
+    public async toggleAlphabet(){
+        // const options = ["Ambigious", "Nucleotides", "Aminos"];
+        const options: def.alphabet[] = ["Ambigious", "Nucleotides", "Aminos"];
+        const userText = "Select Notation Mode\nAminos\nNucleotides";
+        // const selection = await vscode.window.showQuickPick(options, 
+        //     { placeHolder: "Select Notation Mode\nAminos\nNucleotides" }
+        // );
+
+        const selection = await vscUtils.showInterface(options, userText);
+
+        if(selection === "Ambigious"){
+            this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
+
+        }else if(selection === "Nucleotides"){
+            this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
+        }else if(selection === "Aminos"){
+            this.vscCOUT("Protein:   BioNotation registered letters as Amino Acids on toggle.");
+        }else{
+            this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
+        }
+
+        await hoverOver.toggleNotationMode(selection as def.alphabet);
+    }
 
     public async isActive(): Promise<boolean> {
         const config = vscode.workspace.getConfiguration(); //changes at runtime, should not be a private variable
         return config.get("bioNotation.enabled") === true; 
         // Only treat *true* as active
     }
-
-    
-
 
     public async applyBioNotation(fileName: string= this.activePalette ): Promise<void> {
         await this.patchTokenColors(fileName);

@@ -4,10 +4,9 @@ import * as fs from "fs";
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
 import { vscUtils, themeUtils } from "./vscUtils";
-import colorMath from "./ColorInverter";
+import colorMath from "./colorInverter";
 import { version } from "../package.json";
 import hoverOver from "./hoverOver";
-
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
@@ -17,27 +16,42 @@ export class PatchColors{
     private globalConfig = vscUtils.globalConfig;
     private editorConfig = vscUtils.editorConfig;
     private currCustomization = vscUtils.currCustomization;
-     private colorUtil = new colorMath(this.context);
+    private colorUtil = new colorMath(this.context);
 
 
     constructor(private context: vscode.ExtensionContext) {
-        this.vscCOUT(`PatchColors initialized with context: {this.context.extensionPath}`);
+        this.vscCOUT(`PatchColors initialized with context: ${this.context.extensionPath}`);
     }
 
-    public mappingRule(rule: def.ColorRule): def.ColorRule{
+    public versionTagRule(rule: def.ColorRule): def.ColorRule{
+        return this.tagRule(rule);
+    }
+    
+    public userTagRule(rule: def.ColorRule): def.ColorRule{
+       return this.tagRule(rule,"userRule");
+    }
+
+    public highLightTagRule(rule: def.ColorRule): def.ColorRule{
+       return this.tagRule(rule,"highLightRule");
+    }
+
+    private tagRule(rule: def.ColorRule, category?: string): def.ColorRule{
+        if(boolUtils.isAlreadyTagged(rule)) return rule;
+
+        const categorySuffix = category ? ` ${category}` : "";
         return{
             ...rule,
-            name: rule.name.startsWith("bio-colorer@")
-            ? rule.name
-            :`bio-colorer@${version}: ${rule.name || "unnamed"}`
+            name :`bio-colorer@${version}: ${rule.name || "unnamed"}${categorySuffix}`
         };
     }
 
-    public tagColorsGenRules(colors: def.ColorRule[]): def.ColorRule[]{
+    public tagColorsGenRules(colors: def.ColorRule[], category?: def.TagCategory): def.ColorRule[]{
         const tagged = colors.map(rule =>
-            boolUtils.isAlreadyTagged(rule)? rule : this.mappingRule(rule)
+            boolUtils.isAlreadyTagged(rule)
+                ? rule 
+                : this.tagRule(rule,category)
         );
-        this.vscCOUT(`Tagged rules: ${tagged}`);   
+        this.vscCOUT(`Tagged rules: ${tagged}`);
         return tagged;     
     }
 
@@ -54,13 +68,13 @@ export class PatchColors{
         
         this.vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
         this.vscCOUT(colors.tokenColors);
+        // this.vscCOUT(JSON.stringify(colors.tokenColors, null, 2));
         return colors.tokenColors
     }
 
-
     public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
         const palette = this.loadColors(palettePath);
-        const scope = def.tokenMap[tokenName.toUpperCase()];
+        const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
         if (!scope) {
             this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
             return null;
@@ -90,23 +104,21 @@ export class PatchColors{
                 }
             };
         }
-
     
-    public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
-        if (!boolUtils.isValidRule(rule)){ 
-            this.vscCOUT("Invalid rule provided for editing.");
-            return rule;
-        }
-        const updatedRule: def.ColorRule = {
-            ...rule,   
-            settings: {
-                ...rule.settings,
-                foreground: newColor
-            }
-            
-        }
-        return updatedRule;
-    }
+    // public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
+    //     if (!boolUtils.isValidRule(rule)){ 
+    //         this.vscCOUT("Invalid rule provided for editing.");
+    //         return rule;
+    //     }
+    //     const updatedRule: def.ColorRule = {
+    //         ...rule,   
+    //         settings: {
+    //             ...rule.settings,
+    //             foreground: newColor
+    //         }
+    //     }
+    //     return updatedRule;
+    // }
    
     // public toggleHighlight(rule: def.ColorRule){
     //     if (!boolUtils.isValidRule(rule)) {
@@ -134,7 +146,7 @@ export class PatchColors{
     //     return updatedRule;
     // }
     
-    private mergeRules(newRules : Array<def.ColorRule>){
+    public mergeRules(newRules : def.ColorRule[]){
         const customization = this.currCustomization(this.globalConfig());
         
         const existing = Array.isArray(customization.textMateRules)
@@ -152,6 +164,17 @@ export class PatchColors{
             textMateRules: filtered.concat(newRules)
         };
     }
+
+    public getTokenRepo(palette : any): Array<def.ColorRule>{ //TODO: Possibly Extract Method to vscUtils to Mirror LangHandler as PaletteHandler
+    // {
+    // "name": "Warm Palette Colors",
+    // "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",
+    // "tokenColors": [ ColorRules ]
+
+        palette.tokenColors = Array.isArray(palette.tokenColors) ? palette.tokenColors : [];
+        return palette.tokenColors;
+    }
+
     
     private async applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
         const config = this.editorConfig();
@@ -207,3 +230,5 @@ export class PatchColors{
         );
     }
 }
+
+let patcherInstance: PatchColors;

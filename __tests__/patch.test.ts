@@ -1,138 +1,138 @@
-jest.mock('vscode');
+jest.mock('vscode', () => ({
+    window: { showInformationMessage: jest.fn() },
+    workspace: {
+        getConfiguration: jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue({
+                textMateRules: []
+            }),
+           update: jest.fn()
+        })
+    },
+    languages: { registerHoverProvider: jest.fn() },
+    Position: jest.fn(),
+    Range: jest.fn()
+}));
 
-import { 
-    isAlreadyTagged, globalConfig, editorConfig, 
-   isObj, isNull, hasNameStr, hasSettings 
-}  from '../src/patch';
-
-import type { ColorRule } from '../src/patch';
-
-const completeRule: ColorRule = {
-    "name": "bio-colorer@0.0.45: FASTA Header",
-    "scope": "fasta.title",
-    "settings": {
-        "foreground": "#E6DB74",
-        "fontStyle": "bold"
+import { vscUtils } from '../src/vscUtils';
+import type { ColorRule } from '../src/definitions';
+import { boolUtils } from '../src/booleans';
+    const completeRule: ColorRule = {
+        "name": "bio-colorer@0.0.45: FASTA Header",
+        "scope": "fasta.title",
+        "settings": {
+            "foreground": "#E6DB74",
+            "fontStyle": "bold"
+        }
     }
-}
 
-const unTaggedRule: ColorRule = { name: "FASTA Header", scope: "fasta.title"  };
-const partialRule: Partial<ColorRule> = { name: "bio-colorer@0.0.45: FASTA Header" }
-const double = 1.4;
-const int = 1;
-const str = "test";
-const array = [1.4, 2.4, 1, 2, "test"];
+    const unTaggedRule: ColorRule = { name: "FASTA Header", scope: "fasta.title"  };
+    const partialRule: Partial<ColorRule> = { 
+        name: "bio-colorer@0.0.45: FASTA Header", 
+        scope: "fasta.title"  
+    }
+    const double = 1.4;
+    const int = 1;
+    const str = "test";
+    const array = [1.4, 2.4, 1, 2, "test"];
 describe('isAlreadyTagged', () => {
-    test("returns true for object with bio-colorer@ tag", () => {
-        expect(isAlreadyTagged(completeRule)).toBe(true);
-    });
-
-    // test("SHOULDN'T recognize version tag", () => {
-    //     expect(isAlreadyTagged('test.fa')).toBe(false);
+    // test("returns true for object with bio-colorer@ tag", () => {
+    //     expect(boolUtils.isAlreadyTagged(completeRule)).toBe(true);
     // });
-    
+
     // test("SHOULD recognize version tag", () => {
-    //     expect(isAlreadyTagged("bio-colorer@")).toBe(false);
+    //     expect(boolUtils.isAlreadyTagged(completeRule)).toBe(true);
     // });
-
-
-    test("SHOULD recognize version tag", () => {
-        expect(isAlreadyTagged(completeRule)).toBe(true);
-    });
 
       test("SHOULDN'T recognize version tag", () => {
-          expect(isAlreadyTagged(completeRule)).toBe(true);
+          expect(boolUtils.isAlreadyTagged(completeRule)).toBe(true);
     }); 
     
     test("SHOULD recognize version tag", () => {
-        expect(isAlreadyTagged(unTaggedRule)).toBe(false);
+        expect(boolUtils.isAlreadyTagged(unTaggedRule)).toBe(false);
     });
     
     test("SHOULDN'T recognize version tag", () => {
-        expect(isAlreadyTagged(unTaggedRule)).toBe(false);
+        expect(boolUtils.isAlreadyTagged(unTaggedRule)).toBe(false);
     });
 });
 
 describe('Tests for hasSettings Behavior', () => {
     test("Given Whole Object", () => {
-        expect(hasSettings(completeRule)).toBe(true);
+        expect(boolUtils.hasSettings(completeRule)).toBe(true);
     });
     
 });
 describe('Tests for hasNameStr Behavior', () => {
     test("Given Whole Object", () => {
-        expect(hasNameStr(completeRule)).toBe(true);
+        expect(boolUtils.hasNameStr(completeRule)).toBe(true);
     });
     test("Given Partial Object", () => {
-        expect(hasNameStr(partialRule as ColorRule)).toBe(true);
+        expect(boolUtils.hasNameStr(partialRule as ColorRule)).toBe(true);
     });
 
     test("Given Partial Untagged Object", () => {
-        expect(hasNameStr(unTaggedRule)).toBe(true);
+        expect(boolUtils.hasNameStr(unTaggedRule)).toBe(true);
     });
     test("Given string Untagged Object", () => {
-        expect(hasNameStr(str as unknown as ColorRule)).toBe(false);
+        expect(boolUtils.hasNameStr(str as unknown as ColorRule)).toBe(false);
     }); 
 });
-//     test("Given string to NameBoolean", () => {
-//         expect(hasNameStr("name")).toBe(false);
-//     });
-// });
+
 describe('Tests for isNull Behavior', () => {
     test("Given Whole Object", () => {
-        expect(isNull(completeRule)).toBe(false);
+        expect(boolUtils.isNull(completeRule)).toBe(false);
     });
     test("Given Partial Object", () => {
-        expect(isNull(partialRule)).toBe(false);
+        expect(boolUtils.isNull(partialRule)).toBe(false);
     });
     test("Given Partial Untagged Object", () => {
-        expect(isNull(unTaggedRule)).toBe(false);
+        expect(boolUtils.isNull(unTaggedRule)).toBe(false);
     });
     test("Given String", () => {
-        expect(isNull(str)).toBe(false);
+        expect(boolUtils.isNull(str)).toBe(false);
     });
     test("Given int", () => {
-        expect(isNull(int)).toBe(false);
+        expect(boolUtils.isNull(int)).toBe(false);
     }); 
     test("Given double", () => {
-        expect(isNull(double)).toBe(false);
+        expect(boolUtils.isNull(double)).toBe(false);
     });
     test("Given array", () => {
-        expect(isNull(array)).toBe(false);
+        expect(boolUtils.isNull(array)).toBe(false);
     });
 });
 describe('Tests for isObj Behavior', () => {
     test("Given Whole Object", () => {
-        expect(isObj(completeRule)).toBe(true);
+        expect(boolUtils.isObj(completeRule)).toBe(true);
     }); 
     test("Given settings Object", () => {
-        expect(isObj(completeRule.settings)).toBe(true);
+        expect(boolUtils.isObj(completeRule.settings)).toBe(true);
     });
     test("Given Partial Object", () => {
-        expect(isObj(partialRule)).toBe(true);
+        expect(boolUtils.isObj(partialRule)).toBe(true);
     });
     test("Given Partial Untagged Object", () => {
-        expect(isObj(unTaggedRule)).toBe(true);
+        expect(boolUtils.isObj(unTaggedRule)).toBe(true);
     });
     test("Given String", () => {
-        expect(isObj(str)).toBe(false);
+        expect(boolUtils.isObj(str)).toBe(false);
     });
     test("Given int", () => {
-        expect(isObj(int)).toBe(false);
+        expect(boolUtils.isObj(int)).toBe(false);
     }); 
     test("Given double", () => {
-        expect(isObj(double)).toBe(false);
+        expect(boolUtils.isObj(double)).toBe(false);
     });
     test("Given array", () => {
-        expect(isObj(array)).toBe(false);
+        expect(boolUtils.isObj(array)).toBe(false);
     });
     test("Given null", () => {
-        expect(isObj(null)).toBe(false);
+        expect(boolUtils.isObj(null)).toBe(false);
     });
 });
 describe('globalConfig', () => {
     test('returns the global configuration object', () => {
-        const config = globalConfig();
+        const config = vscUtils.globalConfig();
         expect(config).toBeDefined();
         expect(typeof config).toBe('object');
     });
@@ -140,8 +140,20 @@ describe('globalConfig', () => {
 
 describe('editorConfig', () => {
     test('returns the editor configuration object', () => {
-        const config = editorConfig();
+        const config = vscUtils.editorConfig();
         expect(config).toBeDefined();
         expect(typeof config).toBe('object');
+    });
+});
+
+describe('currCustomization', () => {
+    test('returns the current customization object', () => {
+        const config = vscUtils.editorConfig();
+        const customization = vscUtils.currCustomization(config);
+
+        expect(customization).toBeDefined();
+        expect(typeof customization).toBe('object');
+        expect(customization.textMateRules).toBeDefined();
+        expect(Array.isArray(customization.textMateRules)).toBe(true);
     });
 });
