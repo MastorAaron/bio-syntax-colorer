@@ -10,18 +10,22 @@ export class HoverObj{
     private static instance: HoverObj;
     
     private vscCOUT = vscUtils.vscCOUT;
-    private currMode: def.alphabet = "Ambigious"; // Default mode
+    private currAlpha: def.alphabet = "Ambigious"; // Default mode
     private activeToken: def.ColorRule | undefined;
     
     constructor() {
         this.vscCOUT("HoverObj initialized");
     }
 
-    public static getInstance(): HoverObj {
+    public static refHoverObj(): HoverObj {
         if (!HoverObj.instance) {
             HoverObj.instance = new HoverObj();
         }
         return HoverObj.instance;
+    }
+     
+    public getCurrAlpha(): def.alphabet{
+        return this.currAlpha;
     }
 
     private onHover(contents: string, pos: Position): vscode.Hover | undefined {
@@ -47,7 +51,7 @@ export class HoverObj{
                     const letter = line[pos.character].toUpperCase(); // const letter = word[pos.character];
                     if (!letter) return;
                     
-                    const description = this.arrayToStr(this.getDescription(letter, doc.fileName));
+                    const description = def.arrayToStr(this.getDescription(letter, doc.fileName));
                     return this.onHover(description, pos);
                 }catch(err){
                     this.vscCOUT("Error in hoverOver.ts: " + err);
@@ -62,29 +66,19 @@ export class HoverObj{
 
     public async toggleNotationMode(selection: def.alphabet) {
         if (selection === "Ambigious" || selection === "Nucleotides" || selection === "Aminos") {
-            this.currMode = selection;
+            this.currAlpha = selection;
             await vscode.workspace.getConfiguration().update("bio-colorer.notationMode", selection, vscode.ConfigurationTarget.Workspace);
             this.vscCOUT(`BioNotation alphabet mode set to: ${selection}`);
         }
     }
 
-    private arrayToStr(strArr : Array<string> | string): string{
-        if(typeof strArr === "string") {
-            return strArr;
-        }
-
-        let newStr="";
-        for(const each of strArr){
-            newStr+=each+'\n';
-        }
-        return newStr;
-    }
+   
 
     public getDescription(letter: string, fileName: string): Array<string> | string{
-        if (this.currMode === "Nucleotides" || boolUtils.isFna(fileName)) {
+        if (this.currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
             return def.nukeInfoMap[letter as def.nukes] || letter;
         } 
-        if (this.currMode === "Aminos" ||  boolUtils.isFaa(fileName)) {
+        if (this.currAlpha === "Aminos" ||  boolUtils.isFaa(fileName)) {
             return def.aminoInfoMap[letter as def.aa] || letter;
         } // Mixed mode, show raw or dual-name
 
@@ -99,4 +93,4 @@ export class HoverObj{
     }
 }
 
-export default HoverObj.getInstance();
+export default HoverObj.refHoverObj();

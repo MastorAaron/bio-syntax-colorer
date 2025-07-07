@@ -483,9 +483,9 @@ print("Palatte:")
 "#7FFF3F"
 "#00FF7E"
 
-Gold    = "#FFD700"   # RGB(255, 215, 0)
 Bronze  = "#CD7F32"   # RGB(205, 127, 50)
 Silver  = "#C0C0C0"   # RGB(192, 192, 192)
+Gold    = "#FFD700"   # RGB(255, 215, 0)
 
 RoyalPurple = "#7851A9"  # RGB(120, 81, 169)
 Teal        = "#008080"  # RGB(0, 128, 128)
@@ -694,3 +694,17 @@ T = "#7F00FF"
 "#7FFF00"
 "#00FEFF"
 "#7F00FF"
+
+NeonYellow  = "#FFFF33"
+NeonGreen   = "#39FF14"
+NeonBlue    = "#1F51FF"
+NeonMagneta = "#FF00FF"
+
+Neons = [NeonYellow, NeonGreen, NeonBlue, NeonMagneta]
+
+
+"#D4D4D4"
+"#57606C"
+
+DARK_FG  = "#D4D4D4";
+LIGHT_FG = "#57606C";

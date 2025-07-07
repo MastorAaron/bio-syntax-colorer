@@ -14,7 +14,6 @@ export const DARK_FG: def.colorHex  = "#D4D4D4";
 export const LIGHT_FG: def.colorHex = "#57606C";
 export namespace vscUtils{
 
-
     export function vscCOUT(...args: unknown[]): void {
         const formatted = args.map(arg => {
         if(typeof arg === "string") return arg;
@@ -27,6 +26,17 @@ export namespace vscUtils{
         }).join(" ");
 
         vscode.window.showInformationMessage(formatted);
+    }
+
+    export function print(toPrint:string, stream:string="console"){
+        if(stream === "console"){
+            console.log(toPrint);
+        }else if(stream === "vsc"){
+            vscCOUT(toPrint);
+        }
+        // else if(stream === "else"){
+        //     (toPrint);
+        // }
     }
     
     export function globalConfig(): vscode.WorkspaceConfiguration{
@@ -53,15 +63,21 @@ export namespace vscUtils{
         );
     }
 
-    export function mockContext(){
-        return { extensionPath: "./" } as unknown as vscode.ExtensionContext;
-    }
+    // export function mockContext(){
+    //     return { extensionPath: "./" } as unknown as vscode.ExtensionContext;
+    // }
+
+    export function mockContext(): vscode.ExtensionContext {
+    return {
+        extensionPath: "./",
+        subscriptions: []
+    } as unknown as vscode.ExtensionContext;
+}
+
 } 
 
 
 export const themeUtils = {
- 
-    
     themeKind(){
         return vscode.window.activeColorTheme.kind;
     },
@@ -78,6 +94,7 @@ export const themeUtils = {
         return this.isDark() ? DARK_FG : LIGHT_FG;
     }
 };
+
 interface FastaLang {
     repository?:{
         keywords?:{

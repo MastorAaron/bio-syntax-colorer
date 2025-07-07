@@ -3,9 +3,6 @@ import { vscUtils, themeUtils, DARK_FG, LIGHT_FG } from "../src/vscUtils";
 import { LangHandler, RegExBuilder } from "../src/vscUtils";
 import { boolUtils} from "../src/booleans";
 
-
-
-
 import {PatchColors} from "../src/patch";
 import * as def from "../src/definitions";
 
@@ -16,7 +13,6 @@ jest.mock('vscode', () => ({
 }));
 
 describe("RegExBuilder highLight RegEx Generation", () => {
-
     const builder = new RegExBuilder();
 
     test("Generates basic nuke highLight RegEx", () => {
@@ -92,7 +88,7 @@ describe("PatchColors Tagging", () => {
         name: "kmer Highlighter",
         scope: scopeName,
         settings: {
-            "foreground": DARK_FG,
+            "foreground": themeUtils.defaultTextColor(),
             "background": NeonYellow
         }
     };
@@ -104,15 +100,15 @@ describe("PatchColors Tagging", () => {
     test("SHOULD recognize version tag", () => {
         expect(boolUtils.isAlreadyTagged(taggedRule as def.ColorRule)).toBe(true);
     });
-     test("Append new Color Rule", () => {
+    test("Append new Color Rule", () => {
         const palette = patcher.loadColors("fasta-colors-warm.json");
         const updatedPalette = patcher.tagColorsGenRules(palette.concat(taggedRule));
 
         // Validate the taggedRule is present
         const found = updatedPalette.find(rule => rule.scope === taggedRule.scope);
         expect(found).toBeDefined();
-            expect(found?.scope).toContain("highLightRule");
-        }); 
+        expect(found?.scope).toContain("highLightRule");
+    }); 
             
 });
             

@@ -1,9 +1,23 @@
 import * as def from "./definitions";
 
 export class boolUtils{
+    
+    static testForFile(fileName: string, extensions: string[]){
+        const extPattern = extensions.join("|");
+        const pattern = new RegExp(`\\.(${extPattern})$`, "i");
+        return pattern.test(fileName);
+    }
+
+    static isValidColor(color: string): boolean {
+        // Simple regex to check if color is in hex format
+        return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(color);
+    }
 
 
     static isFastaFile(fileName: string): boolean {
+        return this.testForFile(fileName, ["fa","fna","faa","fasta","fastq"]);
+    }
+    static isOriFastaFile(fileName: string): boolean {
         return /\.(fa|fna|faa|fasta|fastq)$/i.test(fileName);
     }
     static isFna(fileName: string): boolean {
@@ -52,27 +66,17 @@ export class boolUtils{
     static isNull(value: unknown): boolean {
         return value === null;
     }
-    
-    // static hasNameStr(rule: def.ColorRule): boolean {
-    //     return typeof rule.name === "string";
-    // }
-    
-    //Returns a Boolean at runtime but 
-    //also verifies the type at compile time
+
     static isObj(potObj : unknown): potObj is Record<string, unknown>{
         return potObj !== null
         && typeof potObj === "object" 
         && !Array.isArray(potObj);
     } 
     
-    // static hasSettings(rule : def.ColorRule): boolean{
-    //     return this.isObj(rule.settings) 
-    //     && Object.keys(rule.settings).length > 0;
+    // static containsFrag(value: string | undefined, frag: string | RegExp): boolean {
+    //     if (typeof value !== "string") return false;
+    //     return frag instanceof RegExp ? frag.test(value) : value.includes(frag);
     // }
-    
-    // static isCompleteRule(rule : def.ColorRule): boolean {
-    //     return this.hasNameStr(rule);
-    // } 
     
     static containsFrag(rule: { name?: string }, frag?: string): boolean {
         return typeof rule.name === "string" && typeof frag === "string" && rule.name.includes(frag);
@@ -82,40 +86,10 @@ export class boolUtils{
         return this.containsFrag(rule, "bio-colorer@");
     }
 
-    // static containsFrag(value: string | undefined, frag: string | RegExp): boolean {
-    //     if (typeof value !== "string") return false;
-    //     return frag instanceof RegExp ? frag.test(value) : value.includes(frag);
-    // }
-
     static isAlreadyTagged(rule : def.ColorRule): boolean {
         // this.isValidRule(rule) 
         // && 
         return this.containsVersion(rule);
     }
-
-    // static containsVersion(category : def.ColorRule | string): boolean {
-    //     return typeof category === "string" && /^bio(-syntax)?-colorer@/.test(category);  
-    // } 
-
-  
-    
-    // static containsLegacyTag(rule : def.ColorRule) {
-    //     const { containsTag } = this;
-    //     // Check if the rule has a comment or name that contains the legacy tag
-    //     const comment = rule.comment || "";
-    //     const name = rule.name || "";
-        
-    //     return containsTag(comment) || containsTag(name);
-    // }
-    
-    // static isManualG(rule : def.ColorRule): boolean {
-    //     return rule.scope === "source.fasta.ntG" && !rule.name;
-    // }
-    
-    // static isValidColor(color: string): boolean {
-    //     // Simple regex to check if color is in hex format
-    //     return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(color);
-    // }
-
 
 } 

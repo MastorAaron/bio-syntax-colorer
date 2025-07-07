@@ -1,4 +1,14 @@
 "use strict";
+
+import { vscUtils } from "../src/vscUtils";
+const { vscCOUT, editorConfig, showInterface } = vscUtils;
+
+
+import { boolUtils } from "../src/booleans";
+import * as def from "../src/definitions";
+const {} = def
+
+
 Object.defineProperty(exports, "__esModule", { value: true });
 
 jest.mock('vscode', () => ({
@@ -36,8 +46,30 @@ describe('check for object', () => {
     });
 });
 
+function boolText(bool: boolean){
+    return bool? "Yes" : "No";
+}
+
+function printBool(bool: boolean){
+    print(boolText(bool));
+}
+
+function print(toPrint:string, stream:string="console"){
+    if(stream === "console"){
+        console.log(toPrint);
+    }else if(stream === "vsc"){
+        vscCOUT(toPrint);
+    }
+    // else if(stream === "else"){
+    //     (toPrint);
+    // }
+}
+
 describe('is Negative Amino Acid', () => {
     test("returns true for Negative Amino", () => {
-        expect(HoverObj.isNeg('E')).toBe(true);
+        const bool = def.isNeg('E');
+        print("isNeg:");
+        printBool(bool);
+        expect(bool).toBe(true);
     });
 });

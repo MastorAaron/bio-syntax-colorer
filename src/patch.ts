@@ -8,6 +8,7 @@ import colorMath from "./colorInverter";
 import { version } from "../package.json";
 import hoverOver from "./hoverOver";
 
+
 const DEFAULT_PALETTE = "fasta-colors.json";
 
 export class PatchColors{

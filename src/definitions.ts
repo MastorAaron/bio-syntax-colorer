@@ -39,7 +39,8 @@ export const aaWild      = ['X'] as const;
 
 export const nucleotides     = ['A','C','G','T','U'] as const;
 export const symbols         = ['-', '*'] as const;//TODO: Stop Codon is Amino not Nuke
-
+                                                   //TODO: Update for parts of FastQ files
+                                                   //TODO: Quality Scores, ignore lines, etc 
 export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
 export const nukeBondStrgth  = ['S', 'W'] as const;
 export const functGroupNukes = ['K', 'M'] as const;
@@ -91,7 +92,7 @@ export type ntExtd = ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ;
 export type nukes  = nt | ntExtd  | Syms;
 
 // export type AminoDescript = [string]
-export const nukeInfoMap : Record<nukes,Array<string>>= {
+export const nukeInfoMap : Partial<Record<nukes,Array<string>>>= {
     'A':["Adenine","Purine","A"],
     'C':["Cytosine","Pyrimidine","C"],
     'G':["Guanine","Purine","G"],
@@ -115,14 +116,13 @@ export const nukeInfoMap : Record<nukes,Array<string>>= {
     'V':["A, C, or G (not T/U)","V"],
     
     '-':["Gap","-"],
-    '*':["Stop Codon","*"]
+
 }
 
 // + is Basic Amino Acids
 // - is Acidic Amino Acids
 
-
-export const aminoInfoMap : Partial<Record<aminos,Array<string>>>= {
+export const aminoInfoMap : Record<aminos,Array<string>>= {
     'K':["Lys","Lysine","Positively Charged","pKa = 10.7"],
     'R':["Arg","Arginine","Positively Charged","pKa = 12.1"],
     
@@ -160,6 +160,9 @@ export const aminoInfoMap : Partial<Record<aminos,Array<string>>>= {
     
     'Z':["Glx: Gln or Glu"], 
     'X':["Any Amino Acid"],
+
+    '*':["Stop Codon","*"],
+    '-':["Gap","-"]
 }
 
 export type conflicts = nukes;
@@ -210,7 +213,7 @@ export const aminoRegExMap : Record<aaAmbig,string>= {
 }
 
 export const nukeRegExMap : Record<ntExtd,string>= {
-    'N': "[NRYSWKMBDHVACGTU-*]",
+    'N': "[NRYSWKMBDHVACGTU-]",
 
     'R': "[RAG]",
     'Y': "[YTCU]",
@@ -311,6 +314,18 @@ export function isNuke(value: unknown): value is nukes {
 
 export function isMemberOf<Template extends string | ColorRule | PatternRule>(value: unknown, group: readonly Template[]): value is Template {
     return typeof value === "string" && group.includes(value as Template);
+}
+
+export function arrayToStr(strArr : Array<string> | string): string{
+    if(typeof strArr === "string") {
+        return strArr;
+    }
+
+    let newStr="";
+    for(const each of strArr){
+        newStr+=each+'\n';
+    }
+    return newStr;
 }
 
 export type PaletteFilePath = string & { readonly __paletteFilePath: unique symbol };
