@@ -1,13 +1,13 @@
 {
-    "name": "Warm Palette Colors",
-    "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",
+  "name": "Warm Palette Colors",
+  "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",
     "tokenColors": [
         {
-            "name": "FASTA Header",
-            "scope":"fasta.title",
-            "settings":{
-                "foreground":"#E6DB74",
-                "fontStyle":"bold"
+      "name": "FASTA Header",
+      "scope":"fasta.title",
+      "settings":{
+        "foreground":"#E6DB74",
+        "fontStyle":"bold"
             }
         },
         {
@@ -129,11 +129,7 @@
             "settings":{
                 "foreground": "#800080"
             }
-        },
-
-
-        
-
+        },     
         {   
             "name": "Gap or Minus Sign", 
             "scope": "source.fasta.symGap", 
@@ -226,22 +222,29 @@
         },
         
         {
+            "name": "Ignored Line?",
+            "scope": "source.fastq.plusLine",
+            "settings":{
+                "foreground": "#CD7F32" 
+            }
+        }, 
+        {
             "name": "Low Quality Read Score",
-            "scope": "fastq.quality.low",
+            "scope": "source.fastq.quality.low",
             "settings":{
                 "foreground": "#CD7F32" 
             }
         },
         {
             "name": "Medium Quality Read Score",
-            "scope": "fastq.quality.mid",
+            "scope": "source.fastq.quality.mid",
             "settings":{
                 "foreground": "#C0C0C0" 
             }
         },
         {
             "name": "High Quality Read Score",
-            "scope": "fastq.quality.high",
+            "scope": "source.fastq.quality.high",
             "settings":{
                 "foreground": "#FFD700" 
             }

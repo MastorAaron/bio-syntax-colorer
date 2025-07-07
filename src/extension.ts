@@ -23,13 +23,13 @@ export type PaletteName =
     "CoolComp" |
     "CoolInvert";
 
-const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
+const PaletteMap: Partial<Record<PaletteName, def.PaletteFilePath>> = {
     // "Default": "fasta-colors.json"as def.PaletteFilePath,
     "Warm": "fasta-colors-warm.json"as def.PaletteFilePath,
     "Cool": "fasta-colors-cool.json"as def.PaletteFilePath,
-    "Cold": "fasta-colors-cold.json"as def.PaletteFilePath,
-    "CoolComp": "fasta-colors-cold-comp.json" as def.PaletteFilePath,
-    "CoolInvert": "fasta-colors-cold-inverted.json" as def.PaletteFilePath
+    "Cold": "fasta-colors-cold.json"as def.PaletteFilePath
+    // "CoolComp": "fasta-colors-cold-comp.json" as def.PaletteFilePath,
+    // "CoolInvert": "fasta-colors-cold-inverted.json" as def.PaletteFilePath
 }
 
 //TODO: Use classes in .ts files for better foundation and maintainability
@@ -96,7 +96,7 @@ export class BioNotation{
    
     public async toggleAlphabet(){
         const options: def.alphabet[] = ["Ambigious", "Nucleotides", "Aminos"];
-        const userText = def.arrayToStr(["Select Notation Mode:",
+        const userText = def.arrayToStr(["Determine Alphabet for HoverOver Info:",
                                         "\tProtein: Aminos",
                                         "\tDNA/RNA: Nucleotides",
                                         "\tDefault: Ambigious"]);
@@ -106,7 +106,7 @@ export class BioNotation{
             //     { placeHolder: "Select Notation Mode\nAminos\nNucleotides" }
             // );
 
-        await hoverOver.toggleNotationMode(selection as def.alphabet);
+        await hoverOver.switchAlphabets(selection as def.alphabet);
 
         if(selection === "Ambigious"){
             this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");

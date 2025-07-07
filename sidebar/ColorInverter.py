@@ -487,9 +487,14 @@ Bronze  = "#CD7F32"   # RGB(205, 127, 50)
 Silver  = "#C0C0C0"   # RGB(192, 192, 192)
 Gold    = "#FFD700"   # RGB(255, 215, 0)
 
-RoyalPurple = "#7851A9"  # RGB(120, 81, 169)
-Teal        = "#008080"  # RGB(0, 128, 128)
 Maroon      = "#800000"  # RGB(128, 0, 0)
+Teal        = "#008080"  # RGB(0, 128, 128)
+RoyalPurple = "#7851A9"  # RGB(120, 81, 169)
+
+Blue        = "#0000FF"
+RoyalPurple = "#7851A9"  # RGB(120, 81, 169)
+Gold        = "#FFD700"   # RGB(255, 215, 0)
+
 
 # printColors([Red,Yellow,Green],"RYG")
 "#FF0000"
