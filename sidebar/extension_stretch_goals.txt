@@ -36,6 +36,11 @@ Palette selection and customization commands:
   • `bio-colorer.savePaletteAs` (InputBox + fs.copyFile to clone palette)
   • Sanger color Palette, Illumina, Oxford Nanopore, PacBio. etc
 
+Highlight RegEx Patterns with Kmers, Codons, etc
+
+
+Isolate by type for Amino/Nuke Properties
+
 Manual Color Override UI:
   • Add QuickPick to select token (nucleotide, amino acid, category)
   • Use InputBox with color slider to set custom foreground
@@ -60,4 +65,13 @@ Optional Rich UI (Webview) for batch editing:
       }
   }
 
+
+  ✅ Your Current Structure:
+definitions.ts = Maps, constants, token scopes
+
+vscUtils.ts = VS Code utilities, grammar handling
+
+patch.ts = Palette logic, color transforms
+
+extension.ts = Entry point, commands, orchestrator
   Publish to VSCode

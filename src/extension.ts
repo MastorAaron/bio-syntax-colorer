@@ -1,3 +1,10 @@
+/**
+ * BioNotation - A VSCode extension for enhanced bioinformatics file visualization.
+ * 
+ * This module provides functions to apply, clear, and toggle BioNotation colors,
+ * as well as manage color palettes and check the active state of the extension.
+*/
+
 // import { patchTokenColors, removeTokenColors, loadColors, vscCOUT } from "./patch";
 import * as vscode from "vscode";
 import { vscUtils, themeUtils } from "./vscUtils";
@@ -5,7 +12,6 @@ import {PatchColors} from "./patch";
 
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
-
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
@@ -26,18 +32,10 @@ const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
     "CoolInvert": "fasta-colors-cold-inverted.json" as def.PaletteFilePath
 }
 
-/**
- * BioNotation - A VSCode extension for enhanced bioinformatics file visualization.
- * 
- * This module provides functions to apply, clear, and toggle BioNotation colors,
- * as well as manage color palettes and check the active state of the extension.
-*/
-
 //TODO: Use classes in .ts files for better foundation and maintainability
 //TODO: Add functions to be run on an uninstall event to clean up settings and token colors
 //TODO: Set up Highlighting for specified letter or Motif in a file
 //TODO: Implement On Hover from Refactored file
-
 
 export class BioNotation{ 
     private patcher: PatchColors;
@@ -58,29 +56,29 @@ export class BioNotation{
 
         this.selectPalette = this.selectPalette.bind(this);
         this.toggleColorOverlay = this.toggleColorOverlay.bind(this);
-        this.clearBioNotation = this.clearBioNotation.bind(this);
-        this.applyBioNotation = this.applyBioNotation.bind(this);
+        this.toggleAlphabet = this.toggleAlphabet.bind(this);
+        this.clearColors = this.clearColors.bind(this);
+        this.applyColors = this.applyColors.bind(this);
 
         this.registerCommands();
         hoverOver.registerProvider();
-
     }
 
     private registerCommands(): void {
         this.context.subscriptions.push(
             vscode.commands.registerCommand("bioNotation.selectPalette", this.selectPalette),
-            vscode.commands.registerCommand("bioNotation.toggleColors", this.toggleColorOverlay),
+            vscode.commands.registerCommand("bioNotation.toggleColorsOverlay", this.toggleColorOverlay),
             vscode.commands.registerCommand("bioNotation.toggleAlphabet", this.toggleAlphabet),
-            vscode.commands.registerCommand("bioNotation.clearColors", this.clearBioNotation),
-            vscode.commands.registerCommand("bioNotation.applyColors", this.applyBioNotation)
+            vscode.commands.registerCommand("bioNotation.clearColors", this.clearColors),
+            vscode.commands.registerCommand("bioNotation.applyColors", this.applyColors)
         );
     }
             
-    private async updateEnabledFlag(value : boolean): Promise<void> {   
-        await vscode.workspace.getConfiguration().update("bioNotation.enabled", value, this.targetConfigWorkspace);
+    private async updateEnabledFlag(bool : boolean): Promise<void> {   
+        await vscode.workspace.getConfiguration().update("bioNotation.enabled", bool, this.targetConfigWorkspace);
     }
 
-    public async clearBioNotation(): Promise<void> {
+    public async clearColors(): Promise<void> {
         await this.removeTokenColors();
         await this.updateEnabledFlag(false);
         this.vscCOUT("BioNotation colors cleared.");
@@ -88,27 +86,30 @@ export class BioNotation{
     
     public async toggleColorOverlay(): Promise<void> {
         if(await this.isActive()){
-            await this.clearBioNotation();
+            await this.clearColors();
             this.vscCOUT("BioNotation deactivated via toggle.");
         }else{
-            await this.applyBioNotation();
+            await this.applyColors();
             this.vscCOUT("BioNotation activated via toggle.");
         }
     }
-    
+   
     public async toggleAlphabet(){
-        // const options = ["Ambigious", "Nucleotides", "Aminos"];
         const options: def.alphabet[] = ["Ambigious", "Nucleotides", "Aminos"];
-        const userText = "Select Notation Mode\nAminos\nNucleotides";
-        // const selection = await vscode.window.showQuickPick(options, 
-        //     { placeHolder: "Select Notation Mode\nAminos\nNucleotides" }
-        // );
-
+        const userText = def.arrayToStr(["Select Notation Mode:",
+                                        "\tProtein: Aminos",
+                                        "\tDNA/RNA: Nucleotides",
+                                        "\tDefault: Ambigious"]);
+        
         const selection = await vscUtils.showInterface(options, userText);
+            // const selection = await vscode.window.showQuickPick(options, 
+            //     { placeHolder: "Select Notation Mode\nAminos\nNucleotides" }
+            // );
+
+        await hoverOver.toggleNotationMode(selection as def.alphabet);
 
         if(selection === "Ambigious"){
             this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
-
         }else if(selection === "Nucleotides"){
             this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
         }else if(selection === "Aminos"){
@@ -116,17 +117,15 @@ export class BioNotation{
         }else{
             this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
         }
-
-        await hoverOver.toggleNotationMode(selection as def.alphabet);
     }
 
     public async isActive(): Promise<boolean> {
-        const config = vscode.workspace.getConfiguration(); //changes at runtime, should not be a private variable
+        const config = vscUtils.globalConfig(); //changes at runtime, should not be a private variable
         return config.get("bioNotation.enabled") === true; 
         // Only treat *true* as active
     }
 
-    public async applyBioNotation(fileName: string= this.activePalette ): Promise<void> {
+    public async applyColors(fileName: string= this.activePalette ): Promise<void> {
         await this.patchTokenColors(fileName);
         await this.updateEnabledFlag(true);
         this.vscCOUT("BioNotation colors applied.");

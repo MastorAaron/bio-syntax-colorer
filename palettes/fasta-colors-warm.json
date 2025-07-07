@@ -223,6 +223,28 @@
             "settings":{
                 "foreground": "#4682B4"
             }
+        },
+        
+        {
+            "name": "Low Quality Read Score",
+            "scope": "fastq.quality.low",
+            "settings":{
+                "foreground": "#CD7F32" 
+            }
+        },
+        {
+            "name": "Medium Quality Read Score",
+            "scope": "fastq.quality.mid",
+            "settings":{
+                "foreground": "#C0C0C0" 
+            }
+        },
+        {
+            "name": "High Quality Read Score",
+            "scope": "fastq.quality.high",
+            "settings":{
+                "foreground": "#FFD700" 
+            }
         }
     ]
 }
