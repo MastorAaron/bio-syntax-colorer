@@ -9,12 +9,15 @@ const path = require('path');
 export class HoverObj{ 
     private static instance: HoverObj;
     
+    private DEFAULT_ALPHABET: def.alphabet = "Ambigious"
+
     private vscCOUT = vscUtils.vscCOUT;
-    private currAlpha: def.alphabet = "Ambigious"; // Default mode
+    private currAlpha: def.alphabet = this.DEFAULT_ALPHABET; // Default mode
     private activeToken: def.ColorRule | undefined;
     
     constructor() {
         this.vscCOUT("HoverObj initialized");
+        this.initAlpha();
     }
 
     public static refHoverObj(): HoverObj {
@@ -24,10 +27,17 @@ export class HoverObj{
         return HoverObj.instance;
     }
      
-    public getCurrAlpha(): def.alphabet{
-        return this.currAlpha;
-    }
+    private initAlpha(): void {
+        const storedAlpha = vscode.workspace.getConfiguration().get<def.alphabet>("bioNotation.alphabet");
+        if (storedAlpha) {
+            this.currAlpha = storedAlpha;
+        }
+}
 
+    public getCurrAlpha(): def.alphabet {
+        const storedAlpha = vscode.workspace.getConfiguration().get<def.alphabet>("bioNotation.alphabet");
+        return storedAlpha || this.currAlpha;
+    }
     private onHover(contents: string, pos: Position): vscode.Hover | undefined {
         const x = pos.line;    
         const y = pos.character;
@@ -64,15 +74,23 @@ export class HoverObj{
         });
     }
 
-    public async toggleNotationMode(selection: def.alphabet) {
+    public async switchAlphabets(selection: def.alphabet) {
         if (selection === "Ambigious" || selection === "Nucleotides" || selection === "Aminos") {
             this.currAlpha = selection;
-            await vscode.workspace.getConfiguration().update("bio-colorer.notationMode", selection, vscode.ConfigurationTarget.Workspace);
+            await vscode.workspace.getConfiguration().update(
+                "bioNotation.alphabet",
+                selection,
+                vscode.ConfigurationTarget.Workspace
+                );
             this.vscCOUT(`BioNotation alphabet mode set to: ${selection}`);
+        }else{
+            this.vscCOUT("Error: no valid Alphabet selection\n",
+                `Fallback is Default: ${this.DEFAULT_ALPHABET}`
+            )
+            this.currAlpha = this.DEFAULT_ALPHABET;
+            return;
         }
     }
-
-   
 
     public getDescription(letter: string, fileName: string): Array<string> | string{
         if (this.currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {

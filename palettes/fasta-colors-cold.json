@@ -212,6 +212,34 @@
       "settings": {
         "foreground": "#B97D4B"
       }
+	},
+    {
+        "name": "Ignored Line?",
+        "scope": "source.fastq.plusLine",
+        "settings":{
+            "foreground": "#CD7F32" 
+        }
+    }, 
+    {
+        "name": "Low Quality Read Score",
+        "scope": "source.fastq.quality.low",
+        "settings":{
+            "foreground": "#0000FF" 
+        }
+    },
+    {
+        "name": "Medium Quality Read Score",
+        "scope": "source.fastq.quality.mid",
+        "settings":{
+            "foreground": "#7851A9" 
+        }
+    },
+    {
+        "name": "High Quality Read Score",
+        "scope": "source.fastq.quality.high",
+        "settings":{
+            "foreground": "#FFD700" 
+        }
     }
-  ]
+    ]
 }

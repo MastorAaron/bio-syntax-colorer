@@ -51,20 +51,8 @@
           "match": "[Yy]+"
         },
         {
-          "name": "source.fasta.ntS",
-          "match": "[Ss]+"
-        },
-        {
-          "name": "source.fasta.ntW",
-          "match": "[Ww]+"
-        },
-        {
-          "name": "source.fasta.ntK",
-          "match": "[Kk]+"
-        },
-        {
-          "name": "source.fasta.ntM",
-          "match": "[Mm]+"
+          "name": "source.fasta.ntB",
+          "match": "[Bb]+"
         },
         {
           "name": "source.fasta.ntD",
@@ -79,24 +67,49 @@
           "match": "[Vv]+"
         },
         {
+          "name": "source.fasta.ntK",
+          "match": "[Kk]+"
+        },
+        {
+          "name": "source.fasta.ntM",
+          "match": "[Mm]+"
+        },
+        {
+          "name": "source.fasta.ntS",
+          "match": "[Ss]+"
+        },
+        {
+          "name": "source.fasta.ntW",
+          "match": "[Ww]+"
+        },
+        {
           "name": "source.fasta.symGap",
           "match": "[-]"
         },
         {
           "name": "source.fasta.symStop",
-          "match": "[*@.]"
+          "match": "[*.]"
         },
-        {
-          "name": "source.fasta.aaB",
-          "match": "[Bb]+"
-        },
+
         {
           "name": "source.fasta.aaE",
           "match": "[Ee]+"
         },
         {
+          "name": "source.fasta.aaQ",
+          "match": "[Qq]+"
+        },
+        {
+          "name": "source.fasta.aaZ",
+          "match": "[Zz]+"
+        },
+        {
           "name": "source.fasta.aaF",
           "match": "[Ff]+"
+        },
+        {
+          "name": "source.fasta.aaL",
+          "match": "[Ll]+"
         },
         {
           "name": "source.fasta.aaI",
@@ -107,28 +120,16 @@
           "match": "[Jj]+"
         },
         {
-          "name": "source.fasta.aaL",
-          "match": "[Ll]+"
+          "name": "source.fasta.aaP",
+          "match": "[Pp]+"
         },
         {
           "name": "source.fasta.aaO",
           "match": "[Oo]+"
         },
         {
-          "name": "source.fasta.aaP",
-          "match": "[Pp]+"
-        },
-        {
-          "name": "source.fasta.aaQ",
-          "match": "[Qq]+"
-        },
-        {
           "name": "source.fasta.aaX",
           "match": "[Xx]+"
-        },
-        {
-          "name": "source.fasta.aaZ",
-          "match": "[Zz]+"
         },
         {
           "name": "source.fastq.plusLine",

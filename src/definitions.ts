@@ -101,10 +101,10 @@ export const nukeInfoMap : Partial<Record<nukes,Array<string>>>= {
 
     'N':["Any Nucleotide","N"],
     
-    'R':["Purine"," A or G","R"],
+    'R':["Purine","A or G","R"],
     'Y':["Pyrimidine","C or T/U","Y"],
     
-    'S':["Strong"," C or G","S"],
+    'S':["Strong","C or G","S"],
     'W':["Weak"," A or T/U","W"],
     
     'K':["Ketone","G or T/U","K"],

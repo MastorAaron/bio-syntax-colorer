@@ -3,7 +3,7 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.54",
+    "version": "0.0.55",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
@@ -31,12 +31,16 @@
     "contributes": {
         "commands": [
             {
-                "command": "bioNotation.toggleColors",
+                "command": "bioNotation.toggleColorsOverlay",
                 "title": "Toggle BioNotation Colors"
             },
             {
                 "command": "bioNotation.toggleAlphabet",
                 "title": "Toggle BioNotation DNA/Protein Alphabets"
+            },  
+            {
+                "command": "bioNotation.toggleHighLight",
+                "title": "Set BioNotation Highlight Tool"
             },
             {
                 "command": "bioNotation.selectPalette",
@@ -50,15 +54,14 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Controls whether BioNotation Syntax colors are applied."
+                },
+                "bioNotation.alphabet": {
+                    "type": "string",
+                    "default": "Ambigious",
+                    "enum": ["Ambigious", "Nucleotides", "Aminos"],
+                    "description": "Determine Alphabet for HoverOver Info:\n Protein: Aminos\n DNA/RNA: Nucleotides\n Default: Ambigious"
                 }
             }
-        },
-
-        "bio-colorer.notationMode": {
-            "type": "string",
-            "default": "mixed",
-            "enum": ["mixed", "nucleotide", "amino"],
-            "description": "Controls how ambiguous symbols in FASTA files are interpreted: mixed (default), nucleotide, or amino acid."
         },
 
         "languages": [
