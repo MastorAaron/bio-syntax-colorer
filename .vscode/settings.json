@@ -69,5 +69,251 @@
     "jest.jestCommandLine": "npx jest --config ./jest.config.ts",
     "jest.runMode": "on-demand",
     "jest.watchMode": "false"
+  },
+  "bioNotation.alphabet": "Nucleotides",
+  "bioNotation.enabled": true,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "name": "bio-colorer@0.0.57: FASTA Header",
+        "scope": "fasta.title",
+        "settings": {
+          "foreground": "#E6DB74",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: FASTQ Header",
+        "scope": "fastq.title",
+        "settings": {
+          "foreground": "#726C38",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Adenine OR Alanine",
+        "scope": "source.fasta.ntA",
+        "settings": {
+          "foreground": "#3ED132"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Cytosine OR Cysteine",
+        "scope": "source.fasta.ntC",
+        "settings": {
+          "foreground": "#4192FF"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Guanine OR Glycine",
+        "scope": "source.fasta.ntG",
+        "settings": {
+          "foreground": "#F09000"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Thymine OR Threonine",
+        "scope": "source.fasta.ntT",
+        "settings": {
+          "foreground": "#FF0000"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Uracil OR Selenocysteine",
+        "scope": "source.fasta.ntU",
+        "settings": {
+          "foreground": "#FF00C8"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Any Nuke OR Asparagine",
+        "scope": "source.fasta.ntN",
+        "settings": {
+          "foreground": "#D8D6D6"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Arginine OR Purine",
+        "scope": "source.fasta.ntR",
+        "settings": {
+          "foreground": "#FF0000"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Tyrosine OR Pyrimidine",
+        "scope": "source.fasta.ntY",
+        "settings": {
+          "foreground": "#5A5A5A"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Asx: Asn or Asp OR not A",
+        "scope": "source.fasta.ntB",
+        "settings": {
+          "foreground": "#E02B31"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Asparagine OR not C",
+        "scope": "source.fasta.ntD",
+        "settings": {
+          "foreground": "#8B4513"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Histidine OR not G",
+        "scope": "source.fasta.ntH",
+        "settings": {
+          "foreground": "#740001"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Valine OR not T",
+        "scope": "source.fasta.ntV",
+        "settings": {
+          "foreground": "#B03060"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Lysine OR Ketone",
+        "scope": "source.fasta.ntK",
+        "settings": {
+          "foreground": "#E9B148"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Methionine OR Amino",
+        "scope": "source.fasta.ntM",
+        "settings": {
+          "foreground": "#FF8C00"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Serine OR Strong",
+        "scope": "source.fasta.ntS",
+        "settings": {
+          "foreground": "#15A4A4"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Tryptophan OR Weak",
+        "scope": "source.fasta.ntW",
+        "settings": {
+          "foreground": "#800080"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Gap or Minus Sign",
+        "scope": "source.fasta.symGap",
+        "settings": {
+          "foreground": "#474747"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Stop Codon",
+        "scope": "source.fasta.symStop",
+        "settings": {
+          "foreground": "#474747"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Glutamic acid",
+        "scope": "source.fasta.aaE",
+        "settings": {
+          "foreground": "#12B9CF"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Glutamine",
+        "scope": "source.fasta.aaQ",
+        "settings": {
+          "foreground": "#00FF00"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Glx: Gln or Glu",
+        "scope": "source.fasta.aaZ",
+        "settings": {
+          "foreground": "#80A0F0"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Phenylalanine",
+        "scope": "source.fasta.aaF",
+        "settings": {
+          "foreground": "#C44C4C"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Leucine",
+        "scope": "source.fasta.aaL",
+        "settings": {
+          "foreground": "#BBBBBB"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Isoleucine",
+        "scope": "source.fasta.aaI",
+        "settings": {
+          "foreground": "#80A0F0"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: (Iso)leucine: L or I",
+        "scope": "source.fasta.aaJ",
+        "settings": {
+          "foreground": "#91E69F"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Proline",
+        "scope": "source.fasta.aaP",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Pyrrolysine",
+        "scope": "source.fasta.aaO",
+        "settings": {
+          "foreground": "#FF5733"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Any Amino Acid",
+        "scope": "source.fasta.aaX",
+        "settings": {
+          "foreground": "#4682B4"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Ignored Line?",
+        "scope": "source.fastq.plusLine",
+        "settings": {
+          "foreground": "#CD7F32"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Low Quality Read Score",
+        "scope": "source.fastq.quality.low",
+        "settings": {
+          "foreground": "#CD7F32"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: Medium Quality Read Score",
+        "scope": "source.fastq.quality.mid",
+        "settings": {
+          "foreground": "#C0C0C0"
+        }
+      },
+      {
+        "name": "bio-colorer@0.0.57: High Quality Read Score",
+        "scope": "source.fastq.quality.high",
+        "settings": {
+          "foreground": "#FFD700"
+        }
+      }
+    ]
   }
 }
