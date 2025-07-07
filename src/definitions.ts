@@ -23,6 +23,17 @@ export interface PatternRule {
     match: string; 
 }
 
+export function isColorRule(obj: any): obj is ColorRule {
+    return (
+        obj &&
+        typeof obj.name === 'string' &&
+        typeof obj.scope === 'string' &&
+        typeof obj.settings === 'object' &&
+        typeof obj.settings.foreground === 'string'
+    );
+}
+
+
 export const aaProperty  = ['N','P','A','R','+','-'] as const;//'R' Ringed
 
 export const aaAliphatic = ['L','I','M','V','A','P','I','G'] as const;
@@ -107,7 +118,7 @@ export const nukeInfoMap : Record<nukes,Array<string>>= {
     'Y':["Pyrimidine","C or T/U","Y"],
     
     'S':["Strong","C or G","S"],
-    'W':["Weak"," A or T/U","W"],
+    'W':["Weak","A or T/U","W"],
     
     'K':["Ketone","G or T/U","K"],
     'M':["Amino","A or C","M"],

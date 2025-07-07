@@ -68,11 +68,10 @@ export class PatchColors{
             throw new Error(`Color file not found: ${colorPath}`);
         }
         const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
+        const rules = colors.tokenColors as def.ColorRule[];
         
         this.vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
-        this.vscCOUT(colors.tokenColors);
-        // this.vscCOUT(JSON.stringify(colors.tokenColors, null, 2));
-        return colors.tokenColors
+        return rules;
     }
 
     public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {

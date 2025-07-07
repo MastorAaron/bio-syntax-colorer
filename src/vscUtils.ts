@@ -121,7 +121,7 @@ export class LangHandler{
         fs.writeFileSync(this.langPath, JSON.stringify(lang, null,2));
     }
 
-    private getPatternRepo(lang : FastaLang): any{
+    private getPatternRepo(lang : FastaLang): def.PatternRule[]{
         // "repository": {
         //     "keywords": {
         //         "patterns": []
@@ -137,7 +137,7 @@ export class LangHandler{
         const langJSON = this.loadLangFile();
 
         //Ensure Repos exist
-        const patternArr = this.getPatternRepo(langJSON );
+        const patternArr = this.getPatternRepo(langJSON);
        
         patternArr.push(pattern);
         vscUtils.vscCOUT(`Appended lang pattern:`, pattern);

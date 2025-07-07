@@ -1,7 +1,13 @@
 {
     "comments": {
-        "lineComment": ">"
+        "lineComment": ">",
+        "blockComment": [">","<"]
     },
-    "brackets": [],
+    "brackets": [
+        [">","<"],
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"]
+    ],
     "wordPattern": "[A-Za-z*.-]+"
 }
