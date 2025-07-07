@@ -1,13 +1,15 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+
+import { version } from "../package.json";
+
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
 import { vscUtils, themeUtils } from "./vscUtils";
-import colorMath from "./colorInverter";
-import { version } from "../package.json";
-import hoverOver from "./hoverOver";
 
+import colorMath from "./colorInverter";
+// import hoverOver from "./hoverOver";
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
@@ -52,8 +54,8 @@ export class PatchColors{
                 ? rule 
                 : this.tagRule(rule,category)
         );
-        this.vscCOUT(`Tagged rules: ${tagged}`);
-        return tagged;     
+        
+        return tagged;                          //Print FileName or Palette Name instead
     }
 
     public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
@@ -193,6 +195,7 @@ export class PatchColors{
         try{
             let rules    = this.loadColors(fileName);
             let tagged   = this.tagColorsGenRules(rules)
+            this.vscCOUT(`Tagged rules: ${fileName}`);//TODO: this prints Tagged rules: [object Object], X 34 not great 
             const merged = this.mergeRules(tagged);
             
             await this.applyCustomTokens(merged);

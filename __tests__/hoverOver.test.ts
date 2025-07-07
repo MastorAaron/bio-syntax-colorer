@@ -9,19 +9,19 @@ import * as def from "../src/definitions";
 const {} = def
 
 
-Object.defineProperty(exports, "__esModule", { value: true });
+// Object.defineProperty(exports, "__esModule", { value: true });
 
-jest.mock('vscode', () => ({
-    window: { showInformationMessage: jest.fn() },
-    workspace: {
-        getConfiguration: jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue({
-                textMateRules: []
-            }),
-            update: jest.fn()
-        })
-    }
-}));
+// jest.mock('vscode', () => ({
+//     window: { showInformationMessage: jest.fn() },
+//     workspace: {
+//         getConfiguration: jest.fn().mockReturnValue({
+//             get: jest.fn().mockReturnValue({
+//                 textMateRules: []
+//             }),
+//             update: jest.fn()
+//         })
+//     }
+// }));
 
 // jest.mock('vscode', () => ({
     // window: { showInformationMessage: jest.fn() },

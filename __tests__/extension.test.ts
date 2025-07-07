@@ -12,47 +12,47 @@ import {  } from '../src/vscUtils';
 const { vscCOUT, editorConfig, showInterface, mockContext} = vscUtils;
 
 
-jest.mock('vscode', () => ({
-    window: {
-        showInformationMessage: jest.fn(),
-        // showQuickPick: jest.fn()
-        showQuickPick: jest.fn(async (options) => {
-            console.log("Simulated QuickPick with options:", options);
-            return "Aminos";  // Simulated user selection
-        })
-    },
-    workspace: {
-        getConfiguration: jest.fn().mockReturnValue({
-            get: jest.fn(),
-            update: jest.fn()
-        })
-    },
-       commands: {
-        registerCommand: jest.fn()
-    },
-    languages: {
-        registerHoverProvider: jest.fn()
-    },
-    ConfigurationTarget: {
-        Workspace: 'Workspace'  // Dummy constant just to satisfy the assignment
-    }
-}));
+// jest.mock('vscode', () => ({
+//     window: {
+//         showInformationMessage: jest.fn(),
+//         // showQuickPick: jest.fn()
+//         showQuickPick: jest.fn(async (options) => {
+//             console.log("Simulated QuickPick with options:", options);
+//             return "Aminos";  // Simulated user selection
+//         })
+//     },
+//     workspace: {
+//         getConfiguration: jest.fn().mockReturnValue({
+//             get: jest.fn(),
+//             update: jest.fn()
+//         })
+//     },
+//        commands: {
+//         registerCommand: jest.fn()
+//     },
+//     languages: {
+//         registerHoverProvider: jest.fn()
+//     },
+//     ConfigurationTarget: {
+//         Workspace: 'Workspace'  // Dummy constant just to satisfy the assignment
+//     }
+// }));
 
-//For Actual function testing
-jest.mock('../src/vscUtils', () => {
-    const realUtils = jest.requireActual('../src/vscUtils');
-    return {
-        vscUtils: {
-            vscCOUT: jest.fn(),
-            showInterface: realUtils.vscUtils.showInterface,
-            editorConfig: jest.fn(),
-            globalConfig: jest.fn(() => ({
-                get: jest.fn().mockReturnValue(false)
-            })),
-            mockContext: realUtils.vscUtils.mockContext
-        }
-    };
-});
+// //For Actual function testing
+// jest.mock('../src/vscUtils', () => {
+//     const realUtils = jest.requireActual('../src/vscUtils');
+//     return {
+//         vscUtils: {
+//             vscCOUT: jest.fn(),
+//             showInterface: realUtils.vscUtils.showInterface,
+//             editorConfig: jest.fn(),
+//             globalConfig: jest.fn(() => ({
+//                 get: jest.fn().mockReturnValue(false)
+//             })),
+//             mockContext: realUtils.vscUtils.mockContext
+//         }
+//     };
+// });
 
 
 
@@ -71,7 +71,7 @@ jest.mock('../src/vscUtils', () => {
 // jest.spyOn(hoverOver, 'toggleNotationMode').mockImplementation(async (selection) => {
     // Optional: preserve internal state updates, or override
     // await vscode.workspace.getConfiguration().update("bio-colorer.notationMode", selection, vscode.ConfigurationTarget.Workspace);
-    jest.spyOn(hoverOver, 'toggleNotationMode');
+    // jest.spyOn(hoverOver, 'toggleNotationMode');
 // });
 
 describe('isFastaFile', () => {

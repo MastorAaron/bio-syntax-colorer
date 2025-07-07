@@ -9,7 +9,7 @@ const path = require('path');
 export class HoverObj{ 
     private static instance: HoverObj;
     
-    private DEFAULT_ALPHABET: def.alphabet = "Ambigious"
+    private DEFAULT_ALPHABET: def.alphabet = "Ambiguous"
 
     private vscCOUT = vscUtils.vscCOUT;
     private currAlpha: def.alphabet = this.DEFAULT_ALPHABET; // Default mode
@@ -75,7 +75,7 @@ export class HoverObj{
     }
 
     public async switchAlphabets(selection: def.alphabet) {
-        if (selection === "Ambigious" || selection === "Nucleotides" || selection === "Aminos") {
+        if (selection === "Ambiguous" || selection === "Nucleotides" || selection === "Aminos") {
             this.currAlpha = selection;
             await vscode.workspace.getConfiguration().update(
                 "bioNotation.alphabet",
@@ -92,7 +92,7 @@ export class HoverObj{
         }
     }
 
-    public getDescription(letter: string, fileName: string): Array<string> | string{
+    public getDescription(letter: string, fileName: string): Array<string>{
         if (this.currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
             return def.nukeInfoMap[letter as def.nukes] || letter;
         } 
@@ -100,14 +100,18 @@ export class HoverObj{
             return def.aminoInfoMap[letter as def.aa] || letter;
         } // Mixed mode, show raw or dual-name
 
-        // return conflictInfoMap[letter as conflicts] || nukeInfoMap[letter as nukes] || aminoInfoMap[letter as aminos] || [letter]; 
-        const conflict = def.conflictInfoMap[letter as def.conflicts];
-        if (conflict) return conflict;
-        const nuke = def.nukeInfoMap[letter as def.nukes];
-        if (nuke) return nuke;
-        const amino = def.aminoInfoMap[letter as def.aminos];
-        if (amino) return amino;
-        return letter;
+        return def.conflictInfoMap[letter as conflicts] || 
+        def.nukeInfoMap[letter as nukes] || 
+        def.aminoInfoMap[letter as aminos] || 
+        [letter]; 
+
+        // const conflict = def.conflictInfoMap[letter as def.conflicts];
+        // if (conflict) return [conflict];
+        // const nuke = def.nukeInfoMap[letter as def.nukes];
+        // if (nuke) return nuke;
+        // const amino = def.aminoInfoMap[letter as def.aminos];
+        // if (amino) return amino;
+        // return [letter];
     }
 }
 

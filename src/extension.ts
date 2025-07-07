@@ -19,11 +19,11 @@ export type PaletteName =
     // "Default" |
     "Warm" |
     "Cool" | 
-    "Cold" | 
-    "CoolComp" |
-    "CoolInvert";
+    "Cold" ;
+    // "CoolComp" |
+    // "CoolInvert";
 
-const PaletteMap: Partial<Record<PaletteName, def.PaletteFilePath>> = {
+const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
     // "Default": "fasta-colors.json"as def.PaletteFilePath,
     "Warm": "fasta-colors-warm.json"as def.PaletteFilePath,
     "Cool": "fasta-colors-cool.json"as def.PaletteFilePath,
@@ -50,7 +50,7 @@ export class BioNotation{
         this.patcher = new PatchColors(context);
         this.patchTokenColors = this.patcher.patchTokenColors.bind(this.patcher);
         this.removeTokenColors = this.patcher.removeTokenColors.bind(this.patcher);
-        this.activePalette = PaletteMap["Warm"];//TODO: set Sanger Colors as Default
+        this.activePalette = PaletteMap["Warm"] ||  "fasta-colors-warm.json" as def.PaletteFilePath;;//TODO: set Sanger Colors as Default
                                                 //TODO: create Sanger Colors Pallete
                                                 //TODO: create Illuminia Colors Pallete
 
@@ -95,7 +95,7 @@ export class BioNotation{
     }
    
     public async toggleAlphabet(){
-        const options: def.alphabet[] = ["Ambigious", "Nucleotides", "Aminos"];
+        const options: def.alphabet[] = ["Ambiguous", "Nucleotides", "Aminos"];
         const userText = def.arrayToStr(["Determine Alphabet for HoverOver Info:",
                                         "\tProtein: Aminos",
                                         "\tDNA/RNA: Nucleotides",
@@ -108,14 +108,14 @@ export class BioNotation{
 
         await hoverOver.switchAlphabets(selection as def.alphabet);
 
-        if(selection === "Ambigious"){
-            this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
+        if(selection === "Ambiguous"){
+            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
         }else if(selection === "Nucleotides"){
             this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
         }else if(selection === "Aminos"){
             this.vscCOUT("Protein:   BioNotation registered letters as Amino Acids on toggle.");
         }else{
-            this.vscCOUT("Ambigious: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
+            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
         }
     }
 
@@ -175,6 +175,8 @@ export class BioNotation{
         if(await this.isActive()){ 
             await this.patchTokenColors(this.activePalette); // Only apply if enabled
             this.vscCOUT("BioNotation colors auto-applied on activation.");
+        }else{
+            this.vscCOUT("Error: Cannot activate Unless you Toggle On.");
         }
     }
     
@@ -184,14 +186,6 @@ export class BioNotation{
         this.vscCOUT("BioNotation colors removed on deactivation.");
     }
 }
-
-// ["bioNotation.acid", "#FF6347"], // Tomato
-// ["bioNotation.base", "#4682B4"], // SteelBlue
-// ["bioNotation.rna", "#32CD32"], // LimeGreen
-// ["bioNotation.dna", "#FFD700"], // Gold
-// ["bioNotation.protein", "#8A2BE2"], // BlueViolet
-// ["bioNotation.sequence", "#FF4500"], // OrangeRed
-// ["bioNotation.annotation", "#00CED1"] // DarkTurquoise
 
 let bioNotationInstance: BioNotation;
 

@@ -98,22 +98,18 @@ export const themeUtils = {
 interface FastaLang {
     repository?:{
         keywords?:{
-            patterns?: Array<langPattern>;
+            patterns?: Array<def.PatternRule>;
         };
 
     };
     [key: string]: unknown;
 }
 
-interface langPattern {
-    match: string;
-    name?: string;
-}
 export class LangHandler{
     private langPath: syntaxFilePath;
     
     constructor(private context : vscode.ExtensionContext){
-        this.langPath = path.join(this.context.extensionPath, "src", "syntaxes", "fasta.tmLanguage.json") as syntaxFilePath;
+        this.langPath = path.join(this.context.extensionPath,  "syntaxes", "fasta.tmLanguage.json") as syntaxFilePath;
     }
 
     public loadLangFile(): FastaLang {
@@ -154,7 +150,7 @@ export class LangHandler{
         const patternArr = this.getPatternRepo(langJSON);
 
         const filtered = patternArr.filter(
-          (rule: langPattern ) =>
+          (rule: def.PatternRule ) =>
                 typeof rule.name !== "string" || 
                 (typeof pattern === "string" && !rule.name.includes(pattern))
         );

@@ -3,7 +3,7 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The A177",
-    "version": "0.0.55",
+    "version": "0.0.56",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
@@ -22,7 +22,9 @@
     ],
         "activationEvents": [
             "onLanguage:fasta",
-            "onCommand:bioNotation.toggleColors",
+            "onCommand:bioNotation.toggleColorsOverlay",
+            "onCommand:bioNotation.toggleAlphabet",
+            "onCommand:bioNotation.toggleHighLight",
             "onCommand:bioNotation.selectPalette"
         ],
     "engines": {
@@ -57,8 +59,8 @@
                 },
                 "bioNotation.alphabet": {
                     "type": "string",
-                    "default": "Ambigious",
-                    "enum": ["Ambigious", "Nucleotides", "Aminos"],
+                    "default": "Ambiguous",
+                    "enum": ["Ambiguous", "Nucleotides", "Aminos"],
                     "description": "Determine Alphabet for HoverOver Info:\n Protein: Aminos\n DNA/RNA: Nucleotides\n Default: Ambigious"
                 }
             }
@@ -72,18 +74,18 @@
                     "fasta"
                 ],
                 "extensions": [
-                    ".fastq",
                     ".fasta",
-                    ".fa"
+                    ".fa",
+                    ".fastq"
                 ],
-                "configuration": "./src/syntaxes/language-configuration.json"
+                "configuration": "./syntaxes/language-configuration.json"
             }
         ],
         "grammars": [
             {
                 "language": "fasta",
                 "scopeName": "source.fasta",
-                "path": "./src/syntaxes/fasta.tmLanguage.json"
+                "path": "./syntaxes/fasta.tmLanguage.json"
             }
         ]
     },
@@ -92,7 +94,7 @@
         "test:watch": "jest --config ./jest.config.ts --watch",
         "tsc":      "tsc -p tsconfig.json",
         "build":    "tsc -p tsconfig.build.json",
-        "package":  "npm run build && npx vsce package",
+        "package":  "npm run clean && npm run build && npx vsce package",
         "clean": "rm -rf dist"
     },
     "devDependencies": {

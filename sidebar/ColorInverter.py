@@ -711,5 +711,13 @@ Neons = [NeonYellow, NeonGreen, NeonBlue, NeonMagneta]
 "#D4D4D4"
 "#57606C"
 
-DARK_FG  = "#D4D4D4";
-LIGHT_FG = "#57606C";
+DARK_FG  = "#D4D4D4"
+LIGHT_FG = "#57606C"
+
+["bioNotation.acid",       "#FF6347"], # Tomato
+["bioNotation.base",       "#4682B4"], # SteelBlue
+["bioNotation.rna",        "#32CD32"], # LimeGreen
+["bioNotation.dna",        "#FFD700"], # Gold
+["bioNotation.protein",    "#8A2BE2"], # BlueViolet
+["bioNotation.sequence",   "#FF4500"], # OrangeRed
+["bioNotation.annotation", "#00CED1"] # DarkTurquoise

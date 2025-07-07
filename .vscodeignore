@@ -1,0 +1,32 @@
+# Ignore test files and dev folders
+__tests__/
+.vscode/
+.vscode/c_cpp_properties.json
+
+# Ignore mocks
+dist/__mocks__/
+
+# Ignore TypeScript sources
+src/**
+
+# Ignore build configs
+jest.config.ts
+tsconfig*.json
+
+# Ignore Reference Material
+sidebar/
+
+# Ignore markdown
+# Exclude stray .md files but preserve LICENSE and README
+!README.md
+!LICENSE.md
+*.md
+
+# Ignore ignores
+*.gitIgnore
+*.vscodeIgnore
+
+# Archive clutter
+*.zip
+*.vsix
+*.log
