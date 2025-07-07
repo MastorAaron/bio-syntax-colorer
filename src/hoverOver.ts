@@ -92,7 +92,7 @@ export class HoverObj{
         }
     }
 
-    public getDescription(letter: string, fileName: string): Array<string>{
+    public getDescription(letter: string, fileName: string): Array<string | def.nukes | def.aminos>{
         if (this.currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
             return def.nukeInfoMap[letter as def.nukes] || letter;
         } 
@@ -100,18 +100,15 @@ export class HoverObj{
             return def.aminoInfoMap[letter as def.aa] || letter;
         } // Mixed mode, show raw or dual-name
 
-        return def.conflictInfoMap[letter as conflicts] || 
-        def.nukeInfoMap[letter as nukes] || 
-        def.aminoInfoMap[letter as aminos] || 
-        [letter]; 
+        const conflict = def.conflictInfoMap[letter as def.nukes];
+            if (conflict) return [conflict];
 
-        // const conflict = def.conflictInfoMap[letter as def.conflicts];
-        // if (conflict) return [conflict];
-        // const nuke = def.nukeInfoMap[letter as def.nukes];
-        // if (nuke) return nuke;
-        // const amino = def.aminoInfoMap[letter as def.aminos];
-        // if (amino) return amino;
-        // return [letter];
+        const nuke = def.nukeInfoMap[letter as def.nukes];
+            if (nuke) return nuke;
+
+        const amino = def.aminoInfoMap[letter as def.aminos];
+            if (amino) return amino;
+        return [letter];
     }
 }
 
