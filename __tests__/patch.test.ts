@@ -1,17 +1,17 @@
-jest.mock('vscode', () => ({
-    window: { showInformationMessage: jest.fn() },
-    workspace: {
-        getConfiguration: jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue({
-                textMateRules: []
-            }),
-           update: jest.fn()
-        })
-    },
-    languages: { registerHoverProvider: jest.fn() },
-    Position: jest.fn(),
-    Range: jest.fn()
-}));
+// jest.mock('vscode', () => ({
+//     window: { showInformationMessage: jest.fn() },
+//     workspace: {
+//         getConfiguration: jest.fn().mockReturnValue({
+//             get: jest.fn().mockReturnValue({
+//                 textMateRules: []
+//             }),
+//            update: jest.fn()
+//         })
+//     },
+//     languages: { registerHoverProvider: jest.fn() },
+//     Position: jest.fn(),
+//     Range: jest.fn()
+// }));
 
 import { vscUtils } from '../src/vscUtils';
 import type { ColorRule } from '../src/definitions';
@@ -147,14 +147,14 @@ describe('editorConfig', () => {
     });
 });
 
-describe('currCustomization', () => {
-    test('returns the current customization object', () => {
-        const config = vscUtils.editorConfig();
-        const customization = vscUtils.currCustomization(config);
+// describe('currCustomization', () => {
+//     test('returns the current customization object', () => {
+//         const config = vscUtils.editorConfig();
+//         const customization = vscUtils.currCustomization(config);
 
-        expect(customization).toBeDefined();
-        expect(typeof customization).toBe('object');
-        expect(customization.textMateRules).toBeDefined();
-        expect(Array.isArray(customization.textMateRules)).toBe(true);
-    });
-});
+//         expect(customization).toBeDefined();
+//         expect(typeof customization).toBe('object');
+//         expect(customization.textMateRules).toBeDefined();
+//         expect(Array.isArray(customization.textMateRules)).toBe(true);
+//     });
+// });

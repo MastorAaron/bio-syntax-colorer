@@ -19,8 +19,8 @@ export interface ColorRule {
     };
 }
 export interface PatternRule {
-name: nameScope;      
-    match: string; //optional Font style
+    name: nameScope;      
+    match: string; 
 }
 
 export const aaProperty  = ['N','P','A','R','+','-'] as const;//'R' Ringed
@@ -37,8 +37,9 @@ export const aaRecoded   = ['O','U'] as const; //UGA  for U
 export const aaDrifts    = ['B', 'Z', 'J'] as const;
 export const aaWild      = ['X'] as const;
 
-export const nucleotides     = ['A','C','G','T','U'] as const;
-export const symbols         = ['-', '*'] as const;//TODO: Stop Codon is Amino not Nuke
+export const nucleotides = ['A','C','G','T','U'] as const;
+export const nukeSymbols = ['-'] as const;
+export const aaSymbols = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
                                                    //TODO: Update for parts of FastQ files
                                                    //TODO: Quality Scores, ignore lines, etc 
 export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
@@ -73,9 +74,10 @@ export type aa = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
 export type aaAmbig = driftsAA | wildAA;
 export type aaExtd = aaAmbig | recodedAA;
 
-export type Syms = (typeof symbols)[number];
+export type ntSyms = (typeof nukeSymbols)[number];
+export type aaSyms = (typeof aaSymbols)[number];
 
-export type aminos = aa | aaExtd | Syms;
+export type aminos = aa | aaExtd | aaSyms;
 
 
 export type nt     = (typeof nucleotides)[number];
@@ -89,10 +91,10 @@ export type ntWild = (typeof nukeWild)[number];
 
 export type ntExtd = ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ; 
 
-export type nukes  = nt | ntExtd  | Syms;
+export type nukes  = nt | ntExtd  | ntSyms;
 
 // export type AminoDescript = [string]
-export const nukeInfoMap : Partial<Record<nukes,Array<string>>>= {
+export const nukeInfoMap : Record<nukes,Array<string>>= {
     'A':["Adenine","Purine","A"],
     'C':["Cytosine","Pyrimidine","C"],
     'G':["Guanine","Purine","G"],
@@ -165,9 +167,7 @@ export const aminoInfoMap : Record<aminos,Array<string>>= {
     '-':["Gap","-"]
 }
 
-export type conflicts = nukes;
-
-export const conflictInfoMap : Partial<Record<conflicts,string>>= {
+export const conflictInfoMap : Record<nukes,string>= {
     'A':"Adenine OR Alanine", 
     'C':"Cytosine OR Cysteine", 
     'G':"Guanine OR Glycine", 
@@ -193,7 +193,7 @@ export const conflictInfoMap : Partial<Record<conflicts,string>>= {
     '-': "Gap or Minus Sign"
 }
 
-export type alphabet = "Nucleotides" | "Aminos" | "Ambigious" ;
+export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" ;
 export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
@@ -234,7 +234,7 @@ export const fileTypes = ["aTitle","qTitle"] as const
 export type fileTitles = (typeof fileTypes)[number];
 export type tokenType = aminos | fileTitles; 
 
-export const tokenMap : Record<tokenType,string>= {
+export const tokenMap : Record<tokenType,nameScope>= {
     "aTitle":"fasta.title",
     "qTitle":"fastq.title",
     'A': "source.fasta.ntA",
@@ -309,7 +309,7 @@ export function isPyrim(value: unknown): boolean {
 }
 
 export function isNuke(value: unknown): value is nukes {
-    return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, symbols);
+    return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, aaSymbols);
 }
 
 export function isMemberOf<Template extends string | ColorRule | PatternRule>(value: unknown, group: readonly Template[]): value is Template {

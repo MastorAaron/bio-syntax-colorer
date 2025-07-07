@@ -1,11 +1,10 @@
 {
+    "patterns": [
+      { "include": "#keywords" }
+    ],
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "scopeName": "source.fasta",
-  "fileTypes": [
-    "fasta",
-    "fastq",
-    "fa"
-  ],
+  "fileTypes": [ "fasta", "fastq", "fa" ],
   "name": "FASTA",
   "repository": {
     "keywords": {
@@ -88,9 +87,8 @@
         },
         {
           "name": "source.fasta.symStop",
-          "match": "[*.]"
+          "match": "[*@.]"
         },
-
         {
           "name": "source.fasta.aaE",
           "match": "[Ee]+"
@@ -131,7 +129,7 @@
           "name": "source.fasta.aaX",
           "match": "[Xx]+"
         },
-        {
+                {
           "name": "source.fastq.plusLine",
           "match": "^\\+.*"
         },
@@ -146,10 +144,6 @@
         {
           "name": "source.fastq.quality.high",
           "match": "[L-~]+"
-        },
-        {
-          "name": "source.fasta.hlATGN.highLightRule",
-          "match": "(?i)ATG[NRYSWKMBDHVACGTU-*]"
         }
       ]
     }

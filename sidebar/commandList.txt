@@ -1,8 +1,13 @@
+npm run clean
 npm run build
-npm run package
+//npm run package
 npx vsce package
+npm install
+
 code --install-extension bio-colorer-0.0.XX.vsix
 code --install-extension bio-colorer-$(node -p "require('./package.json').version").vsix
+
+$ code --uninstall-extension "the a177.bio-colorer"
 
 Add the following line to view color palletes
 "$schema": "vscode://schemas/color-theme",

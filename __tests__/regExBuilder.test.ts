@@ -6,11 +6,11 @@ import { boolUtils} from "../src/booleans";
 import {PatchColors} from "../src/patch";
 import * as def from "../src/definitions";
 
-jest.mock('vscode', () => ({
-    window: {
-        showInformationMessage: jest.fn(),
-    },
-}));
+// jest.mock('vscode', () => ({
+//     window: {
+//         showInformationMessage: jest.fn(),
+//     },
+// }));
 
 describe("RegExBuilder highLight RegEx Generation", () => {
     const builder = new RegExBuilder();
