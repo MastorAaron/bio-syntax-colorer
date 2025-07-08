@@ -56,7 +56,7 @@ export namespace vscUtils{
         return typeof scope === "string" && scope.startsWith("source.fasta.");
     }
     
-    export async function showInterface(options: Array<string>, userText: string): Promise<string | undefined>{
+    export async function showInterface(options: string[], userText: string): Promise<string | undefined>{
         return await vscode.window.showQuickPick(
             options,
             { placeHolder: userText }
@@ -68,11 +68,11 @@ export namespace vscUtils{
     // }
 
     export function mockContext(): vscode.ExtensionContext {
-    return {
-        extensionPath: "./",
-        subscriptions: []
-    } as unknown as vscode.ExtensionContext;
-}
+        return {
+            extensionPath: "./",
+            subscriptions: []
+        } as unknown as vscode.ExtensionContext;
+    }
 
 } 
 
@@ -167,15 +167,20 @@ export class LangHandler{
 export class RegExBuilder{
     constructor(private allowExtended=true){}
 
+    public genLetterRegEx(char : string, map: Record<string,string>){
+        if(this.allowExtended && map[char]){
+            return map[char];
+        }
+        return char.replace(/[-\/\\^$*+?.()|[\]{}]/g,"\\$&");
+    }
+
     public genHighLightRegEx(strand: string, map: Record<string,string>): string{
         let regExStr = "";
         for(const char of strand){
             const upper = char.toUpperCase();
-            if(this.allowExtended && map[upper]){
-                regExStr += map[upper];
-            }else{
-                regExStr += upper.replace(/[-\/\\^$*+?.()|[\]{}]/g,"\\$&");
-            }
+            const lower = char.toLowerCase();
+            regExStr +=this.genLetterRegEx(upper, map);
+            regExStr +=this.genLetterRegEx(lower, map);
         }
         return regExStr;
     }
@@ -192,3 +197,168 @@ export class RegExBuilder{
         return `(?i)${this.genHighLightRegEx(strand,def.aminoPropertyRegExMap)}`
     }//TODO: remove (?i) possibly and add lowerCase to regEx? 
 }
+
+
+// export class ruleParameters(private context: vscode.ExtensionContext, jsonKind : ruleType, fileKind: string, descript: string, variants: string){
+//     private fileName: File;
+//     private targetPath: def.FilePath;
+//     private targetFolder: ruleType;
+//     private fileType: string;
+//     private regi : RegExBuilder; 
+//     private fileDescript : string; 
+//     private variants: string[];
+    
+//     constructor(private context: vscode.ExtensionContext, jsonKind : ruleType, fileKind: string, descript: string, variants: string){
+//         this.fileType = fileKind.toLowerCase();
+//         this.targetFolder = jsonKind;
+//         this.fileName= this.genOutputFileStr();
+//         this.regi = new RegExBuilder(false);
+//         this.targetPath = this.genPath();
+//         this.fileDescript = descript;
+//     }
+// }
+
+type ruleType = "syntaxes" | "palettes";
+type File = `${string}.tmLanguage.json` | `${string}-colors.json`;
+
+/**
+ * Configuration for output file generation.
+ * Determines type, filename, description, and variant extensions.
+ */
+interface writeRuleParams{
+    fileKind: string;
+    descript: string;
+    jsonKind: ruleType;
+    variants: string[];
+}
+export class RuleWriter{
+    private fileName: File;
+    private targetPath: def.FilePath;
+    private targetFolder: ruleType;
+    private fileType: string;
+    private regi : RegExBuilder; 
+    private fileDescript : string; 
+    private variants : string[]; 
+    
+    constructor(private context: vscode.ExtensionContext, params : writeRuleParams){
+        this.fileType = params.fileKind.toLowerCase();
+        this.targetFolder = params.jsonKind;
+        this.fileName= this.genOutputFileStr();
+        this.regi = new RegExBuilder(false);
+        this.targetPath = this.genPath();
+        this.fileDescript = params.descript;
+        this.variants = params.variants;
+    }
+
+
+    private genOutputFileStr(): File{
+        switch(this.targetFolder){  
+            case "syntaxes":
+                return `${this.fileType}.tmLanguage.json` as File;
+            case "palettes":
+                return `${this.fileType}-colors.json` as File;
+            default:
+                throw new Error(`Unknown ruleType: ${this.targetFolder}`);
+            }
+    }
+
+    private genPath(): def.FilePath{
+        const filePath = 
+        path.isAbsolute(this.fileName)
+        ? this.fileName as def.FilePath
+        : path.join(this.context.extensionPath, this.targetFolder, path.basename(this.fileName)) as def.FilePath;
+        
+        return filePath;
+    }
+    
+    private extractFileType(filename: string): string{
+        return path.extname(filename);
+    }    
+
+    private genRegEx(letters : string): def.RegEx{
+        return this.regi.genNukeRegEx(letters);
+    }
+
+    private genPatternName(letter : string, tokenType : string=""): def.genericScope{
+        const token = `${letter}${tokenType}`
+        const name = `source.${this.fileType}.${token}`;
+        return name as def.genericScope;
+    }
+
+    private genPattern(letter : string, tokenType : string=""): def.PatternRule {
+        const name = this.genPatternName(letter, tokenType);
+        const match = `${this.genRegEx(letter)}+`;
+
+        return {name,match}
+    }
+    
+    private writeToFile(output : string): void{
+        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
+        fs.appendFileSync(this.targetPath, output+'\n', "utf8");
+    } 
+    
+    private writeJSON(output : any): void{
+        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
+        const jsonStr = JSON.stringify(output, null, 4)
+        fs.appendFileSync(this.targetPath, jsonStr+'\n', "utf8");
+    }
+
+    private writePattern(letter : string, tokenType : string=""):void{
+        const pattern = this.genPattern(letter,tokenType);
+        this.writeJSON(pattern);
+        vscUtils.print(`Wrote pattern for ${letter} (${tokenType}) to (${this.targetPath})`);
+    }
+
+    private writeFileTopper(){
+        switch(this.targetFolder){  
+            case "syntaxes":
+                this.writeToFile(`{`)
+                this.writeToFile(`  "patterns": [ { "include": "#keywords" } ],`)
+                this.writeToFile(`  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",`)
+                this.writeToFile(`  "scopeName": "source.fasta",`)
+                this.writeToFile(`  "fileTypes": [${def.arrayToStr(this.variants)}],`)
+                this.writeToFile(`  "name": "${this.fileType.toUpperCase()}",`)
+                this.writeToFile(`  "repository": {`)
+                this.writeToFile(`    "keywords": {`)
+                this.writeToFile(`      "patterns": [`)
+                break;
+            case "palettes":
+                this.writeToFile("{");
+                this.writeToFile(`  "name": "${this.fileDescript}",`);
+                this.writeToFile(`  "tokenColors": [`);
+                break;
+            default:
+                throw new Error(`Unknown ruleType: ${this.targetFolder}`);
+            }
+        }
+
+    private writeFileEnd(): void{
+        switch(this.targetFolder){  
+            case "syntaxes":
+                this.writeToFile(`      ]`);
+                this.writeToFile(`    }`);
+                this.writeToFile(`  }`);
+                this.writeToFile(`}`);
+                break;
+            case "palettes":
+                this.writeToFile(`  ]`);
+                this.writeToFile(`}`);
+                break;
+            default:
+                throw new Error(`Unknown ruleType: ${this.targetFolder}`);
+        }
+    }
+
+    public writePatterns(letterMap : Record<string,string>){
+        const entries = Object.entries(letterMap);
+        this.writeFileTopper();
+        for(let i = 0; i < entries.length; i++){
+            const [token, tokenType] = entries[i];
+            this.writePattern(token,tokenType);
+            if(i < entries.length-1){
+                this.writeToFile (",");
+            }
+        }
+        this.writeFileEnd();
+    }
+}   

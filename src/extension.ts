@@ -12,6 +12,7 @@ import {PatchColors} from "./patch";
 
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
+import { config } from "process";
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
@@ -71,11 +72,23 @@ export class BioNotation{
             vscode.commands.registerCommand("bioNotation.toggleAlphabet", this.toggleAlphabet),
             vscode.commands.registerCommand("bioNotation.clearColors", this.clearColors),
             vscode.commands.registerCommand("bioNotation.applyColors", this.applyColors)
+            // vscode.commands.registerCommand("bioNotation.toggleHighLight", this.toggleHighLight);//TODO extract Method from RegExBuilder.test
+
         );
     }
             
     private async updateEnabledFlag(bool : boolean): Promise<void> {   
         await vscode.workspace.getConfiguration().update("bioNotation.enabled", bool, this.targetConfigWorkspace);
+    }
+    
+    private async removeEnabledFlag(): Promise<void> {   
+        await vscode.workspace.getConfiguration().update("bioNotation.enabled", undefined, this.targetConfigWorkspace);
+        await vscode.workspace.getConfiguration().get("bioNotation.enabled");
+        // .update("bioNotation.enabled", bool, this.targetConfigWorkspace);
+    }
+
+    private toggleHighLight(): void {
+    //TODO: push functions from Tests here!
     }
 
     public async clearColors(): Promise<void> {
@@ -185,7 +198,23 @@ export class BioNotation{
         await this.updateEnabledFlag(false); // Clear flag
         this.vscCOUT("BioNotation colors removed on deactivation.");
     }
+
+    public async onUninstall(): Promise<void>{
+        //Clean Rules
+        await this.clearColors();
+        const config = vscUtils.editorConfig();
+        //Delete boolean
+        // "bioNotation.alphabet": "Nucleotides",
+        // "bioNotation.enabled": true,
+        // "editor.tokenColorCustomizations": {
+        //     "textMateRules": [
+        //     {
+        //     }
+        //     ]
+    }
 }
+
+
 
 let bioNotationInstance: BioNotation;
 

@@ -2,10 +2,12 @@ export type colorHex = `#${string}`;
 
 export type fastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
 export type fastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
+export type genericScope =`source.${string}.${string}`
+
 
 export type tokenScope = fastAScope | fastQScope;
 export type headerScope = `fast${'a' | 'q'}.title`;
-export type nameScope = tokenScope | headerScope; 
+export type nameScope = tokenScope | headerScope| genericScope; 
 
 
 export interface ColorRule {
@@ -17,10 +19,13 @@ export interface ColorRule {
         background?: colorHex; //optional Background color
         fontStyle?: string; //optional Font style
     };
+    
 }
+
+export type RegEx = string;
 export interface PatternRule {
     name: nameScope;      
-    match: string; 
+    match: RegEx; 
 }
 
 export function isColorRule(obj: any): obj is ColorRule {
@@ -51,8 +56,8 @@ export const aaWild      = ['X'] as const;
 export const nucleotides = ['A','C','G','T','U'] as const;
 export const nukeSymbols = ['-'] as const;
 export const aaSymbols = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
-                                                   //TODO: Update for parts of FastQ files
-                                                   //TODO: Quality Scores, ignore lines, etc 
+                                            //TODO: Update for parts of FastQ files
+                                            //TODO: Quality Scores, ignore lines, etc 
 export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
 export const nukeBondStrgth  = ['S', 'W'] as const;
 export const functGroupNukes = ['K', 'M'] as const;
@@ -76,9 +81,9 @@ export type ringAA     = (typeof aaRinged)[number];
 export type posAA      = (typeof aaPositive)[number]; 
 export type negAA      = (typeof aaNegative)[number];
 
-export type recodedAA = (typeof aaRecoded)[number];
-export type driftsAA = (typeof aaDrifts)[number];
-export type wildAA = (typeof aaWild)[number];
+export type recodedAA  = (typeof aaRecoded)[number];
+export type driftsAA   = (typeof aaDrifts)[number];
+export type wildAA     = (typeof aaWild)[number];
 
 
 export type aa = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
@@ -93,19 +98,19 @@ export type aminos = aa | aaExtd | aaSyms;
 
 export type nt     = (typeof nucleotides)[number];
 
-export type ntNots = (typeof nukeNots)[number];
+export type ntNots   = (typeof nukeNots)[number];
 export type ntStrgth = (typeof nukeBondStrgth)[number];
-export type ntFunct = (typeof functGroupNukes)[number];
+export type ntFunct  = (typeof functGroupNukes)[number];
 export type ntRingQt = (typeof ringStructNukes)[number];
 
-export type ntWild = (typeof nukeWild)[number];
+export type ntWild   = (typeof nukeWild)[number];
 
 export type ntExtd = ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ; 
 
 export type nukes  = nt | ntExtd  | ntSyms;
 
 // export type AminoDescript = [string]
-export const nukeInfoMap : Record<nukes,Array<string>>= {
+export const nukeInfoMap : Record<nukes,string[]>= {
     'A':["Adenine","Purine","A"],
     'C':["Cytosine","Pyrimidine","C"],
     'G':["Guanine","Purine","G"],
@@ -135,14 +140,14 @@ export const nukeInfoMap : Record<nukes,Array<string>>= {
 // + is Basic Amino Acids
 // - is Acidic Amino Acids
 
-export const aminoInfoMap : Record<aminos,Array<string>>= {
+export const aminoInfoMap : Record<aminos,string[]>= {
     'K':["Lys","Lysine","Positively Charged","pKa = 10.7"],
     'R':["Arg","Arginine","Positively Charged","pKa = 12.1"],
     
     'H':["His","Histidine","Positively Charged","pKa = 6.0"],
     
     'P':["Pro","Proline","Nonpolar","Aliphatic"],
-    'W':[ "Trp", "Tryptophan", "Aromatic", "Hydrophobic" ],
+    'W':["Trp","Tryptophan", "Aromatic", "Hydrophobic" ],
     'Y':["Tyr","Tyrosine","Aromatic","Hydrophobic","pKa = 10.0"],
     'F':["Phe","Phenylalanine","Aromatic","Hydrophobic"],
     
@@ -201,7 +206,7 @@ export const conflictInfoMap : Record<nukes,string>= {
     'H':"Histidine OR not G",
     'V':"Valine OR not T/U",
     
-    '-': "Gap or Minus Sign"
+    '-':"Gap or Minus Sign"
 }
 
 export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" ;
@@ -327,7 +332,7 @@ export function isMemberOf<Template extends string | ColorRule | PatternRule>(va
     return typeof value === "string" && group.includes(value as Template);
 }
 
-export function arrayToStr(strArr : Array<string> | string): string{
+export function arrayToStr(strArr : string[] | string): string{
     if(typeof strArr === "string") {
         return strArr;
     }
@@ -340,3 +345,4 @@ export function arrayToStr(strArr : Array<string> | string): string{
 }
 
 export type PaletteFilePath = string & { readonly __paletteFilePath: unique symbol };
+export type FilePath = string & { readonly __paletteFilePath: unique symbol };
