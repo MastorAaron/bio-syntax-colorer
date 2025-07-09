@@ -36,7 +36,7 @@ const NeonGreen   = "#39FF14"
 const NeonBlue    = "#1F51FF"
 const NeonMagneta = "#FF00FF"
 
-function genHLNameScope(kmer: string): def.nameScope{
+function genHLNameScope(kmer: string): def.NameScope{
     return `source.fasta.hl${kmer}.highLightRule`;
 }
 

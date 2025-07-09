@@ -1,22 +1,46 @@
-export type colorHex = `#${string}`;
+export type ColorHex = `#${string}`;
 
-export type fastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
-export type fastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
-export type genericScope =`source.${string}.${string}`
+export type FastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
+export type FastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
+export type GenericScope =`source.${string}.${string}`
 
 
-export type tokenScope = fastAScope | fastQScope;
-export type headerScope = `fast${'a' | 'q'}.title`;
-export type nameScope = tokenScope | headerScope| genericScope; 
+export type TokenScope = FastAScope | FastQScope;
+export type HeaderScope = `fast${'a' | 'q'}.title`;
+export type NameScope = TokenScope | HeaderScope| GenericScope; 
 
+export interface TokenColorSetting {
+  foreground?: string;
+  fontStyle?: string;
+}
+
+export interface TokenColorRule {
+  name?: string;
+  scope: string | string[];
+  settings: TokenColorSetting;
+}
+
+export interface FlatTokenPalette {
+  name?: string;
+  description?: string;
+  tokenColors: TokenColorRule[];
+}
+
+export interface DeconstructedPalette {
+  [language: string]: {
+    [tokenGroup: string]: {
+      [token: string]: string;
+    };
+  };
+}
 
 export interface ColorRule {
-    name: string;      //optional Name
-    scope: nameScope;     //optional Scope
+    name: string;      
+    scope: NameScope;     
     comment?: string;     //optional Comment
     settings: {
-        foreground: colorHex;
-        background?: colorHex; //optional Background color
+        foreground: ColorHex;
+        background?: ColorHex; //optional Background color
         fontStyle?: string; //optional Font style
     };
     
@@ -24,7 +48,7 @@ export interface ColorRule {
 
 export type RegEx = string;
 export interface PatternRule {
-    name: nameScope;      
+    name: NameScope;      
     match: RegEx; 
 }
 
@@ -53,8 +77,26 @@ export const aaRecoded   = ['O','U'] as const; //UGA  for U
 export const aaDrifts    = ['B', 'Z', 'J'] as const;
 export const aaWild      = ['X'] as const;
 
+export const extendedAminos = [
+    ...aaRecoded,
+    ...aaDrifts,
+    ...aaRinged,
+    ...aaWild
+] as const;
+
+export const regAminos = [
+    ...aaAliphatic,
+    ...aaPolar,
+    ...aaAromatic,
+    ...aaPositive,
+    ...aaNegative
+] as const;
+
+
 export const nucleotides = ['A','C','G','T','U'] as const;
 export const nukeSymbols = ['-'] as const;
+export const symbols = ['@','>','*','+','-'] as const;
+export const symString = ["Title","Stop","Gap"] as const;
 export const aaSymbols = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
                                             //TODO: Update for parts of FastQ files
                                             //TODO: Quality Scores, ignore lines, etc 
@@ -90,6 +132,8 @@ export type aa = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
 export type aaAmbig = driftsAA | wildAA;
 export type aaExtd = aaAmbig | recodedAA;
 
+export type syms = (typeof symbols)[number];
+export type symStrs = (typeof symString)[number];
 export type ntSyms = (typeof nukeSymbols)[number];
 export type aaSyms = (typeof aaSymbols)[number];
 
@@ -134,7 +178,17 @@ export const nukeInfoMap : Record<nukes,string[]>= {
     'V':["A, C, or G (not T/U)","V"],
     
     '-':["Gap","-"],
+}
 
+export const symInfoMap : Record<string,string[]>= {
+    '@':["Header"],
+    '>':["Header"],
+    '*':["Stop Codon"],
+    '-':["Gap or Minus Sign"],
+    '+':["Sequence_ID line"],
+    "low": ["Phred Score: Low Quality Read Score"],
+    "mid": ["Phred Score: Medium Quality Read Score"],
+    "high":["Phred Score: High Quality Read Score"]
 }
 
 // + is Basic Amino Acids
@@ -153,7 +207,7 @@ export const aminoInfoMap : Record<aminos,string[]>= {
     
     
     'E':["Glu","Glutamic Acid","Negatively Charged","pKa = 4.2"],
-    'D':["Asp","Aspartic acid","Negatively Charged","pKa = 3.7"],
+    'D':["Asp","Aspartic Acid","Negatively Charged","pKa = 3.7"],
     
     'B':["Asx: Asn or Asp"],
     
@@ -183,34 +237,34 @@ export const aminoInfoMap : Record<aminos,string[]>= {
     '-':["Gap","-"]
 }
 
-export const conflictInfoMap : Record<nukes,string>= {
-    'A':"Adenine OR Alanine", 
-    'C':"Cytosine OR Cysteine", 
-    'G':"Guanine OR Glycine", 
-    'T':"Thymine OR Threonine", 
-    'U':"Uracil OR Selenocysteine\n(Rare Amino Acid)", 
+export const conflictInfoMap : Record<nukes,string[]>= {
+    'A':["Adenine OR Alanine"], 
+    'C':["Cytosine OR Cysteine"], 
+    'G':["Guanine OR Glycine"], 
+    'T':["Thymine OR Threonine"], 
+    'U':["Uracil OR Selenocysteine","(Rare Amino Acid)"], 
     
-    'N':"Any Nuke or Asparagine", 
+    'N':["Any Nuke or Asparagine"], 
 
-    'R':"Arginine OR Purine", 
-    'Y':"Tyrosine OR Pyrimidine", 
+    'R':["Arginine OR Purine"], 
+    'Y':["Tyrosine OR Pyrimidine"], 
 
-    'S':"Serine OR Strong",
-    'W':"Tryptophan OR Weak",
+    'S':["Serine OR Strong"],
+    'W':["Tryptophan OR Weak"],
     
-    'K':"Lysine OR Ketone",
-    'M':"Methionine OR Amino",
+    'K':["Lysine OR Ketone"],
+    'M':["Methionine OR Amino"],
     
-    'B':"Asx: Asn or Asp OR not A",
-    'D':"Aspartate OR not C", 
-    'H':"Histidine OR not G",
-    'V':"Valine OR not T/U",
+    'B':["Asx: Asn or Asp OR not A"],
+    'D':["Aspartate OR not C"], 
+    'H':["Histidine OR not G"],
+    'V':["Valine OR not T/U"],
     
-    '-':"Gap or Minus Sign"
+    '-':["Gap or Minus Sign"]
 }
 
 export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" ;
-export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
+export type TagCategory = "version" | "userRule" | "highLightRule";
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
     'N': "[LIMVAPIG]",
@@ -226,6 +280,21 @@ export const aminoRegExMap : Record<aaAmbig,string>= {
     'Z': "[ZQE]",
     'J': "[JLI]",
     'X': "[XKRHOPWYFEDSTNCQUOLIMVAGBZJX-*]",
+}
+
+// export const symbolRegExMap : Record<syms,string>= {
+//     '-': "[\-.]",
+//     '*': "[\*.]",
+//     '@': "[\@.]",
+//     '>': "[\>.]",
+// }
+
+export const symbolLookUpMap : Record<syms,string>= {
+    '*':"Stop",
+    '-':"Gap",
+    '@':"",
+    '+':"",
+    '>':""
 }
 
 export const nukeRegExMap : Record<ntExtd,string>= {
@@ -250,7 +319,7 @@ export const fileTypes = ["aTitle","qTitle"] as const
 export type fileTitles = (typeof fileTypes)[number];
 export type tokenType = aminos | fileTitles; 
 
-export const tokenMap : Record<tokenType,nameScope>= {
+export const tokenMap : Record<tokenType,NameScope>= {
     "aTitle":"fasta.title",
     "qTitle":"fastq.title",
     'A': "source.fasta.ntA",
@@ -292,6 +361,20 @@ export const tokenMap : Record<tokenType,nameScope>= {
     'O': "source.fasta.aaO",
 }
 
+export const tokenStripMapA : Record<string,string[]>= {
+    "sym":   ['-','*'] , // '-': "symGap", // '*': "symStop",
+    "nt":    ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
+    "aa" :   ['F','E','Z','J','I','L','P','Q','O','X'] ,
+    "Title": ['@'] ,
+}
+
+export const tokenStripMapQ : Record<string,string[]>= {
+    "sym":   ['Gap','Stop'] , // '-': "symGap", // '*': "symStop",
+    "nt":    ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
+    "aa" :   ['F','E','Z','J','I','L','P','Q','O','X'] ,
+    "Title": ['@'] ,
+}
+
 export function isNeg(value: unknown): value is negAA {
     return isMemberOf(value, aaNegative);
 }
@@ -328,6 +411,14 @@ export function isNuke(value: unknown): value is nukes {
     return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, aaSymbols);
 }
 
+export function isAmino(value: unknown): value is nukes {
+    return isMemberOf(value, extendedAminos) || isMemberOf(value, regAminos);
+}
+
+export function isSymbol(value: unknown): value is nukes {
+    return isMemberOf(value, symbols);
+}
+
 export function isMemberOf<Template extends string | ColorRule | PatternRule>(value: unknown, group: readonly Template[]): value is Template {
     return typeof value === "string" && group.includes(value as Template);
 }
@@ -340,6 +431,18 @@ export function arrayToStr(strArr : string[] | string): string{
     let newStr="";
     for(const each of strArr){
         newStr+=each+'\n';
+    }
+    return newStr;
+}
+
+export function arrayToArrStr(strArr : string[]): string{
+    let newStr="";
+    for(let i=0; i<strArr.length; i++){
+        const each = strArr[i];
+        newStr+=`"${each}"`;
+        if(i < strArr.length-1){
+            newStr+=','
+        }
     }
     return newStr;
 }

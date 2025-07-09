@@ -3,12 +3,12 @@
   "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",
     "tokenColors": [
         {
-      "name": "FASTA Header",
-      "scope":"fasta.title",
-      "settings":{
-        "foreground":"#E6DB74",
-        "fontStyle":"bold"
-            }
+            "name": "FASTA Header",
+            "scope":"fasta.title",
+            "settings":{
+                "foreground":"#E6DB74",
+                "fontStyle":"bold"
+                }
         },
         {
             "name": "FASTQ Header",
@@ -222,28 +222,28 @@
         },
         
         {
-            "name": "Ignored Line?",
+            "name": "Sequence_ID line",
             "scope": "source.fastq.plusLine",
             "settings":{
                 "foreground": "#CD7F32" 
             }
         }, 
         {
-            "name": "Low Quality Read Score",
+            "name": "Phred Score: Low Quality Read Score",
             "scope": "source.fastq.quality.low",
             "settings":{
                 "foreground": "#CD7F32" 
             }
         },
         {
-            "name": "Medium Quality Read Score",
+            "name": "Phred Score: Medium Quality Read Score",
             "scope": "source.fastq.quality.mid",
             "settings":{
                 "foreground": "#C0C0C0" 
             }
         },
         {
-            "name": "High Quality Read Score",
+            "name": "Phred Score: High Quality Read Score",
             "scope": "source.fastq.quality.high",
             "settings":{
                 "foreground": "#FFD700" 

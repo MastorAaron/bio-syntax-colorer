@@ -11,7 +11,7 @@ import { vscUtils, themeUtils } from "./vscUtils";
 import colorMath from "./colorInverter";
 // import hoverOver from "./hoverOver";
 
-const DEFAULT_PALETTE = "fasta-colors.json";
+const DEFAULT_PALETTE = "fasta-colors-warm.json";
 
 export class PatchColors{
     // private static readonly DEFAULT_PALETTE = DEFAULT_PALETTE ;

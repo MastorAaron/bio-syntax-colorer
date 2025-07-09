@@ -87,7 +87,7 @@
         },
         {
           "name": "source.fasta.symStop",
-          "match": "[*@.]"
+          "match": "[*.]"
         },
         {
           "name": "source.fasta.aaE",

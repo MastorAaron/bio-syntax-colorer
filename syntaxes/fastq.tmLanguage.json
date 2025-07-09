@@ -1,0 +1,129 @@
+{
+  "patterns": [ { "include": "#keywords" } ],
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "scopeName": "source.fasta",
+  "fileTypes": ["fna","faa","fastq"],
+  "name": "FASTQ",
+  "repository": {
+      "keywords": {
+          "patterns": [
+{
+    "name": "source.fastq.Title",
+    "match": "[@.]+"
+},
+{
+    "name": "source.fastq.symGap",
+    "match": "[-.]+"
+},
+{
+    "name": "source.fastq.symStop",
+    "match": "[*.]+"
+},
+{
+    "name": "source.fastq.ntA",
+    "match": "[Aa]+"
+},
+{
+    "name": "source.fastq.ntC",
+    "match": "[Cc]+"
+},
+{
+    "name": "source.fastq.ntG",
+    "match": "[Gg]+"
+},
+{
+    "name": "source.fastq.ntT",
+    "match": "[Tt]+"
+},
+{
+    "name": "source.fastq.ntU",
+    "match": "[Uu]+"
+},
+{
+    "name": "source.fastq.ntN",
+    "match": "[Nn]+"
+},
+{
+    "name": "source.fastq.ntR",
+    "match": "[Rr]+"
+},
+{
+    "name": "source.fastq.ntY",
+    "match": "[Yy]+"
+},
+{
+    "name": "source.fastq.ntB",
+    "match": "[Bb]+"
+},
+{
+    "name": "source.fastq.ntD",
+    "match": "[Dd]+"
+},
+{
+    "name": "source.fastq.ntH",
+    "match": "[Hh]+"
+},
+{
+    "name": "source.fastq.ntV",
+    "match": "[Vv]+"
+},
+{
+    "name": "source.fastq.ntK",
+    "match": "[Kk]+"
+},
+{
+    "name": "source.fastq.ntM",
+    "match": "[Mm]+"
+},
+{
+    "name": "source.fastq.ntS",
+    "match": "[Ss]+"
+},
+{
+    "name": "source.fastq.ntW",
+    "match": "[Ww]+"
+},
+{
+    "name": "source.fastq.aaF",
+    "match": "[Ff]+"
+},
+{
+    "name": "source.fastq.aaE",
+    "match": "[Ee]+"
+},
+{
+    "name": "source.fastq.aaZ",
+    "match": "[Zz]+"
+},
+{
+    "name": "source.fastq.aaJ",
+    "match": "[Jj]+"
+},
+{
+    "name": "source.fastq.aaI",
+    "match": "[Ii]+"
+},
+{
+    "name": "source.fastq.aaL",
+    "match": "[Ll]+"
+},
+{
+    "name": "source.fastq.aaP",
+    "match": "[Pp]+"
+},
+{
+    "name": "source.fastq.aaQ",
+    "match": "[Qq]+"
+},
+{
+    "name": "source.fastq.aaO",
+    "match": "[Oo]+"
+},
+{
+    "name": "source.fastq.aaX",
+    "match": "[Xx]+"
+}
+            ]
+        }
+    }
+}
