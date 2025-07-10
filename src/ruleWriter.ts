@@ -7,152 +7,46 @@ import { PatchColors } from "./patch";
 import { RegExBuilder } from "./regExBuilder";
 import { vscUtils, themeUtils } from "./vscUtils";
 
-type ruleType = "syntaxes" | "palettes";
-type JsonFile = `${string}.tmLanguage.json` | `${string}-colors.json`;
+type ruleType  = "syntaxes" | "palettes";
+type langFile  = `${string}.tmLanguage.json`;
+type colorFile = `${string}-colors.json`;
+type JsonFile  = langFile | colorFile;
 type DeconFile = `${string}-Deconstruct.json` | `${string}-colors.json`;
 
-interface wPatternRuleParams{
-    jsonKind: "syntaxes";
+interface PatternRuleParams{
     fileKind: string;
     variants: string[];
-    
-    deconPalFile?: never;
-    actualPalFile? : never;
-    descript?: never;
-    temperature?: never;
 }
-interface wColorRuleParams{
+interface ColorRuleParams{
     jsonKind: "palettes";
     fileKind: string;
     
     descript: string;
     temperature: string;
-    deconPalFile?: DeconFile;
-    actualPalFile? : JsonFile;
+    deconPalFile: DeconFile;
+    actualPalFile : JsonFile;
 
-    variants?: never;
 }
-
-
-
-// export class ruleParameters(private context: vscode.ExtensionContext, jsonKind : ruleType, fileKind: string, descript: string, variants: string){
-//     private fileName: File;
-//     private targetPath: def.FilePath;
-//     private targetFolder: ruleType;
-//     private fileType: string;
-//     private regi : RegExBuilder; 
-//     private fileDescript : string; 
-//     private variants: string[];
-    
-//     constructor(private context: vscode.ExtensionContext, jsonKind : ruleType, fileKind: string, descript: string, variants: string){
-//         this.fileType = fileKind.toLowerCase();
-//         this.targetFolder = jsonKind;
-//         this.fileName= this.genOutputFileStr();
-//         this.regi = new RegExBuilder(false);
-//         this.targetPath = this.genPath();
-//         this.fileDescript = descript;
-//     }
-// }
 
 
 
 /**
  * Configuration for output file generation.
  * Determines type, filename, description, and variant extensions.
- */
+*/
 
+type PatternParams = { jsonKind: "syntaxes" } & PatternRuleParams;
+type ColorParams = { jsonKind: "palettes" } & ColorRuleParams;
+type RuleParams = PatternParams | ColorParams;
 
-type writeRuleParams = wPatternRuleParams | wColorRuleParams;
+export class PatternRuleGenerator extends RuleWriter{
+    private variants: string[];
+    private regi = new RegExBuilder(false);
 
-export class PatternRuleGenerator{
-
-}
-
-export class ColorRuleGenerator{
-
-}
-
-export class PaletteDeconstructor{
-
-}
-
-
-export class RuleWriter{
-    //Both Types
-        private outputFile: JsonFile;
-        private targetPath: def.FilePath;
-        
-        private fileType: string;
-        private JSONType: ruleType;
-    
-    //Other Class Object
-        private regi : RegExBuilder; 
-        private patcher = new PatchColors(this.context);
-        private copter  = new HoverObj;
-
-    // PatternRule
-        private variants? : string[]; 
-    // ColorRule
-        private fileDescript? : string; 
-        private temperature? : string; 
-        
-        private deconInput? : DeconFile;
-
-    
-    constructor(private context: vscode.ExtensionContext, params : writeRuleParams){
-        this.JSONType = params.jsonKind;
-      
-
-        if(this.JSONType === "syntaxes"){
-            this.variants = params.variants;
-        }else if(this.JSONType === "palettes"){
-            this.fileDescript = params.descript;
-            this.temperature = params.temperature?.toLowerCase();
-            this.deconInput = params.deconPalFile;
-        }else{
-            throw new Error(`Unknown ruleType: ${this.JSONType}`);
-        } 
-
-        this.fileType = params.fileKind.toLowerCase();
-        
-        this.outputFile= this.genOutputFileStr();
-        this.regi = new RegExBuilder(false);
-        this.targetPath = this.genPath();
-
+    constructor(context: vscode.ExtensionContext, params : PatternRuleParams){
+        super(context, "syntaxes", params.fileKind);
+        this.variants = params.variants;
     }
-
-    public clear(): void {
-        const file = this.targetPath;
-        fs.mkdirSync(path.dirname(file), { recursive: true });
-
-        fs.writeFileSync(file, "", "utf8");
-        vscUtils.print(`Cleared file at: ${file}`);
-    }
-
-
-    private genOutputFileStr(): JsonFile{
-        switch(this.JSONType){  
-            case "syntaxes":
-                return `${this.fileType}.tmLanguage.json` as JsonFile;
-            case "palettes":
-                return `${this.fileType}-colors-${this.temperature}.json` as JsonFile;
-            default:
-                throw new Error(`Unknown ruleType: ${this.JSONType}`);
-            }
-    }
-
-    public genPath(): def.FilePath{
-        const filePath = 
-        path.isAbsolute(this.outputFile)
-        ? this.outputFile as def.FilePath
-        : path.join(this.context.extensionPath, this.JSONType, path.basename(this.outputFile)) as def.FilePath;
-        
-        return filePath;
-    }
-    
-    private extractFileType(filename: string): string{
-        return path.extname(filename);
-    }    
 
     private genRegEx(letter : string, tokenType=""): def.RegEx{
         switch(tokenType){  
@@ -169,23 +63,82 @@ export class RuleWriter{
             }
     }
 
-    private genPatternNameScope(letter : string, tokenType : string=""): def.GenericScope{
-       // Resolve symbol alias if it's a known special symbol, otherwise fallback to original letter
-        const resolvedToken = def.isSymbol(letter)
-        ? def.symbolLookUpMap[letter as keyof typeof def.symbolLookUpMap] ?? letter
-        : letter;
+    private genPatternRule(letter : string, tokenType : string=""): def.PatternRule {
+        const name = this.genPatternNameScope(letter, tokenType);
+        const match = `${this.genRegEx(letter,tokenType)}`;
 
-        const spacer = (tokenType === "quality")? '.':'';
-        const token = `${tokenType}${spacer!}${resolvedToken}`;
-        const name = `source.${this.fileType}.${token}`;
-        return name as def.GenericScope;
+        return {name,match}
+    }
+
+     
+    private writePattern(letter : string, tokenType : string="", comma : string=""):void{
+        const pattern = this.genPatternRule(letter,tokenType);
+        this.writeJSON(pattern,comma);
+        vscUtils.print(`Wrote pattern for ${letter} (${tokenType}) to (${this.targetPath})`);
+    }  
+
+    
+    public writePatterns(letterMap : Record<string,string[]>){
+        const entries = Object.entries(letterMap);
+        this.writeFileTopper();
+
+        const total = entries.reduce((sum, [, tokens]) => sum + tokens.length, 0);
+        let count = 0;
+
+        for(let i = 0; i < entries.length; i++){
+            const [ tokenType , tokens ] = entries[i];
+            
+            for(let j = 0; j < tokens.length; j++){
+                const token = tokens[j];
+                count++;
+
+                const comma = count < total ? "," : "";
+                this.writePattern(token, tokenType, comma);
+            }
+        }
+        this.writeFileEnd();
+    } 
+
+        private override  writeFileTopper(){
+            this.writeToFile(`{`)
+            this.writeToFile(`  "patterns": [ { "include": "#keywords" } ],`)
+            this.writeToFile(`"$schema": "./schema/tmLanguage.schema.json,"`),
+            this.writeToFile(`"$comment": "Forked from https://github.com/martinring/tmlanguage. Canonical source may change.",`)
+            this.writeToFile(`  "scopeName": "source.${this.fileType}",`)
+            this.writeToFile(`  "fileTypes": [${def.arrayToArrStr(this.variants!)}],`)
+            this.writeToFile(`  "name": "${this.fileType.toUpperCase()}",`)
+            this.writeToFile(`  "repository": {`)
+            this.writeToFile(`      "keywords": {`)
+            this.writeToFile(`          "patterns": [`)
+        }
+
+}
+
+export class ColorRuleGenerator extends RuleWriter{
+    private fileDescript : string; 
+    private temperature : string;
+
+    private targetPath: def.FilePath;
+    private deconInput? : DeconFile;
+        
+
+    //Other Class Objects
+    private copter  = new HoverObj;
+    private patcher  = new PatchColors(this.context);
+
+    constructor(context: vscode.ExtensionContext, params : ColorRuleParams){
+        super(context, "palettes", params.fileKind);
+
+        this.fileDescript = params.descript;
+        this.temperature = params.temperature?.toLowerCase();
+        this.deconInput = params.deconPalFile;
     }
 
     private getFontSytle(tokenType : string): string{
         return (tokenType === "Title")? "bold" : "";
     }
 
-    private genColorRule( fileScope : string, tokenType : string, letter : string ): def.ColorRule {
+      private genColorRule( fileScope : string, tokenType : string, letter : string ): def.ColorRule {
         //Use Ambigous Descriptions from Defintions as Name parameter 
         const name = this.copter.getDescription(letter, `./null.${this.fileType}` as def.FilePath,true).trim();
         const scope = this.genPatternNameScope(letter, tokenType) as def.NameScope;
@@ -194,29 +147,10 @@ export class RuleWriter{
             const fontStyle = this.getFontSytle(tokenType) as string;
             const settings = (fontStyle !== "")? {foreground,fontStyle} : {foreground};
 
-        return {name,scope,settings}
+        return {name,scope,settings};
     }
 
-    private genPatternRule(letter : string, tokenType : string=""): def.PatternRule {
-        const name = this.genPatternNameScope(letter, tokenType);
-        const match = `${this.genRegEx(letter,tokenType)}`;
-
-        return {name,match}
-    }
-
-    // interface ColorRule {
-    //     name: string;      //optional Name
-    //     scope: nameScope;     //optional Scope
-    //     comment?: string;     //optional Comment
-    //     settings: {
-    //         foreground: colorHex;
-    //         background?: colorHex; //optional Background color
-    //         fontStyle?: string; //optional Font style
-    //     };
-        
-    // }
-    
-    public readFromFile(filePath:JsonFile | DeconFile): string{
+       public readFromFile(filePath:JsonFile | DeconFile): string{
         return fs.readFileSync(filePath, "utf8");      
     }
     
@@ -243,19 +177,7 @@ export class RuleWriter{
         return JSON.parse(raw);
     } 
 
-
-    public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
-        const palette = this.patcher.loadColors(palettePath);
-        const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
-        if (!scope) {
-            vscUtils.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
-            return null;
-        }
-        return palette.find(rule => rule.scope === scope) || null;
-    }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
-    //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
-        
-    public getRuleColor(rule : def.ColorRule){
+        public getRuleColor(rule : def.ColorRule){
         const container = rule.settings;
         const colorHex = container.foreground? container.foreground : container.background;
         return colorHex;
@@ -273,95 +195,12 @@ export class RuleWriter{
     private pullRulePalette(palettePath : JsonFile):def.ColorRule[]{
         return this.patcher.loadColors(palettePath);
     }
-    
-    private writeToFile(output : string): void{
-        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
-        fs.appendFileSync(this.targetPath, output+'\n', "utf8");
-    } 
-    
-    private writeJSON(output : any, comma? : string): void{
-        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
-        const jsonStr = JSON.stringify(output, null, 4)
-        fs.appendFileSync(this.targetPath, jsonStr+comma+'\n', "utf8");
-    }
 
-    private writePattern(letter : string, tokenType : string="", comma : string=""):void{
-        const pattern = this.genPatternRule(letter,tokenType);
-        this.writeJSON(pattern,comma);
-        vscUtils.print(`Wrote pattern for ${letter} (${tokenType}) to (${this.targetPath})`);
-    }
-    
-    public writeRule(fileScope:string, tokenType : string="", letter : string, comma : string=""):void{
+     public writeRule(fileScope:string, tokenType : string="", letter : string, comma : string=""):void{
         const colorRule = this.genColorRule(fileScope, tokenType, letter);
         this.writeJSON(colorRule,comma);
         vscUtils.print(`Color bound to Rule for ${letter} (${tokenType}) to (${this.targetPath})`);
     }
-
-    public capitalizeFirstLetter(val: string) {
-        return String(val).charAt(0).toUpperCase() + String(val).slice(1);
-    }
-
-    public writeFileTopper(){
-        switch(this.JSONType){  
-            case "syntaxes":
-                this.writeToFile(`{`)
-                this.writeToFile(`  "patterns": [ { "include": "#keywords" } ],`)
-                this.writeToFile(`  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",`)
-                this.writeToFile(`  "scopeName": "source.${this.fileType}",`)
-                this.writeToFile(`  "fileTypes": [${def.arrayToArrStr(this.variants!)}],`)
-                this.writeToFile(`  "name": "${this.fileType.toUpperCase()}",`)
-                this.writeToFile(`  "repository": {`)
-                this.writeToFile(`      "keywords": {`)
-                this.writeToFile(`          "patterns": [`)
-                break;
-            case "palettes":
-                this.writeToFile("{");
-                this.writeToFile(`  "name": "${this.capitalizeFirstLetter(this.temperature!)}",`);
-                this.writeToFile(`  "description": "${this.fileDescript}",`);
-                this.writeToFile(`  "tokenColors": [`);
-                break;
-            default:
-                throw new Error(`Unknown ruleType: ${this.JSONType}`);
-            }
-        }
-
-    public writeFileEnd(): void{
-        switch(this.JSONType){  
-            case "syntaxes":
-                this.writeToFile(`            ]`);
-                this.writeToFile(`        }`);
-                this.writeToFile(`    }`);
-                this.writeToFile(`}`);
-                break;
-            case "palettes":
-                this.writeToFile(`  ]`);
-                this.writeToFile(`}`);
-                break;
-            default:
-                throw new Error(`Unknown ruleType: ${this.JSONType}`);
-        }
-    }
-
-    public writePatterns(letterMap : Record<string,string[]>){
-        const entries = Object.entries(letterMap);
-        this.writeFileTopper();
-
-        const total = entries.reduce((sum, [, tokens]) => sum + tokens.length, 0);
-        let count = 0;
-
-        for(let i = 0; i < entries.length; i++){
-            const [ tokenType , tokens ] = entries[i];
-            
-            for(let j = 0; j < tokens.length; j++){
-                const token = tokens[j];
-                count++;
-
-                const comma = count < total ? "," : "";
-                this.writePattern(token, tokenType, comma);
-            }
-        }
-        this.writeFileEnd();
-    } 
 
     public extractTokenPairsFromPalette(): [string, string][] {
         const palette = this.pullDeconPalette();
@@ -403,4 +242,214 @@ export class RuleWriter{
         // }
     }
 
+           
+    private override writeFileTopper(){
+        this.writeToFile("{");
+        this.writeToFile(`  "name": "${this.capitalizeFirstLetter(this.temperature!)}",`);
+        this.writeToFile(`  "description": "${this.fileDescript}",`);
+        this.writeToFile(`  "tokenColors": [`);
+    }
+
+    public writeFileEnd(): void{
+        this.writeToFile(`  ]`);
+        this.writeToFile(`}`);
+    }
+
+}
+
+export class PaletteDeconstructor extends ColorRuleGenerator{
+    private outputFile: JsonFile;
+    private inputFile: JsonFile;
+
+    constructor(input:langFile){
+        this.inputFile=input;
+    }
+        
+      private pullRuleColor(rule: def.ColorRule): def.ColorHex{
+        if(!rule){
+            return themeUtils.defaultTextColor();
+        }
+        const colorHex = this.getRuleColor(rule);
+        return colorHex as def.ColorHex;
+    }
+
+}
+
+
+abstract class RuleWriter{
+    //Both Types
+        protected outputFile: JsonFile;
+        protected targetPath: def.FilePath;
+        
+        protected fileType: string;
+        protected JSONType: ruleType;
+    
+    //Other Class Objects
+        // private regi : RegExBuilder; 
+        private patcher  = new PatchColors(this.context);
+    
+    constructor(protected context: vscode.ExtensionContext, params :  RuleParams){
+        this.JSONType = params.jsonKind;
+        this.fileType = params.fileKind.toLowerCase();
+        this.outputFile = this.genOutputFileStr();
+        this.targetPath = this.genPath();
+    }
+
+    public clear(): void {
+        const file = this.targetPath;
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+
+        fs.writeFileSync(file, "", "utf8");
+        vscUtils.print(`Cleared file at: ${file}`);
+    }
+
+
+    // abstract genOutputFileStr(): JsonFile{ }
+    // private genOutputFileStr(): JsonFile{
+    //     return `${this.fileType}.tmLanguage.json` as JsonFile;
+    //     }
+    // }
+    // private genOutputFileStr(): JsonFile{
+    //         return `${this.fileType}-colors-${this.temperature}.json` as JsonFile;
+    //     }
+    
+    protected genOutputFileStr(): JsonFile{
+        switch(this.JSONType){  
+            case "syntaxes":
+                return `${this.fileType}.tmLanguage.json` as JsonFile;
+            case "palettes":
+                return `${this.fileType}-colors-${this.temperature}.json` as JsonFile;
+            default:
+                throw new Error(`Unknown ruleType: ${this.JSONType}`);
+            }
+    }
+
+    protected genPath(): def.FilePath{
+        const filePath = 
+        path.isAbsolute(this.outputFile)
+        ? this.outputFile as def.FilePath
+        : path.join(this.context.extensionPath, this.JSONType, path.basename(this.outputFile)) as def.FilePath;
+        
+        return filePath;
+    }
+    
+    private extractFileType(filename: string): string{
+        return path.extname(filename);
+    }    
+
+    protected genPatternNameScope(letter : string, tokenType : string=""): def.GenericScope {
+       // Resolve symbol alias if it's a known special symbol, otherwise fallback to original letter
+        const resolvedToken = def.isSymbol(letter)
+        ? def.symbolLookUpMap[letter as keyof typeof def.symbolLookUpMap] ?? letter
+        : letter;
+
+        const spacer = (tokenType === "quality")? '.':'';
+        const token = `${tokenType}${spacer!}${resolvedToken}`;
+        const name = `source.${this.fileType}.${token}`;
+        return name as def.GenericScope;
+    }
+
+     public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
+        const palette = this.patcher.loadColors(palettePath);
+        const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
+        if (!scope) {
+            vscUtils.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
+            return null;
+        }
+        return palette.find(rule => rule.scope === scope) || null;
+    }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
+    //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
+    
+
+    
+    protected writeToFile(output : string): void{
+        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
+        fs.appendFileSync(this.targetPath, output+'\n', "utf8");
+    } 
+    
+    protected writeJSON(output : any, comma? : string): void{
+        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
+        const jsonStr = JSON.stringify(output, null, 4)
+        fs.appendFileSync(this.targetPath, jsonStr+comma+'\n', "utf8");
+    }
+
+    public capitalizeFirstLetter(val: string) {
+        return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+    }
+
+    protected abstract writeFileTopper(): void
+
+    // abstract writeFileTopper(){
+    //     switch(this.JSONType){  
+    //         case "syntaxes":
+    //             this.writeToFile(`{`)
+    //             this.writeToFile(`  "patterns": [ { "include": "#keywords" } ],`)
+    //             this.writeToFile(`"$schema": "./schema/tmLanguage.schema.json,"`),
+    //             this.writeToFile(`"$comment": "Forked from https://github.com/martinring/tmlanguage. Canonical source may change.",`)
+    //             this.writeToFile(`  "scopeName": "source.${this.fileType}",`)
+    //             this.writeToFile(`  "fileTypes": [${def.arrayToArrStr(this.variants!)}],`)
+    //             this.writeToFile(`  "name": "${this.fileType.toUpperCase()}",`)
+    //             this.writeToFile(`  "repository": {`)
+    //             this.writeToFile(`      "keywords": {`)
+    //             this.writeToFile(`          "patterns": [`)
+    //             break;
+    //         case "palettes":
+    //             this.writeToFile("{");
+    //             this.writeToFile(`  "name": "${this.capitalizeFirstLetter(this.temperature!)}",`);
+    //             this.writeToFile(`  "description": "${this.fileDescript}",`);
+    //             this.writeToFile(`  "tokenColors": [`);
+    //             break;
+    //         default:
+    //             throw new Error(`Unknown ruleType: ${this.JSONType}`);
+    //         }
+    //     }
+
+ 
+
+    protected abstract writeFileEnd(): void
+    // private writeFileEnd(): void{
+    //     switch(this.JSONType){  
+    //         case "syntaxes":
+    //             this.writeToFile(`            ]`);
+    //             this.writeToFile(`        }`);
+    //             this.writeToFile(`    }`);
+    //             this.writeToFile(`}`);
+    //             break;
+    //         case "palettes":
+    //             this.writeToFile(`  ]`);
+    //             this.writeToFile(`}`);
+    //             break;
+    //         default:
+    //             throw new Error(`Unknown ruleType: ${this.JSONType}`);
+    //     }
+    // }    public writeFileEnd(): void{
+    //         this.writeToFile(`            ]`);
+    //         this.writeToFile(`        }`);
+    //         this.writeToFile(`    }`);
+    //         this.writeToFile(`}`);
+    //         break;
+    //     }
+    // }
+
 }   
+
+
+
+// export class ruleParameters(private context: vscode.ExtensionContext, jsonKind : ruleType, fileKind: string, descript: string, variants: string){
+//     private fileName: File;
+//     private targetPath: def.FilePath;
+//     private targetFolder: ruleType;
+//     private fileType: string;
+//     private regi : RegExBuilder; 
+//     private fileDescript : string; 
+//     private variants: string[];
+    
+//     constructor(private context: vscode.ExtensionContext, jsonKind : ruleType, fileKind: string, descript: string, variants: string){
+//         this.fileType = fileKind.toLowerCase();
+//         this.targetFolder = jsonKind;
+//         this.fileName= this.genOutputFileStr();
+//         this.regi = new RegExBuilder(false);
+//         this.targetPath = this.genPath();
+//         this.fileDescript = descript;
+//     }
+// }

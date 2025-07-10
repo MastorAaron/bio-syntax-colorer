@@ -1,0 +1,12 @@
+"fasta" :[
+    "title": [ "<" ],
+    "nt": [ "A" , "C" , "G" , "T" , "U" , "N" , "R" , "Y" , "B" , "D" , "H" , "V" , "K" , "M" , "S" , "W" ],
+    "sym":[ "*" , "-" ],
+    "aa": [ "E" , "Q" , "F" , "J" , "L" , "I" , "Z" , "P" , "O" , "X" ] 
+],
+
+"fastq":[ 
+    "title":[ "@" ],
+    "ignoreLine":[ "+" ], 
+    "quality":[ "low"  , "mid"  , "high" ]
+    ]

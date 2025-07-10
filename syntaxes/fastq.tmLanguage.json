@@ -1,6 +1,7 @@
 {
   "patterns": [ { "include": "#keywords" } ],
-  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "$schema": "./schema/tmLanguage.schema.json",
+    "$comment": "Forked from https://github.com/martinring/tmlanguage. Canonical source may change.",
   "scopeName": "source.fasta",
   "fileTypes": ["fna","faa","fastq"],
   "name": "FASTQ",

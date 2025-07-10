@@ -1,0 +1,503 @@
+{
+  "name": "Warm",
+  "description": "Standard FASTQ Palette",
+  "tokenColors": [
+{
+    "name": "0",
+    "scope": "source.fastq.00",
+    "settings": {
+        "foreground": "."
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.10",
+    "settings": {
+        "foreground": "/"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.20",
+    "settings": {
+        "foreground": "d"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.30",
+    "settings": {
+        "foreground": "e"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.40",
+    "settings": {
+        "foreground": "c"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.50",
+    "settings": {
+        "foreground": "o"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.60",
+    "settings": {
+        "foreground": "n"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.70",
+    "settings": {
+        "foreground": "s"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.80",
+    "settings": {
+        "foreground": "t"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.90",
+    "settings": {
+        "foreground": "r"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.100",
+    "settings": {
+        "foreground": "u"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.110",
+    "settings": {
+        "foreground": "c"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.120",
+    "settings": {
+        "foreground": "t"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.130",
+    "settings": {
+        "foreground": "."
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.140",
+    "settings": {
+        "foreground": "s"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.150",
+    "settings": {
+        "foreground": "c"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.160",
+    "settings": {
+        "foreground": "h"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.170",
+    "settings": {
+        "foreground": "e"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.180",
+    "settings": {
+        "foreground": "m"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.190",
+    "settings": {
+        "foreground": "a"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.200",
+    "settings": {
+        "foreground": "."
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.210",
+    "settings": {
+        "foreground": "j"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.220",
+    "settings": {
+        "foreground": "s"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.230",
+    "settings": {
+        "foreground": "o"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.240",
+    "settings": {
+        "foreground": "n"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.00",
+    "settings": {
+        "foreground": "W"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.10",
+    "settings": {
+        "foreground": "a"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.20",
+    "settings": {
+        "foreground": "r"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.30",
+    "settings": {
+        "foreground": "m"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.40",
+    "settings": {
+        "foreground": " "
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.50",
+    "settings": {
+        "foreground": "P"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.60",
+    "settings": {
+        "foreground": "a"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.70",
+    "settings": {
+        "foreground": "l"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.80",
+    "settings": {
+        "foreground": "e"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.90",
+    "settings": {
+        "foreground": "t"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.100",
+    "settings": {
+        "foreground": "t"
+    }
+},
+{
+    "name": "0",
+    "scope": "source.fastq.110",
+    "settings": {
+        "foreground": "e"
+    }
+},
+{
+    "name": "<",
+    "scope": "source.fastq.title<",
+    "settings": {
+        "foreground": "#E6DB74"
+    }
+},
+{
+    "name": "Adenine OR Alanine",
+    "scope": "source.fastq.ntA",
+    "settings": {
+        "foreground": "#3ED132"
+    }
+},
+{
+    "name": "Cytosine OR Cysteine",
+    "scope": "source.fastq.ntC",
+    "settings": {
+        "foreground": "#4192FF"
+    }
+},
+{
+    "name": "Guanine OR Glycine",
+    "scope": "source.fastq.ntG",
+    "settings": {
+        "foreground": "#F09000"
+    }
+},
+{
+    "name": "Thymine OR Threonine",
+    "scope": "source.fastq.ntT",
+    "settings": {
+        "foreground": "#FF0000"
+    }
+},
+{
+    "name": "Uracil OR Selenocysteine",
+    "scope": "source.fastq.ntU",
+    "settings": {
+        "foreground": "#FF00C8"
+    }
+},
+{
+    "name": "Any Nuke or Asparagine",
+    "scope": "source.fastq.ntN",
+    "settings": {
+        "foreground": "#D8D6D6"
+    }
+},
+{
+    "name": "Arginine OR Purine",
+    "scope": "source.fastq.ntR",
+    "settings": {
+        "foreground": "#FF0000"
+    }
+},
+{
+    "name": "Tyrosine OR Pyrimidine",
+    "scope": "source.fastq.ntY",
+    "settings": {
+        "foreground": "#5A5A5A"
+    }
+},
+{
+    "name": "Asx: Asn or Asp OR not A",
+    "scope": "source.fastq.ntB",
+    "settings": {
+        "foreground": "#E02B31"
+    }
+},
+{
+    "name": "Aspartate OR not C",
+    "scope": "source.fastq.ntD",
+    "settings": {
+        "foreground": "#8B4513"
+    }
+},
+{
+    "name": "Histidine OR not G",
+    "scope": "source.fastq.ntH",
+    "settings": {
+        "foreground": "#740001"
+    }
+},
+{
+    "name": "Valine OR not T/U",
+    "scope": "source.fastq.ntV",
+    "settings": {
+        "foreground": "#B03060"
+    }
+},
+{
+    "name": "Lysine OR Ketone",
+    "scope": "source.fastq.ntK",
+    "settings": {
+        "foreground": "#E9B148"
+    }
+},
+{
+    "name": "Methionine OR Amino",
+    "scope": "source.fastq.ntM",
+    "settings": {
+        "foreground": "#FF8C00"
+    }
+},
+{
+    "name": "Serine OR Strong",
+    "scope": "source.fastq.ntS",
+    "settings": {
+        "foreground": "#15A4A4"
+    }
+},
+{
+    "name": "Tryptophan OR Weak",
+    "scope": "source.fastq.ntW",
+    "settings": {
+        "foreground": "#800080"
+    }
+},
+{
+    "name": "*",
+    "scope": "source.fastq.symStop",
+    "settings": {
+        "foreground": "#474747"
+    }
+},
+{
+    "name": "Gap or Minus Sign",
+    "scope": "source.fastq.symGap",
+    "settings": {
+        "foreground": "#474747"
+    }
+},
+{
+    "name": "Glutamic Acid",
+    "scope": "source.fastq.aaE",
+    "settings": {
+        "foreground": "#12B9CF"
+    }
+},
+{
+    "name": "Glutamine",
+    "scope": "source.fastq.aaQ",
+    "settings": {
+        "foreground": "#00FF00"
+    }
+},
+{
+    "name": "Phenylalanine",
+    "scope": "source.fastq.aaF",
+    "settings": {
+        "foreground": "#C44C4C"
+    }
+},
+{
+    "name": "(Iso)leucine: L or I",
+    "scope": "source.fastq.aaJ",
+    "settings": {
+        "foreground": "#91E69F"
+    }
+},
+{
+    "name": "Leucine",
+    "scope": "source.fastq.aaL",
+    "settings": {
+        "foreground": "#BBBBBB"
+    }
+},
+{
+    "name": "Isoleucine",
+    "scope": "source.fastq.aaI",
+    "settings": {
+        "foreground": "#80A0F0"
+    }
+},
+{
+    "name": "Glx: Gln or Glu",
+    "scope": "source.fastq.aaZ",
+    "settings": {
+        "foreground": "#80A0F0"
+    }
+},
+{
+    "name": "Proline",
+    "scope": "source.fastq.aaP",
+    "settings": {
+        "foreground": "#FFFF00"
+    }
+},
+{
+    "name": "Pyrrolysine",
+    "scope": "source.fastq.aaO",
+    "settings": {
+        "foreground": "#FF5733"
+    }
+},
+{
+    "name": "Any Amino Acid",
+    "scope": "source.fastq.aaX",
+    "settings": {
+        "foreground": "#4682B4"
+    }
+},
+{
+    "name": "Header",
+    "scope": "source.fastq.title",
+    "settings": {
+        "foreground": "#726C38"
+    }
+},
+{
+    "name": "Sequence_ID line",
+    "scope": "source.fastq.plusLine",
+    "settings": {
+        "foreground": "#CD7F32"
+    }
+},
+{
+    "name": "Phred Score: Low Quality Read Score",
+    "scope": "source.fastq.quality.low",
+    "settings": {
+        "foreground": "#CD7F32"
+    }
+},
+{
+    "name": "Phred Score: Medium Quality Read Score",
+    "scope": "source.fastq.quality.mid",
+    "settings": {
+        "foreground": "#C0C0C0"
+    }
+},
+{
+    "name": "Phred Score: High Quality Read Score",
+    "scope": "source.fastq.quality.high",
+    "settings": {
+        "foreground": "#FFD700"
+    }
+}
+  ]
+}

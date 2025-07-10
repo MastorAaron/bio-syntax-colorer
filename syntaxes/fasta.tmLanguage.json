@@ -2,7 +2,7 @@
     "patterns": [
       { "include": "#keywords" }
     ],
-  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "$schema": "./schema/tmLanguage.schema.json",
   "scopeName": "source.fasta",
   "fileTypes": [ "fasta", "fastq", "fa" ],
   "name": "FASTA",

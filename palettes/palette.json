@@ -1,0 +1,40 @@
+/* Coolors Exported Palette - https://coolors.co/65fc4a-656c78-c7b7c8-ec4f47-ffffff-fafbfb-824c27-f6c2bd-83832d-f5a89a */
+
+- Tailwind
+
+{ 'neon_green': { DEFAULT: '#65FC4A', 100: '#0a4001', 200: '#158102', 300: '#1fc103', 400: '#2efb0a', 500: '#65fc4a', 600: '#84fd6e', 700: '#a3fd92', 800: '#c1feb7', 900: '#e0fedb' }, 'payne's_gray': { DEFAULT: '#656C78', 100: '#141518', 200: '#282b30', 300: '#3c4048', 400: '#505660', 500: '#656c78', 600: '#808895', 700: '#a0a6b0', 800: '#c0c3ca', 900: '#dfe1e5' }, 'thistle': { DEFAULT: '#C7B7C8', 100: '#2b212b', 200: '#554356', 300: '#806482', 400: '#a48ca6', 500: '#c7b7c8', 600: '#d2c5d3', 700: '#ddd4de', 800: '#e8e2e9', 900: '#f4f1f4' }, 'vermilion': { DEFAULT: '#EC4F47', 100: '#370806', 200: '#6f110c', 300: '#a61911', 400: '#de2117', 500: '#ec4f47', 600: '#ef726b', 700: '#f39590', 800: '#f7b8b5', 900: '#fbdcda' }, 'white': { DEFAULT: '#FFFFFF', 100: '#333333', 200: '#666666', 300: '#999999', 400: '#cccccc', 500: '#ffffff', 600: '#ffffff', 700: '#ffffff', 800: '#ffffff', 900: '#ffffff' }, 'seasalt': { DEFAULT: '#FAFBFB', 100: '#2c3737', 200: '#596f6f', 300: '#8aa1a1', 400: '#c2cece', 500: '#fafbfb', 600: '#fafbfb', 700: '#fcfcfc', 800: '#fdfdfd', 900: '#fefefe' }, 'russet': { DEFAULT: '#824C27', 100: '#1a0f08', 200: '#341e0f', 300: '#4e2d17', 400: '#683c1f', 500: '#824c27', 600: '#b66a36', 700: '#d08d61', 800: '#e0b396', 900: '#efd9ca' }, 'tea_rose_(red)': { DEFAULT: '#F6C2BD', 100: '#4c100a', 200: '#992015', 300: '#e13323', 400: '#eb7a6f', 500: '#f6c2bd', 600: '#f8cdc9', 700: '#f9dad7', 800: '#fbe6e4', 900: '#fdf3f2' }, 'olive': { DEFAULT: '#83832D', 100: '#1b1b09', 200: '#353512', 300: '#50501b', 400: '#6a6a24', 500: '#83832d', 600: '#b6b63e', 700: '#cccc6b', 800: '#dddd9c', 900: '#eeeece' }, 'melon': { DEFAULT: '#F5A89A', 100: '#481107', 200: '#91220e', 300: '#d93315', 400: '#ee6850', 500: '#f5a89a', 600: '#f7b8ad', 700: '#f9cac2', 800: '#fbdcd6', 900: '#fdedeb' } }
+
+- CSV
+
+65FC4A,656C78,C7B7C8,EC4F47,FFFFFF,FAFBFB,824C27,F6C2BD,83832D,F5A89A
+
+- With #
+
+#65FC4A, #656C78, #C7B7C8, #EC4F47, #FFFFFF, #FAFBFB, #824C27, #F6C2BD, #83832D, #F5A89A
+
+- Array
+
+["65FC4A","656C78","C7B7C8","EC4F47","FFFFFF","FAFBFB","824C27","F6C2BD","83832D","F5A89A"]
+
+- Object
+
+{"Neon green":"65FC4A","Payne's gray":"656C78","Thistle":"C7B7C8","Vermilion":"EC4F47","White":"FFFFFF","Seasalt":"FAFBFB","Russet":"824C27","Tea rose (red)":"F6C2BD","Olive":"83832D","Melon":"F5A89A"}
+
+- Extended Array
+
+[{"name":"Neon green","hex":"65FC4A","rgb":[101,252,74],"cmyk":[60,0,71,1],"hsb":[111,71,99],"hsl":[111,97,64],"lab":[88,-71,69]},{"name":"Payne's gray","hex":"656C78","rgb":[101,108,120],"cmyk":[16,10,0,53],"hsb":[218,16,47],"hsl":[218,9,43],"lab":[45,0,-8]},{"name":"Thistle","hex":"C7B7C8","rgb":[199,183,200],"cmyk":[0,8,0,22],"hsb":[296,8,78],"hsl":[296,13,75],"lab":[76,9,-7]},{"name":"Vermilion","hex":"EC4F47","rgb":[236,79,71],"cmyk":[0,67,70,7],"hsb":[3,70,93],"hsl":[3,81,60],"lab":[56,60,38]},{"name":"White","hex":"FFFFFF","rgb":[255,255,255],"cmyk":[0,0,0,0],"hsb":[0,0,100],"hsl":[0,0,100],"lab":[100,0,0]},{"name":"Seasalt","hex":"FAFBFB","rgb":[250,251,251],"cmyk":[0,0,0,2],"hsb":[180,0,98],"hsl":[180,11,98],"lab":[99,0,0]},{"name":"Russet","hex":"824C27","rgb":[130,76,39],"cmyk":[0,42,70,49],"hsb":[24,70,51],"hsl":[24,54,33],"lab":[38,19,31]},{"name":"Tea rose (red)","hex":"F6C2BD","rgb":[246,194,189],"cmyk":[0,21,23,4],"hsb":[5,23,96],"hsl":[5,76,85],"lab":[83,18,10]},{"name":"Olive","hex":"83832D","rgb":[131,131,45],"cmyk":[0,0,66,49],"hsb":[60,66,51],"hsl":[60,49,35],"lab":[53,-11,45]},{"name":"Melon","hex":"F5A89A","rgb":[245,168,154],"cmyk":[0,31,37,4],"hsb":[9,37,96],"hsl":[9,82,78],"lab":[76,27,19]}]
+
+- XML
+
+<palette>
+  <color name="Neon green" hex="65FC4A" r="101" g="252" b="74" />
+  <color name="Payne's gray" hex="656C78" r="101" g="108" b="120" />
+  <color name="Thistle" hex="C7B7C8" r="199" g="183" b="200" />
+  <color name="Vermilion" hex="EC4F47" r="236" g="79" b="71" />
+  <color name="White" hex="FFFFFF" r="255" g="255" b="255" />
+  <color name="Seasalt" hex="FAFBFB" r="250" g="251" b="251" />
+  <color name="Russet" hex="824C27" r="130" g="76" b="39" />
+  <color name="Tea rose (red)" hex="F6C2BD" r="246" g="194" b="189" />
+  <color name="Olive" hex="83832D" r="131" g="131" b="45" />
+  <color name="Melon" hex="F5A89A" r="245" g="168" b="154" />
+</palette>
