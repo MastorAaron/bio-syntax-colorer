@@ -103,12 +103,12 @@ export class RegExBuilder{
 
     public genNukeRegEx(strand : string, remove :boolean=false): string{
         const casePrefix = remove?"":`(?i)`;
-        return `${casePrefix}${this.genHighLightRegEx(strand,def.nukeRegExMap)}`
+        return `${casePrefix}${this.genHighLightRegEx(strand,def.nukeRegExMap)}`;
     }
 
     public genAminoRegEx(strand : string, remove :boolean=false): string{
         const casePrefix = remove?"":`(?i)`;
-        return `${casePrefix}${this.genHighLightRegEx(strand,def.aminoRegExMap)}`
+        return `${casePrefix}${this.genHighLightRegEx(strand,def.aminoRegExMap)}`;
     } 
     
     // public genSymbolRegEx(strand : string, remove :boolean=false): string{
@@ -117,7 +117,12 @@ export class RegExBuilder{
     // }
 
     public genAminoPropertyRegEx(strand : string, remove :boolean=false): string{
-       const casePrefix = remove?"":`(?i)`;
-        return `${casePrefix}${this.genHighLightRegEx(strand,def.aminoPropertyRegExMap)}`
+        const casePrefix = remove?"":`(?i)`;
+        return `${casePrefix}${this.genHighLightRegEx(strand,def.aminoPropertyRegExMap)}`;
+    }
+
+    public splitCamelCase(str:string){//Pass it a camelCase -> [camelCase, camel, Case] 
+        return str.match(/^([a-z]+)([A-Z].*)$/);
+
     }
 }
