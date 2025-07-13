@@ -1,0 +1,252 @@
+{
+  "tokenColors": [
+    {
+      "name": "bio-colorer@0.0.58: FASTA Header",
+      "scope": "fasta.title",
+      "settings": {
+        "foreground": "#E6DB74",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: FASTQ Header",
+      "scope": "fastq.title",
+      "settings": {
+        "foreground": "#726C38",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Adenine OR Alanine",
+      "scope": "source.fasta.ntA",
+      "settings": {
+        "foreground": "#3ED132"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Cytosine OR Cysteine",
+      "scope": "source.fasta.ntC",
+      "settings": {
+        "foreground": "#4192FF"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Guanine OR Glycine",
+      "scope": "source.fasta.ntG",
+      "settings": {
+        "foreground": "#F09000"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Thymine OR Threonine",
+      "scope": "source.fasta.ntT",
+      "settings": {
+        "foreground": "#FF0000"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Uracil OR Selenocysteine",
+      "scope": "source.fasta.ntU",
+      "settings": {
+        "foreground": "#FF00C8"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Any Nuke OR Asparagine",
+      "scope": "source.fasta.ntN",
+      "settings": {
+        "foreground": "#D8D6D6"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Arginine OR Purine",
+      "scope": "source.fasta.ntR",
+      "settings": {
+        "foreground": "#FF0000"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Tyrosine OR Pyrimidine",
+      "scope": "source.fasta.ntY",
+      "settings": {
+        "foreground": "#5A5A5A"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Asx: Asn or Asp OR not A",
+      "scope": "source.fasta.ntB",
+      "settings": {
+        "foreground": "#E02B31"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Asparagine OR not C",
+      "scope": "source.fasta.ntD",
+      "settings": {
+        "foreground": "#8B4513"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Histidine OR not G",
+      "scope": "source.fasta.ntH",
+      "settings": {
+        "foreground": "#740001"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Valine OR not T",
+      "scope": "source.fasta.ntV",
+      "settings": {
+        "foreground": "#B03060"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Lysine OR Ketone",
+      "scope": "source.fasta.ntK",
+      "settings": {
+        "foreground": "#E9B148"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Methionine OR Amino",
+      "scope": "source.fasta.ntM",
+      "settings": {
+        "foreground": "#FF8C00"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Serine OR Strong",
+      "scope": "source.fasta.ntS",
+      "settings": {
+        "foreground": "#15A4A4"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Tryptophan OR Weak",
+      "scope": "source.fasta.ntW",
+      "settings": {
+        "foreground": "#800080"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Gap or Minus Sign",
+      "scope": "source.fasta.symGap",
+      "settings": {
+        "foreground": "#474747"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Stop Codon",
+      "scope": "source.fasta.symStop",
+      "settings": {
+        "foreground": "#474747"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Glutamic acid",
+      "scope": "source.fasta.aaE",
+      "settings": {
+        "foreground": "#12B9CF"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Glutamine",
+      "scope": "source.fasta.aaQ",
+      "settings": {
+        "foreground": "#00FF00"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Glx: Gln or Glu",
+      "scope": "source.fasta.aaZ",
+      "settings": {
+        "foreground": "#80A0F0"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Phenylalanine",
+      "scope": "source.fasta.aaF",
+      "settings": {
+        "foreground": "#C44C4C"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Leucine",
+      "scope": "source.fasta.aaL",
+      "settings": {
+        "foreground": "#BBBBBB"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Isoleucine",
+      "scope": "source.fasta.aaI",
+      "settings": {
+        "foreground": "#80A0F0"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: (Iso)leucine: L or I",
+      "scope": "source.fasta.aaJ",
+      "settings": {
+        "foreground": "#91E69F"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Proline",
+      "scope": "source.fasta.aaP",
+      "settings": {
+        "foreground": "#FFFF00"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Pyrrolysine",
+      "scope": "source.fasta.aaO",
+      "settings": {
+        "foreground": "#FF5733"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Any Amino Acid",
+      "scope": "source.fasta.aaX",
+      "settings": {
+        "foreground": "#4682B4"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Sequence_ID line",
+      "scope": "source.fastq.plusLine",
+      "settings": {
+        "foreground": "#CD7F32"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Phred Score: Low Quality Read Score",
+      "scope": "source.fastq.quality.low",
+      "settings": {
+        "foreground": "#CD7F32"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Phred Score: Medium Quality Read Score",
+      "scope": "source.fastq.quality.mid",
+      "settings": {
+        "foreground": "#C0C0C0"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: Phred Score: High Quality Read Score",
+      "scope": "source.fastq.quality.high",
+      "settings": {
+        "foreground": "#FFD700"
+      }
+    },
+    {
+      "name": "bio-colorer@0.0.58: kmer Highlighter",
+      "scope": "source.fasta.hlATGN.highLightRule",
+      "settings": {
+        "foreground": "#D4D4D4",
+        "background": "#FFFF33"
+      }
+    }
+  ]
+}

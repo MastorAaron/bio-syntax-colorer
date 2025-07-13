@@ -1,6 +1,5 @@
 {
 
-  // "$schema": "http://json-schema.org/schema#",
   "$schema": "https://json-schema.org/draft-07/schema#",
   "$id": "./syntaxes/schema/tmLanguage.schema.json",
   "$comment": "Forked from https://github.com/martinring/tmlanguage. This local version ensures stability and allows project-specific tweaks.",

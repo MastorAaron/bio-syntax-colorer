@@ -12,7 +12,10 @@ jest.mock('vscode', () => ({
     }
 }));
 
-import { vscUtils,RuleWriter } from "../src/vscUtils";
+import { JsonFile, DeconFile } from "../src/ruleWriter";
+import { LangGenerator } from "../src/langGen";
+import { PaletteGenerator } from "../src/paletteGen";
+import { vscUtils } from "../src/vscUtils";
 import * as fs from "fs";
 import * as def from "../src/definitions";
 
@@ -64,37 +67,51 @@ describe("Test for JSON Generation", () => {
             vscUtils.vscCOUT = jest.fn();
         });
 
-        const writer = new RuleWriter(vscUtils.mockContext(), {
-            jsonKind:    "palettes",
-            fileKind:    "fastq",
-            descript:    "Standard FASTQ Palette",
-            temperature: "Warm",
-            deconPalFile: "palettes/Warm-Deconstruct.json"
+    // interface ColorRuleParams{
+    //     jsonKind: "palettes";
+    //     fileKind: string;
+        
+    //     descript: string;
+    //     theme: string;
+    //     actualPalFile : rW.JsonFile;
+    //     deconPalFile?: rW.DeconFile;
+
+    // }
+
+
+        const writer = new PaletteGenerator(vscUtils.mockContext(), {
+            jsonKind:      "palettes",
+            fileKind:      "fastq",
+            
+            descript:      "Standard FASTQ Palette",
+            palFlavor:     "Warm",
+            paletteFile: "palettes/fasta-colors-warm.json" as JsonFile, //as rW.DeconFile
+            deconPalFile:  "palettes/Warm-Deconstruct.json" as DeconFile //as rW.DeconFile
             // variants: ["fna", "faa", "fastq"]
         });
 
-        // test("Probe Rule Writer", () => {
-        //     writer.clear(); // ensure fresh file
-        //     // ['A','C','G','T','U','N'];
-        //     const tokenTypes = 
-        //     ["title", "ignoreLine","quality"];
-        //     const letters = 
-        //     ["@","+","low","mid","high"];
-        //     // ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'];
-        //     // ['F','E','Z','J','I','L','P','Q','O','X'];
-        //     // ["Gap", "Stop"];
-        //     // [ "title", "nt", "aa", "sym" ];
-        //     // const tokType="nt";
-        //     const tokType="foreground";
-        //     writer.writeFileTopper();
-        //     for(const tokType of tokenTypes){
-        //         for(const letter of letters){
-        //             writer.writeRule( "fastq", tokType, letter, ',' );
-        //         }
-        //     }
-        //     writer.writeFileEnd();
+        test("Probe Palette Writer", () => {
+            writer.clear(); // ensure fresh file
+            // ['A','C','G','T','U','N'];
+            const tokenTypes = 
+            ["title", "ignoreLine","quality"];
+            const letters = 
+            ["@","+","low","mid","high"];
+            // ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'];
+            // ['F','E','Z','J','I','L','P','Q','O','X'];
+            // ["Gap", "Stop"];
+            // [ "title", "nt", "aa", "sym" ];
+            // const tokType="nt";
+            const tokType="foreground";
+            writer.writeFileTopper();
+            for(const tokType of tokenTypes){
+                for(const letter of letters){
+                    writer.writeRule( "fastq", tokType, letter, ',' );
+                }
+            }
+            writer.writeFileEnd();
 
-        // }); 
+        }); 
         
     //    test("Probe Rule Writer", () => {
     //         writer.clear();
@@ -112,26 +129,26 @@ describe("Test for JSON Generation", () => {
     //         });
     // });
 
-    test("Probe Rule Writer", () => {
-        writer.clear();
-        writer.writeFileTopper();
+    // test("Probe Rule Writer", () => {
+    //     writer.clear();
+    //     writer.writeFileTopper();
 
-        const tokenMap = writer.extractTokenMap();
+    //     const tokenMap = writer.extractTokenMap();
 
-        const fileScopes = Object.keys(tokenMap);
-        let ruleCount = 0;
-        const total = Object.values(tokenMap).reduce((sum, list) => sum + list.length, 0);
+    //     const fileScopes = Object.keys(tokenMap);
+    //     let ruleCount = 0;
+    //     const total = Object.values(tokenMap).reduce((sum, list) => sum + list.length, 0);
 
-        for (const fileScope of fileScopes) {
-            for (const [tokenType, letter] of tokenMap[fileScope]) {
-                const comma = ruleCount < total - 1 ? ',' : '';
-                writer.writeRule(fileScope, tokenType, letter, comma);
-                ruleCount++;
-            }
-        }
+    //     for (const fileScope of fileScopes) {
+    //         for (const [tokenType, letter] of tokenMap[fileScope]) {
+    //             const comma = ruleCount < total - 1 ? ',' : '';
+    //             writer.writeRule(fileScope, tokenType, letter, comma);
+    //             ruleCount++;
+    //         }
+    //     }
 
-        writer.writeFileEnd();
-        });
+    //     writer.writeFileEnd();
+    //     });
     });
         
     //     test("should generate valid COLOR PALETTE JSON output file", () => {

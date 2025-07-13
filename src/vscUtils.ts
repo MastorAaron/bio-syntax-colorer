@@ -1,17 +1,21 @@
 import * as vscode from "vscode";
 import * as def from "./definitions";
-import * as fs from "fs";
-import * as path from "path";
-import { HoverObj } from "./hoverOver";
-import { PatchColors } from "./patch";
 
 interface TokenCustomization {
     textMateRules?: def.ColorRule[];
     [key: string]: unknown;
 }
 
-export const DARK_FG: def.ColorHex  = "#D4D4D4";
+export const DARK_FG : def.ColorHex = "#D4D4D4";
 export const LIGHT_FG: def.ColorHex = "#57606C";
+
+const NeonYellow    : def.ColorHex = "#FFFF33";
+const NeonGreen     : def.ColorHex = "#39FF14";
+const NeonBlue      : def.ColorHex = "#1F51FF";
+const NeonMagneta   : def.ColorHex = "#FF00FF";
+
+const NeonsColors = [NeonYellow,NeonGreen,NeonBlue,NeonMagneta];
+export type Neons = (typeof NeonsColors)[number];
 export namespace vscUtils{
 
     export function vscCOUT(...args: unknown[]): void {
@@ -61,21 +65,33 @@ export namespace vscUtils{
             { placeHolder: userText }
         );
     }
-
-    // export function mockContext(){
-    //     return { extensionPath: "./" } as unknown as vscode.ExtensionContext;
-    // }
+    
+    export async function showInputBox(userText: string, givenEx: string=""): Promise<string | undefined>{
+        return await vscode.window.showInputBox({
+            prompt: userText,
+            placeHolder: givenEx
+        });
+    }
 
     export function mockContext(): vscode.ExtensionContext {
+        //     return { extensionPath: "./" } as unknown as vscode.ExtensionContext;
         return {
             extensionPath: "./",
             subscriptions: []
         } as unknown as vscode.ExtensionContext;
     }
 
+
+    export function getActiveDoc(): vscode.TextDocument | null {
+        const editor = vscode.window.activeTextEditor;
+        return editor ? editor.document : null;
+    }
+
 } 
 
 export const themeUtils = {
+
+
     themeKind(){
         return vscode.window.activeColorTheme.kind;
     },
@@ -90,5 +106,21 @@ export const themeUtils = {
     
     defaultTextColor(): def.ColorHex {
         return this.isDark() ? DARK_FG : LIGHT_FG;
+    }, 
+    
+    highLightColors(color : string): def.ColorHex {
+        switch(color){
+            case "Neon Yellow":
+                return NeonYellow;
+            case "Neon Green":
+                return NeonGreen;
+            case "Neon Blue":
+                return NeonBlue;            
+            case "Neon Magneta":
+                return NeonMagneta;
+            default:
+                return NeonYellow;
+
+        }
     }
 };

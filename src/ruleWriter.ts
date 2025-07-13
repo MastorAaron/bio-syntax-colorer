@@ -4,23 +4,119 @@ import * as fs from "fs";
 import * as path from "path";
 import { PatchColors } from "./patch";
 import { RegExBuilder } from "./regExBuilder";
-import { vscUtils, themeUtils } from "./vscUtils";
+import { Themes } from "./extension";
+import { vscUtils } from "./vscUtils";
 
-export type ruleType  = "syntaxes" | "palettes" | "strip";
-export type langFile  = `${string}.tmLanguage.json`;
-export type colorFile = `${string}-colors.json`;
-export type DeconFile = `${string}-Deconstruct.json`;
-// type StripFile = `${string}-stripped.json` ;
-export type JsonFile = langFile | colorFile | DeconFile; //| StripFile;
+export type RuleType  = "syntaxes" | "palettes" | "decon";
+export type LangFile  = `${Lang}.tmLanguage.json`;
+export type Lang  = "fasta" | "fastq" | "else";
+export type ColorFile = `${Lang}-${string}-colors.json`;
+export type DeconFile = `${string}-Deconstruct.json`; // type StripFile = `${string}-stripped.json` ;
+export type JsonFile = LangFile | ColorFile | DeconFile; //| StripFile;
+
+export class FileMeta {
+    lang!: Lang;
+    theme?: Themes;
+    jsonKind!: RuleType;
+    filePath: JsonFile;
+    variants?: string[];
+
+    constructor(filePath: string) {
+        this.filePath = filePath as JsonFile;
+        this.parseFilePath(filePath as JsonFile);
+    }
+
+    private parseFilePath(filePath: JsonFile){
+        if (filePath.endsWith(".tmLanguage.json")) {
+            this.parseLangFile(filePath as LangFile);
+        } else if (filePath.endsWith("-colors.json")) {
+            this.parseColorFile(filePath as ColorFile);
+        } else if (filePath.endsWith("-Deconstruct.json")) {
+            this.parseDeconFile(filePath as DeconFile);
+        } else {
+            throw new Error(`Unrecognized file format: ${filePath}`);
+        }
+        this.setVariants();
+    }
+    private parseLangFile(filePath: LangFile){
+        this.jsonKind = "syntaxes";
+        const match = filePath.match(/^(.+)\.tmLanguage\.json$/);
+        
+        if (match){ 
+            this.lang = match[1] as Lang;
+        }else{
+            throw new Error(`Invalid LangFile format: ${filePath}`);
+        }
+    } 
+    
+    private parseColorFile(filePath: ColorFile){
+        this.jsonKind = "palettes";
+        const match = filePath.match(/^(.+)-(.+)-colors\.json$/);
+        if (match) {
+            this.lang = match[1] as Lang;
+            this.theme = match[2] as Themes;
+        }else{
+            throw new Error(`Invalid ColorFile format: ${filePath}`);
+        }
+    } 
+    
+    private parseDeconFile(filePath: DeconFile){
+        this.jsonKind = "decon";
+        const match = filePath.match(/^(.+)-(.+)-Deconstruct\.json$/);
+        if (match) {
+            this.lang = match[1] as Lang;
+            this.theme = match[2] as Themes;
+        } else {
+            throw new Error(`Invalid DeconFile format: ${filePath}`);
+        }
+    }
+
+    private setVariants(){
+        if(this.lang == "fasta"){
+            this.variants = [ "fasta", "fastq", "fa" ]
+        } 
+        if(this.lang == "fastq"){
+            this.variants = [ "fastq", "fa", "fna", "faa" ]
+        } 
+    }
+
+    public filePartner(){
+        if(this.jsonKind === "palettes" || this.jsonKind === "decon"){
+            return `${this.lang}.tmLanguage.json` as LangFile;
+        }
+        if(this.jsonKind === "syntaxes"){
+            return `${this.lang}-${this.theme}-colors.json` as ColorFile;
+        }else{
+            throw new Error(`Unrecognized file format: ${this.filePath}`);
+        }
+    }
+}
 
 export interface LangParams{
-    fileKind: string;
+    jsonKind: "syntaxes";
+
     variants: string[];
-    theme: string;
+    palFlavor: Themes;
     
+    tmLangFile : LangFile;//langFile  = `${lang}.tmLanguage.json`
     stripRuleFile?: DeconFile;
 }
 
+export interface PaletteParams{
+    jsonKind: "palettes";
+    
+    descript: string;
+
+    paletteFile : ColorFile;
+    deconPalFile?: DeconFile;
+}
+
+export interface ColorDeconParams{
+    jsonKind: "decon";
+
+    paletteFile : ColorFile;
+    deconPalFile?: DeconFile;
+}
 // export interface PatternStripParams{
 //     jsonKind: "strip";
 //     theme: string;
@@ -28,25 +124,6 @@ export interface LangParams{
 //     actualRuleFile : JsonFile;
 //     stripRuleFile?: DeconFile;
 // }
-
-export interface PaletteParams{
-        jsonKind: "palettes";
-        fileKind: string;
-        
-        descript: string;
-        theme: string;
-        actualPalFile : JsonFile;
-        deconPalFile?: DeconFile;
-
-    }
-
-export interface ColorDeconParams{
-    jsonKind: "decon";
-    theme: string;
-    actualPalFile : JsonFile;
-    deconPalFile?: DeconFile;
-}
-
 /**
  * Configuration for output file generation.
  * Determines type, filename, description, and variant extensions.
@@ -57,30 +134,31 @@ type ColorParams = { jsonKind: "palettes" } & PaletteParams;
 type RuleParams = PatternParams | ColorParams;
 
 export abstract class RuleWriter{
-    //Both Types
-        protected outputFile: JsonFile;
-        protected targetPath: def.FilePath;
-        
-        protected fileType: string;
-        protected JSONType: ruleType;
+    protected outputFile!: JsonFile;
+    protected actualPalFile!: def.FilePath;
     
-    //Other Class Objects
-        protected regi = new RegExBuilder(false); 
-        protected patcher  = new PatchColors(this.context);
+    protected fileType: Lang;
+    protected JSONType: RuleType;
+
+    protected regi = new RegExBuilder(false); 
+    protected patcher  = new PatchColors(this.context);
     
-    constructor(protected context: vscode.ExtensionContext, params :  RuleParams){
-        this.JSONType = params.jsonKind;
-        this.fileType = params.fileKind.toLowerCase();
-        this.outputFile = this.genOutputFileStr();
-        this.targetPath = this.genPath();
+    constructor(protected context: vscode.ExtensionContext, fileKind: Lang, jsonKind: RuleType){
+        this.fileType =fileKind;
+        this.JSONType = jsonKind;
     }
 
     public clear(): void {
-        const file = this.targetPath;
+        const file = this.actualPalFile;
         fs.mkdirSync(path.dirname(file), { recursive: true });
 
         fs.writeFileSync(file, "", "utf8");
         vscUtils.print(`Cleared file at: ${file}`);
+    }
+
+    protected finalizePathSetup() {
+        this.outputFile = this.genOutputFileStr();
+        this.actualPalFile = this.genPath();
     }
 
     protected abstract writeFileTopper(): void
@@ -88,11 +166,12 @@ export abstract class RuleWriter{
     
     abstract genOutputFileStr(): JsonFile
 
-    protected genPath(): def.FilePath{
+    // protected 
+    public genPath(): def.FilePath{
         const filePath = 
         path.isAbsolute(this.outputFile)
         ? this.outputFile as def.FilePath
-        : path.join(this.context.extensionPath, this.JSONType, path.basename(this.outputFile)) as def.FilePath;
+        : path.resolve(this.context.extensionPath, this.JSONType, path.basename(this.outputFile)) as def.FilePath;
         
         return filePath;
     }
@@ -125,8 +204,8 @@ export abstract class RuleWriter{
     //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
     
     protected writeToFile(output : string): void{
-        fs.mkdirSync(path.dirname(this.targetPath), {recursive: true});
-        fs.appendFileSync(this.targetPath, output+'\n', "utf8");
+        fs.mkdirSync(path.dirname(this.actualPalFile), {recursive: true});
+        fs.appendFileSync(this.actualPalFile, output+'\n', "utf8");
     } 
     
     protected writeJSON(output : any, commaORsuffix? : string): void{
@@ -134,7 +213,7 @@ export abstract class RuleWriter{
         this.writeToFile(`${jsonStr+ (commaORsuffix ?? "")}`);
     }
 
-    public capitalizeFirstLetter(val: string) {
+    public capFront(val: string) {
         return String(val).charAt(0).toUpperCase() + String(val).slice(1);
     }
 }   

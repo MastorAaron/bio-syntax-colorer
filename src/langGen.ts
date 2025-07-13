@@ -6,27 +6,37 @@ import { vscUtils, themeUtils } from "./vscUtils";
 
 export class LangGenerator extends RuleWriter{
     private variants: string[];
+    private tmLangFile: rW.LangFile;
+    // private tmLangFile: rW.langFile;
 
     constructor(context: vscode.ExtensionContext, params : rW.LangParams){
-        const theme = params.theme.toLowerCase();
-        const outputFile = `${theme}-Strip.json` as  DeconFile;
+        const meta = new rW.FileMeta(params.tmLangFile);
 
-        super(context, {...params, jsonKind: "syntaxes"});
+        if (meta.jsonKind !== "syntaxes") {
+            throw new Error(`Invalid file passed to LangGenerator: ${params.tmLangFile}`);
+        }
+
+        super(context, meta.lang, "syntaxes");
         this.variants = params.variants;
+        this.tmLangFile = params.tmLangFile as rW.LangFile;
     }
 
-    private genRegEx(letter : string, tokenType=""): def.RegEx{
+    // export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
+    private genRegEx(letter : string | def.alphabet, tokenType=""): def.RegEx{
         switch(tokenType){  
             case "nt":
-                return `[${this.regi.genNukeRegEx(letter,true)}]+`;
+            case "Nucleotides":
+            case "Nucleotide Categories":
+                return `[${this.regi.genNukeRegEx(letter)}]+`;
             case "aa":
-                return `[${this.regi.genAminoRegEx(letter,true)}]+`;
+            case "Aminos":
+                return `[${this.regi.genAminoRegEx(letter)}]+`;
             case "sym":
             case "Title":
                 return `[${letter}.]+` 
             default:
                 throw new Error(`Unknown tokenType: ${tokenType}`);
-                return `[${this.regi.genNukeRegEx(letter,true)}]+`;
+                return `[${this.regi.genNukeRegEx(letter)}]+`;
             }
     }
 
@@ -34,7 +44,7 @@ export class LangGenerator extends RuleWriter{
         return `${this.fileType}.tmLanguage.json` as JsonFile;
     }
 
-    private genPatternRule(letter : string, tokenType : string=""): def.PatternRule {
+    public genPatternRule(letter : string, tokenType : string=""): def.PatternRule {
         const name = this.genPatternNameScope(letter, tokenType);
         const match = `${this.genRegEx(letter,tokenType)}`;
 
@@ -44,11 +54,11 @@ export class LangGenerator extends RuleWriter{
     private writePattern(letter : string, tokenType : string="", comma : string=""):void{
         const pattern = this.genPatternRule(letter,tokenType);
         this.writeJSON(pattern,comma);
-        vscUtils.print(`Wrote pattern for ${letter} (${tokenType}) to (${this.targetPath})`);
+        vscUtils.print(`Wrote pattern for ${letter} (${tokenType}) to (${this.tmLangFile})`);
     }  
 
-    public writePatterns(letterMap : Record<string,string[]>){
-        const entries = Object.entries(letterMap);
+    public writePatterns(lang : string){
+        const entries = Object.entries(def.tokenStripMap[lang]);
         this.writeFileTopper();
 
         const total = entries.reduce((sum, [, tokens]) => sum + tokens.length, 0);
@@ -106,3 +116,79 @@ export class LangGenerator extends RuleWriter{
 // }
 
 
+interface FastaLang {
+    repository?:{
+        keywords?:{
+            patterns?: Array<def.PatternRule>;
+        };
+
+    };
+    [key: string]: unknown;
+}
+
+
+export type syntaxFilePath = string & { readonly __syntaxFilePath: unique symbol };
+
+import * as fs from "fs";
+import * as path from "path";
+
+export class LangFileEditor{
+    private langPath: syntaxFilePath;
+    
+    constructor(private context : vscode.ExtensionContext){
+        this.langPath = path.join(this.context.extensionPath, "syntaxes", "fasta.tmLanguage.json") as syntaxFilePath;
+    }
+
+    public loadLangFile(): FastaLang {
+        const raw = fs.readFileSync(this.langPath, "utf8");
+        return JSON.parse(raw);
+    }
+
+    public savelang(lang : FastaLang): void {
+        fs.writeFileSync(this.langPath, JSON.stringify(lang, null, 4));
+    }
+
+    private getPatternRepo(lang : FastaLang): def.PatternRule[]{
+        // "repository": {
+        //     "keywords": {
+        //         "patterns": []
+        //     }
+        // }
+        lang.repository = lang.repository || {};
+        lang.repository.keywords = lang.repository.keywords || {};
+        lang.repository.keywords.patterns = lang.repository.keywords.patterns || [];
+        return lang.repository.keywords.patterns;
+    }
+
+    public appendPattern(pattern: def.PatternRule): void{
+        const langJSON = this.loadLangFile();
+
+        //Ensure Repos exist
+        const patternArr = this.getPatternRepo(langJSON);
+       
+        patternArr.push(pattern);
+        vscUtils.vscCOUT(`Appended lang pattern:`, pattern);
+
+        this.savelang(langJSON);
+    }
+
+    public removePattern(pattern: def.TagCategory){
+        const langJSON = this.loadLangFile();
+        const patternArr = this.getPatternRepo(langJSON);
+
+        const filtered = patternArr.filter(
+          (rule: def.PatternRule ) =>
+                typeof rule.name !== "string" || 
+                (typeof pattern === "string" && !rule.name.includes(pattern))
+        );
+        langJSON.repository!.keywords!.patterns = filtered;
+
+        this.savelang(langJSON);
+    }
+
+    public removeHighLightPatterns(){
+        this.removePattern("highLightRule");
+    }
+}//TODO: Gracefully Admit you need sleep since you forgot this was made before writing a 3 generation class to do something similar
+//TODO: Cry loudly
+//TODO: absorb into LangGen perhaps use this name here or drop? idk

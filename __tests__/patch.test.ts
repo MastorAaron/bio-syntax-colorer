@@ -16,7 +16,7 @@
 import { vscUtils } from '../src/vscUtils';
 import type { ColorRule } from '../src/definitions';
 import { boolUtils } from '../src/booleans';
-import { Color } from 'vscode';
+// import { Color } from 'vscode';
     const completeRule: ColorRule = {
         "name": "bio-colorer@0.0.45: FASTA Header",
         "scope": "fasta.title",

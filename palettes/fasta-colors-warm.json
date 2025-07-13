@@ -1,6 +1,6 @@
 {
-  "name": "Warm Palette Colors",
-  "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",
+    "name": "Warm Palette Colors",
+    "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode",
     "tokenColors": [
         {
             "name": "FASTA Header",

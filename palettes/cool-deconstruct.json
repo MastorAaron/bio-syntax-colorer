@@ -1,0 +1,56 @@
+{
+"$schema": "./schemas/deconstruct.schema.json",
+"description": "Cool Decon Palette",
+    "fasta": {
+        "title": {
+            ">": "#737FE6"
+        },
+        "nt": {
+            "A": "#C12ECD",
+            "C": "#BE6D00",
+            "G": "#0F6FFF",
+            "T": "#00FFFF",
+            "U": "#00FF37",
+            "N": "#272929",
+            "R": "#00FFFF",
+            "Y": "#A5A5A5",
+            "B": "#1FD4CE",
+            "D": "#74BAEC",
+            "H": "#8BFFFE",
+            "V": "#4FCF9F",
+            "K": "#164EB7",
+            "M": "#0073FF",
+            "S": "#EA5B5B",
+            "W": "#7FFF7F"
+        },
+        "sym": {
+            "Gap": "#B8B8B8",
+            "Stop": "#B8B8B8"
+        },
+        "aa": {
+            "E": "#ED4630",
+            "Q": "#FF00FF",
+            "Z": "#7F5F0F",
+            "F": "#3BB3B3",
+            "L": "#444444",
+            "I": "#7F5F0F",
+            "J": "#6E1960",
+            "P": "#0000FF",
+            "O": "#00A8CC",
+            "X": "#B97D4B"
+        }
+    },
+    "fastq": {
+        "title": {
+            "@": "#8D93C7"
+        },
+        "plus": {
+            "Line": "#CD7F32"
+        },
+        "quality": {
+            "low": "#800000",
+            "mid": "#008080",
+            "high": "#7851A9"
+        }
+    }
+}

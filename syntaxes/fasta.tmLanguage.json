@@ -1,151 +1,161 @@
 {
     "patterns": [
-      { "include": "#keywords" }
-    ],
-  "$schema": "./schema/tmLanguage.schema.json",
-  "scopeName": "source.fasta",
-  "fileTypes": [ "fasta", "fastq", "fa" ],
-  "name": "FASTA",
-  "repository": {
-    "keywords": {
-      "patterns": [
         {
-          "name": "fasta.title",
-          "match": "^>.*"
-        },
-        {
-          "name": "fastq.title",
-          "match": "^@.*"
-        },
-        {
-          "name": "source.fasta.ntA",
-          "match": "[Aa]+"
-        },
-        {
-          "name": "source.fasta.ntC",
-          "match": "[Cc]+"
-        },
-        {
-          "name": "source.fasta.ntG",
-          "match": "[Gg]+"
-        },
-        {
-          "name": "source.fasta.ntT",
-          "match": "[Tt]+"
-        },
-        {
-          "name": "source.fasta.ntU",
-          "match": "[Uu]+"
-        },
-        {
-          "name": "source.fasta.ntN",
-          "match": "[Nn]+"
-        },
-        {
-          "name": "source.fasta.ntR",
-          "match": "[Rr]+"
-        },
-        {
-          "name": "source.fasta.ntY",
-          "match": "[Yy]+"
-        },
-        {
-          "name": "source.fasta.ntB",
-          "match": "[Bb]+"
-        },
-        {
-          "name": "source.fasta.ntD",
-          "match": "[Dd]+"
-        },
-        {
-          "name": "source.fasta.ntH",
-          "match": "[Hh]+"
-        },
-        {
-          "name": "source.fasta.ntV",
-          "match": "[Vv]+"
-        },
-        {
-          "name": "source.fasta.ntK",
-          "match": "[Kk]+"
-        },
-        {
-          "name": "source.fasta.ntM",
-          "match": "[Mm]+"
-        },
-        {
-          "name": "source.fasta.ntS",
-          "match": "[Ss]+"
-        },
-        {
-          "name": "source.fasta.ntW",
-          "match": "[Ww]+"
-        },
-        {
-          "name": "source.fasta.symGap",
-          "match": "[-]"
-        },
-        {
-          "name": "source.fasta.symStop",
-          "match": "[*.]"
-        },
-        {
-          "name": "source.fasta.aaE",
-          "match": "[Ee]+"
-        },
-        {
-          "name": "source.fasta.aaQ",
-          "match": "[Qq]+"
-        },
-        {
-          "name": "source.fasta.aaZ",
-          "match": "[Zz]+"
-        },
-        {
-          "name": "source.fasta.aaF",
-          "match": "[Ff]+"
-        },
-        {
-          "name": "source.fasta.aaL",
-          "match": "[Ll]+"
-        },
-        {
-          "name": "source.fasta.aaI",
-          "match": "[Ii]+"
-        },
-        {
-          "name": "source.fasta.aaJ",
-          "match": "[Jj]+"
-        },
-        {
-          "name": "source.fasta.aaP",
-          "match": "[Pp]+"
-        },
-        {
-          "name": "source.fasta.aaO",
-          "match": "[Oo]+"
-        },
-        {
-          "name": "source.fasta.aaX",
-          "match": "[Xx]+"
-        },
-                {
-          "name": "source.fastq.plusLine",
-          "match": "^\\+.*"
-        },
-        {
-          "name": "source.fastq.quality.low",
-          "match": "[!-0]+"
-        },
-        {
-          "name": "source.fastq.quality.mid",
-          "match": "[1-K]+"
-        },
-        {
-          "name": "source.fastq.quality.high",
-          "match": "[L-~]+"
+            "include": "#keywords"
         }
-      ]
+    ],
+    "$schema": "./schema/tmLanguage.schema.json",
+    "scopeName": "source.fasta",
+    "fileTypes": [
+        "fasta",
+        "fastq",
+        "fa"
+    ],
+    "name": "FASTA",
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "fasta.title",
+                    "match": "^>.*"
+                },
+                {
+                    "name": "fastq.title",
+                    "match": "^@.*"
+                },
+                {
+                    "name": "source.fasta.ntA",
+                    "match": "[Aa]+"
+                },
+                {
+                    "name": "source.fasta.ntC",
+                    "match": "[Cc]+"
+                },
+                {
+                    "name": "source.fasta.ntG",
+                    "match": "[Gg]+"
+                },
+                {
+                    "name": "source.fasta.ntT",
+                    "match": "[Tt]+"
+                },
+                {
+                    "name": "source.fasta.ntU",
+                    "match": "[Uu]+"
+                },
+                {
+                    "name": "source.fasta.ntN",
+                    "match": "[Nn]+"
+                },
+                {
+                    "name": "source.fasta.ntR",
+                    "match": "[Rr]+"
+                },
+                {
+                    "name": "source.fasta.ntY",
+                    "match": "[Yy]+"
+                },
+                {
+                    "name": "source.fasta.ntB",
+                    "match": "[Bb]+"
+                },
+                {
+                    "name": "source.fasta.ntD",
+                    "match": "[Dd]+"
+                },
+                {
+                    "name": "source.fasta.ntH",
+                    "match": "[Hh]+"
+                },
+                {
+                    "name": "source.fasta.ntV",
+                    "match": "[Vv]+"
+                },
+                {
+                    "name": "source.fasta.ntK",
+                    "match": "[Kk]+"
+                },
+                {
+                    "name": "source.fasta.ntM",
+                    "match": "[Mm]+"
+                },
+                {
+                    "name": "source.fasta.ntS",
+                    "match": "[Ss]+"
+                },
+                {
+                    "name": "source.fasta.ntW",
+                    "match": "[Ww]+"
+                },
+                {
+                    "name": "source.fasta.symGap",
+                    "match": "[-]"
+                },
+                {
+                    "name": "source.fasta.symStop",
+                    "match": "[*.]"
+                },
+                {
+                    "name": "source.fasta.aaE",
+                    "match": "[Ee]+"
+                },
+                {
+                    "name": "source.fasta.aaQ",
+                    "match": "[Qq]+"
+                },
+                {
+                    "name": "source.fasta.aaZ",
+                    "match": "[Zz]+"
+                },
+                {
+                    "name": "source.fasta.aaF",
+                    "match": "[Ff]+"
+                },
+                {
+                    "name": "source.fasta.aaL",
+                    "match": "[Ll]+"
+                },
+                {
+                    "name": "source.fasta.aaI",
+                    "match": "[Ii]+"
+                },
+                {
+                    "name": "source.fasta.aaJ",
+                    "match": "[Jj]+"
+                },
+                {
+                    "name": "source.fasta.aaP",
+                    "match": "[Pp]+"
+                },
+                {
+                    "name": "source.fasta.aaO",
+                    "match": "[Oo]+"
+                },
+                {
+                    "name": "source.fasta.aaX",
+                    "match": "[Xx]+"
+                },
+                {
+                    "name": "source.fastq.plusLine",
+                    "match": "^\\+.*"
+                },
+                {
+                    "name": "source.fastq.quality.low",
+                    "match": "[!-0]+"
+                },
+                {
+                    "name": "source.fastq.quality.mid",
+                    "match": "[1-K]+"
+                },
+                {
+                    "name": "source.fastq.quality.high",
+                    "match": "[L-~]+"
+                },
+                {
+                    "name": "source.fasta.hlATGN.highLightRule",
+                    "match": "(?i)A[TU]G[NRYSWKMBDHVACGTU-*]+"
+                }
+            ]
+        }
     }
-  }
 }

@@ -54,9 +54,6 @@ export class HoverObj{
         );
     }
 
-    public getDescription(letter: string, file : def.FilePath, directName :boolean=false): string{
-        return def.arrayToStr(this.getInfoMap(letter, file, directName));
-    }
     
     public registerProvider(): void {
         vscode.languages.registerHoverProvider('fasta', {
@@ -67,7 +64,7 @@ export class HoverObj{
                     const letter = line[pos.character].toUpperCase(); // const letter = word[pos.character];
                     if (!letter) return;
                     
-                    const description = this.getDescription(letter,doc.fileName as def.FilePath);
+                    const description = def.getDescription(letter,this.currAlpha,doc.fileName as def.FilePath);
                     return this.onHover(description, pos);
                 }catch(err){
                     this.vscCOUT("Error in hoverOver.ts: " + err);
@@ -98,27 +95,7 @@ export class HoverObj{
         }
     }
 
-    public getInfoMap(letter: string, fileName: def.FilePath, directName: boolean=false): Array<string | def.nukes | def.aminos>{
-        if (this.currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
-            return def.nukeInfoMap[letter as def.nukes] || letter;
-        } 
-        if (this.currAlpha === "Aminos" ||  boolUtils.isFaa(fileName)) {
-            return def.aminoInfoMap[letter as def.aa] || letter;
-        } // Mixed mode, show raw or dual-name
-
-        const conflicting = def.conflictInfoMap[letter as def.nukes];
-            if (conflicting) return (directName && conflicting.length > 1)? [conflicting[0]]: conflicting;
-
-        const nuke = def.nukeInfoMap[letter as def.nukes];
-            if (nuke) return nuke;
-
-        const amino = def.aminoInfoMap[letter as def.aminos];
-            if (amino) return (directName && amino.length > 1)? [amino[1]]: amino;
-
-        const sym = def.symInfoMap[letter as def.symStrs];
-            if (sym) return sym;
-        return [letter];
-    }
+   
 }
 
 export default HoverObj.refHoverObj();

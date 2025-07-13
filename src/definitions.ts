@@ -1,3 +1,5 @@
+import { boolUtils } from "./booleans";
+
 export type ColorHex = `#${string}`;
 
 export type FastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
@@ -93,11 +95,13 @@ export const regAminos = [
 ] as const;
 
 
-export const nucleotides = ['A','C','G','T','U'] as const;
+export const nukeTrio    = ['A','C','G'] as const;
+export const nukeDuo     = ['T','U'] as const;
+export const nucleotides = [...nukeTrio, ...nukeDuo]
 export const nukeSymbols = ['-'] as const;
-export const symbols = ['@','>','*','+','-'] as const;
-export const symString = ["Title","Stop","Gap"] as const;
-export const aaSymbols = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
+export const symbols     = ['@','>','*','+','-'] as const;
+export const symString   = ["Title","Stop","Gap"] as const;
+export const aaSymbols   = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
                                             //TODO: Update for parts of FastQ files
                                             //TODO: Quality Scores, ignore lines, etc 
 export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
@@ -128,19 +132,21 @@ export type driftsAA   = (typeof aaDrifts)[number];
 export type wildAA     = (typeof aaWild)[number];
 
 
-export type aa = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
+export type aa      = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
 export type aaAmbig = driftsAA | wildAA;
-export type aaExtd = aaAmbig | recodedAA;
+export type aaExtd  = aaAmbig | recodedAA;
 
-export type syms = (typeof symbols)[number];
+export type syms    = (typeof symbols)[number];
 export type symStrs = (typeof symString)[number];
-export type ntSyms = (typeof nukeSymbols)[number];
-export type aaSyms = (typeof aaSymbols)[number];
+export type ntSyms  = (typeof nukeSymbols)[number];
+export type aaSyms  = (typeof aaSymbols)[number];
 
-export type aminos = aa | aaExtd | aaSyms;
+export type aminos  = aa | aaExtd | aaSyms;
 
 
-export type nt     = (typeof nucleotides)[number];
+export type ntTrio = (typeof nukeTrio )[number];
+export type ntDuo  = (typeof nukeDuo)[number];
+export type nt     = (typeof nukeTrio | typeof nukeDuo)[number];
 
 export type ntNots   = (typeof nukeNots)[number];
 export type ntStrgth = (typeof nukeBondStrgth)[number];
@@ -149,7 +155,7 @@ export type ntRingQt = (typeof ringStructNukes)[number];
 
 export type ntWild   = (typeof nukeWild)[number];
 
-export type ntExtd = ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ; 
+export type ntExtd = ntDuo | ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ; 
 
 export type nukes  = nt | ntExtd  | ntSyms;
 
@@ -181,14 +187,14 @@ export const nukeInfoMap : Record<nukes,string[]>= {
 }
 
 export const symInfoMap : Record<string,string[]>= {
-    '@':["Header"],
-    '>':["Header"],
-    '*':["Stop Codon"],
-    '-':["Gap or Minus Sign"],
-    '+':["Sequence_ID line"],
+    '@'  : ["Header"],
+    '>'  : ["Header"],
+    '*'  : ["Stop Codon"],
+    '-'  : ["Gap or Minus Sign"],
+    '+'  : ["Sequence_ID line"],
     "low": ["Phred Score: Low Quality Read Score"],
     "mid": ["Phred Score: Medium Quality Read Score"],
-    "high":["Phred Score: High Quality Read Score"]
+   "high": ["Phred Score: High Quality Read Score"]
 }
 
 // + is Basic Amino Acids
@@ -209,18 +215,19 @@ export const aminoInfoMap : Record<aminos,string[]>= {
     'E':["Glu","Glutamic Acid","Negatively Charged","pKa = 4.2"],
     'D':["Asp","Aspartic Acid","Negatively Charged","pKa = 3.7"],
     
-    'B':["Asx: Asn or Asp"],
     
     'S':["Ser","Serine","Polar Uncharged"],
     'T':["Thr","Threonine","Polar Uncharged"],
     'N':["Asn","Asparagine","Polar Uncharged"],
     'C':["Cys","Cysteine","Polar","pKa = 8.2"],
-
+    
     'Q':["Gln","Glutamine","Polar Uncharged"],
     'U':["Sec","Selenocysteine","Special Case"],
     'O':["Pyr","Pyrrolysine","Special Case"],
     
+    'B':["Asx: Asn or Asp"],
     'J':["(Iso)leucine: L or I"],
+    'Z':["Glx: Gln or Glu"], 
     
     'L':["Leu","Leucine","Aliphatic","Nonpolar","Hydrophobic"],
     'I':["Ile","Isoleucine","Aliphatic","Nonpolar","Hydrophobic"],
@@ -230,7 +237,6 @@ export const aminoInfoMap : Record<aminos,string[]>= {
     'A':["Ala","Alanine","Aliphatic","Nonpolar","Hydrophobic"],
     'G':["Gly","Glycine","Aliphatic","Nonpolar"],
     
-    'Z':["Glx: Gln or Glu"], 
     'X':["Any Amino Acid"],
 
     '*':["Stop Codon","*"],
@@ -263,24 +269,8 @@ export const conflictInfoMap : Record<nukes,string[]>= {
     '-':["Gap or Minus Sign"]
 }
 
-export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" ;
+export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
 export type TagCategory = "version" | "userRule" | "highLightRule";
-
-export const aminoPropertyRegExMap : Record<typesAA,string>= {
-    'N': "[LIMVAPIG]",
-    'P': "[STNCQU]",
-    'A': "[WYF]",
-    'R': "[HPWYF]",
-    '+': "[KRHO]",
-    '-': "[ED]",
-}
-
-export const aminoRegExMap : Record<aaAmbig,string>= {
-    'B': "[BND]",
-    'Z': "[ZQE]",
-    'J': "[JLI]",
-    'X': "[XKRHOPWYFEDSTNCQUOLIMVAGBZJX-*]",
-}
 
 // export const symbolRegExMap : Record<syms,string>= {
 //     '-': "[\-.]",
@@ -297,11 +287,55 @@ export const symbolLookUpMap : Record<syms,string>= {
     '>':""
 }
 
+export function getDescription(letter: string, currAlpha: alphabet, file : FilePath, directName :boolean=false): string{
+    return arrayToStr(getInfoMap(letter, currAlpha, file, directName));
+}
+
+export function getInfoMap(letter: string, currAlpha: alphabet, fileName: FilePath, directName: boolean=false): Array<string | nukes | aminos>{
+    if (currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
+        return nukeInfoMap[letter as nukes] || letter;
+    } 
+    if (currAlpha === "Aminos" ||  boolUtils.isFaa(fileName)) {
+        return aminoInfoMap[letter as aa] || letter;
+    } // Mixed mode, show raw or dual-name
+
+    const conflicting = conflictInfoMap[letter as nukes];
+        if (conflicting) return (directName && conflicting.length > 1)? [conflicting[0]]: conflicting;
+
+    const nuke = nukeInfoMap[letter as nukes];
+        if (nuke) return nuke;
+
+    const amino = aminoInfoMap[letter as aminos];
+        if (amino) return (directName && amino.length > 1)? [amino[1]]: amino;
+
+    const sym = symInfoMap[letter as symStrs];
+        if (sym) return sym;
+    return [letter];
+}
+
+export function getRegEx(letter: string, currAlpha: alphabet, directName: boolean=false): string | nukes | aminos{
+    if (currAlpha === "Nucleotides" ) {
+        return nukeRegExMap[letter as ntExtd] || letter;
+    } 
+    if (currAlpha === "Aminos") {
+        return aminoRegExMap[letter as aaAmbig] || letter;
+    } 
+    if (currAlpha === "Aminos Properties") {
+        return aminoPropertyRegExMap[letter as typesAA] || letter;
+    } 
+    if (currAlpha === "Nucleotide Categories" ) {
+        return aminoRegExMap[letter as aaAmbig] || letter;
+    }
+    return letter;
+}
+
 export const nukeRegExMap : Record<ntExtd,string>= {
-    'N': "[NRYSWKMBDHVACGTU-]",
+    'N': "[NRYSWKMBDHVACGTU-*]",
 
     'R': "[RAG]",
     'Y': "[YTCU]",
+    'U': "[UT]",
+    'T': "[TU]",
 
     'S': "[SGC]",
     'W': "[WTAU]",
@@ -309,10 +343,26 @@ export const nukeRegExMap : Record<ntExtd,string>= {
     'K': "[KTUG]",
     'M': "[NAC]",
 
-    'B': "[BCGTU]",
-    'D': "[DAGTU]",
-    'H': "[HACTU]",
-    'V': "[VACG]",
+    'B': "[BCGTUY]",
+    'D': "[DAGTURW]",
+    'H': "[HACTUYW]",
+    'V': "[VACGRS]",
+}
+
+export const aminoPropertyRegExMap : Record<typesAA,string>= {
+    'N': "[LIMVAPIG]",
+    'P': "[STNCQU]",
+    'A': "[WYF]",
+    'R': "[HPWYF]",
+    '+': "[KRHO]",
+    '-': "[ED]",
+}
+
+export const aminoRegExMap : Record<aaAmbig,string>= {
+    'B': "[BND]",
+    'Z': "[ZQE]",
+    'J': "[JLI]",
+    'X': "[XKRHOPWYFEDSTNCQUOLIMVAGBZJ-*]",
 }
 
 export const fileTypes = ["aTitle","qTitle"] as const
@@ -361,19 +411,45 @@ export const tokenMap : Record<tokenType,NameScope>= {
     'O': "source.fasta.aaO",
 }
 
-export const tokenStripMapA : Record<string,string[]>= {
-    "sym":   ['-','*'] , // '-': "symGap", // '*': "symStop",
-    "nt":    ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
-    "aa" :   ['F','E','Z','J','I','L','P','Q','O','X'] ,
-    "Title": ['@'] ,
+export const tokenStripMap : Record<string,Record<string,string[]>>= {
+    "fasta":{ 
+        "Title": ['>'] ,
+        "nt":    ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
+        "sym":   ['-','*'] , // '-': "symGap", // '*': "symStop",
+        "aa" :   ['F','E','Z','J','I','L','P','Q','O','X'] ,
+    },
+    "fastq": {
+        "title": ['@'] ,
+        "plus": ["Line"] ,
+        "quality": ["low","mid","high"]
+    } 
 }
 
-export const tokenStripMapQ : Record<string,string[]>= {
-    "sym":   ['Gap','Stop'] , // '-': "symGap", // '*': "symStop",
-    "nt":    ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
-    "aa" :   ['F','E','Z','J','I','L','P','Q','O','X'] ,
-    "Title": ['@'] ,
+export function deterAlpha(token: string): alphabet{
+    switch(token){  
+        case "nt":
+            return "Nucleotides" ;
+        case "aa":
+            return "Aminos";
+        case "sym":
+        case "Title":
+            return "Ambiguous";
+        default:
+            console.log(`${token} not in any known Def.Alphabet currently`);
+            return "Ambiguous";
+    }
 }
+
+export function lookUpTitle(lang: string,alpha: string){
+        if(lang === "fasta"){
+            return '>'
+        }
+        if(lang === "fastq"){
+            return '@'
+        }
+        return ""
+    }
+
 
 export function isNeg(value: unknown): value is negAA {
     return isMemberOf(value, aaNegative);
@@ -449,3 +525,99 @@ export function arrayToArrStr(strArr : string[]): string{
 
 export type PaletteFilePath = string & { readonly __paletteFilePath: unique symbol };
 export type FilePath = string & { readonly __paletteFilePath: unique symbol };
+
+export const kmerText = "Find Entered Pattern: kmer, Codon, letter, etc" as const;
+export const nukeText = "Nucleotide Categories" as const;
+export const aminoText = "Amino Properties" as const;
+export const swapText = "Swap Text Colors and Highlight Colors" as const;
+export const aaAlpha = "Amino acids" as const;
+export const ntAlpha = "Nucleic acids" as const;
+
+export const HLight = { //HighLightOptions
+    topLevelOptions: [
+        kmerText,
+        swapText,
+        nukeText,
+        aminoText
+    ] as const,
+
+    alphaSubOptions: [
+        aaAlpha,
+        ntAlpha
+    ] as const,
+
+    aminoSubOptions: [
+        "N: Nonpolar/Alipathic",
+        "P: Polar",
+        "A: Aromatic",
+        "R: Ringed",
+        "+: Positive\\Basic:",
+        "-: Negative\\Acidic:",
+        "B: B Drift:      Asx: Asn or Asp",
+        "Z: Z Drift:      Glx: Gln or Glu",
+        "J: J Drift:      (Iso)leucine: L or I"
+    ] as const,
+
+    nucleotideSubOptions: [
+        "R: Purine",
+        "Y: Pyrimidine",
+        "S: Strong Bonds",
+        "W: Weak Bonds",
+        "K: Ketone",
+        "M: Amino",
+        "B: Not A",
+        "D: Not C",
+        "H: Not G",
+        "V: Not T/U"
+    ] as const,
+
+    userTopTextArr: [
+        "Determine What to Highlight:",
+        "Swap: Swap color text for highlighted blocks",
+        "Kmer: Highlight specific pattern in file",
+        "Amino Properities:",
+        "Nucleotide Categories:"
+    ] as const
+};
+
+export type HLSelect =
+    typeof HLight.topLevelOptions[number] |
+    typeof HLight.alphaSubOptions[number] |
+    typeof HLight.aminoSubOptions[number] |
+    typeof HLight.nucleotideSubOptions[number];
+
+
+// export const userTextArr : [
+        
+//             // export const aminoTextArr = [ 
+//                 //     "N: Nonpolar/Alipathic:",
+//                 //     "P: Polar:",
+                
+//                 //     "A: Aromatic:",
+//                 //     "R: Ringed:",
+                
+//                 //     "+: Positive\\Basic:",
+//                 //     `-: Negative\\Acidic:`,
+//                 //     "B: B Drift: Asx: Asn or Asp",
+//                 //     "J: J Drift: (Iso)leucine: L or I",
+//                 //     "Z: Z Drift: Glx: Gln or Glu"
+                
+//                 // ]
+                
+//                 // export const nukeTextArr = [
+//                     //     "R: Purine: A or G",
+//     //     "Y: Pyrimidine: C or T/U",
+
+//     //     "S: Strong Bonds: C or G",
+//     //     "W: Weak Bonds: A or T/U",
+
+//     //     "K: Ketone: G or T/U",
+//     //     "M: Amino: A or C",
+
+//     //     "B: Not A:   C, G, or T/U",
+//     //     "D: Not C:   A, G, or T/U",
+//     //     "H: Not G:   A, C, or T/U",
+//     //     "V: Not T/U: A, C, or G"
+//     // ]
+//     ];
+

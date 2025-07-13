@@ -1,53 +1,38 @@
 import * as vscode from "vscode";
+import * as vscUtils from "./vscUtils";
+import { Themes } from "./extension";
 import * as def from "./definitions";
-import * as rW from "./ruleWriter";
-import { RuleWriter, ColorDeconParams, JsonFile, DeconFile } from "./ruleWriter";
+import * as fs from "fs";
+
+import { ColorDeconParams, JsonFile, DeconFile, PaletteParams} from "./ruleWriter";
 import { PaletteGenerator } from "./paletteGen";
 
 export class PaletteDeconstructor extends PaletteGenerator{
     private inputPath: JsonFile;
     
-    
-    // constructor(context: vscode.ExtensionContext, params : ColorDeconParams){
-    //     private inputPath: params.actualPalFile;
-    //     const theme = params.theme;
-    //     const outputFile = `${params.theme}-Deconstruct.json` as  DeconFile;
-        
-    //     super(context, {
-    //         jsonKind: "palettes",
-    //         theme: "decon",
-    //         fileKind: "decon", // treat theme as fileKind for patching logic
-    //         descript: `Deconstructed version of ${params.theme}`,
-    //         actualPalFile: params.actualPalFile,
-    //         deconPalFile: outputFile // or params.deconPalFile ?? ...
-    //     });
 
-    //     this.inputPath = params.actualPalFile;
-    //     this.deconOutput = this.outputFile;
-    // }
-        
-  
    constructor(context: vscode.ExtensionContext, params: ColorDeconParams) {
-        const outputFile = `${params.theme}-Deconstruct.json` as DeconFile;
 
-        // You must prepare this separately first:
-        const colorParams: rW.PaletteParams = {
-            jsonKind: "palettes",
-            fileKind: params.theme, // treat theme as fileKind for patching logic
-            descript: `Deconstructed version of ${params.theme}`,
-            theme: params.theme,
-            actualPalFile: params.actualPalFile,
+        const outputFile = `${params.palFlavor.toLowerCase()}-deconstruct.json` as DeconFile;
+        const colorParams: PaletteParams = {
+           jsonKind: "palettes",
+           fileKind: params.fileKind, 
+           
+            palFlavor: params.palFlavor.toLowerCase(),
+            descript: `Deconstructed version of ${params.palFlavor}`,
+            paletteFile: params.paletteFile,
             deconPalFile: outputFile
         };
 
         super(context, colorParams);
-        
-        this.inputPath = params.actualPalFile;
+        this.palFlavor = params.palFlavor as Themes;
+        this.inputPath = params.paletteFile;
+        this.finalizePathSetup();
         this.deconOutput = outputFile;
     }
 
     override genOutputFileStr(): DeconFile{
-        return `${this.theme}-Deconstruct.json` as  DeconFile;
+        return `${this.palFlavor.toLowerCase()}-deconstruct.json` as  DeconFile;
     }
     
     // private pullRuleColor(tokenType : string, letter : string, fileScope : string, palettePath : def.PaletteFilePath): def.ColorHex{
@@ -63,7 +48,7 @@ export class PaletteDeconstructor extends PaletteGenerator{
         return this.patcher.loadColors(palettePath);
     }
     
-    private decomposeScope(scopeName : string): string[]{
+    public decomposeScope(scopeName : string): string[]{
         let frags = scopeName.split('.');
 
         if (frags[0] === "source") {
@@ -71,6 +56,11 @@ export class PaletteDeconstructor extends PaletteGenerator{
         }
         if (frags.length < 2) {
             throw new Error(`Invalid scope: ${scopeName}`);
+        } 
+        if (frags.length === 2 && frags.includes("title")) {
+            const [lang, alpha] = frags;
+            const letter = def.lookUpTitle(lang,alpha);
+            return [lang, alpha, letter]; // Enforce third level as alpha again
         }
         if (frags.length === 3) {
             return frags;   //examples like [fastq, quality, low/mid/high] are valid already  
@@ -95,23 +85,11 @@ export class PaletteDeconstructor extends PaletteGenerator{
         throw new Error(`Unable to decompose token scope: ${scopeName}`);
         // return [lang, "unknown", tokenPart];
     }
-
-
-    //    if(!langs.includes(tokens[0])){ //push fasta,fastq or other dual type syntaxes
-    //                 langs.push(tokens[0]);
-    //             }
-    //             if(!alpha.includes(tokens[1])){
-        //                 alpha.push(tokens[1]);
-        //             }if(){
-            
-        //             }
-        
-        //     {lang: {alphabet : {letters,color}}}
-
         
     override writeFileTopper(){
-        this.writeToFile(`"$schema": "./deconstruct.schema.json",`);
-        this.writeToFile(`"description": ${this.theme} Decon Palette`);
+        this.writeToFile(`{`);
+        this.writeToFile(`"$schema": "./schemas/deconstruct.schema.json",`);
+        this.writeToFile(`"description": "${this.capFront(this.palFlavor)} Decon Palette",`);
     }
 
     private genDeconMap(){
@@ -132,14 +110,48 @@ export class PaletteDeconstructor extends PaletteGenerator{
         return deconMap;
     }
 
+    public removeLineAfter(catergory : string) {
+        const contents = fs.readFileSync(this.actualPalFile, "utf8").split("\n");
+        const themeIndex = contents.findIndex(line => line.includes(catergory));
+
+        if (themeIndex >= 0) {
+            const strayIndex = themeIndex + 1;
+            if (contents[strayIndex]?.trim() === "{") {
+                contents.splice(strayIndex, 1);
+            }
+        }
+
+        fs.writeFileSync(this.actualPalFile, contents.join("\n"), "utf8");
+}
+
     public writeDeconFile():void{
         const deconMap = this.genDeconMap();
         this.writeFileTopper();
-        this.writeToFile(`  "theme": "${this.fileDescript ?? this.fileType}",`);
+        // this.writeToFile(`  "theme": "${this.fileDescript ?? this.fileType}",`); //overkill
         this.writeJSON(deconMap);
-        this.writeToFile("}");
+        this.removeLineAfter("description"); //TODO: add function to consume stray `{` from stringify that is breaking the formatting 
+        // this.writeToFile("}");
     }
 
+
 }
+    
+    // constructor(context: vscode.ExtensionContext, params : ColorDeconParams){
+    //     private inputPath: params.actualPalFile;
+    //     const theme = params.theme;
+    //     const outputFile = `${params.theme}-Deconstruct.json` as  DeconFile;
+        
+    //     super(context, {
+    //         jsonKind: "palettes",
+    //         theme: "decon",
+    //         fileKind: "decon", // treat theme as fileKind for patching logic
+    //         descript: `Deconstructed version of ${params.theme}`,
+    //         actualPalFile: params.actualPalFile,
+    //         deconPalFile: outputFile // or params.deconPalFile ?? ...
+    //     });
 
-
+    //     this.inputPath = params.actualPalFile;
+    //     this.deconOutput = this.outputFile;
+    // }
+        
+  
