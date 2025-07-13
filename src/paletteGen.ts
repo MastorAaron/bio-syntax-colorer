@@ -6,11 +6,11 @@ import * as fs from "fs";
 import { RuleWriter, PaletteParams, JsonFile, DeconFile } from "./ruleWriter";
 import { vscUtils, themeUtils } from "./vscUtils";
 import { HoverObj } from "./hoverOver";
-import { Themes } from "./extension";
+import { Theme } from "./extension";
 
 export class PaletteGenerator extends RuleWriter{
     protected fileDescript : string; 
-    protected palFlavor : Themes;
+    protected palFlavor : Theme;
 
     private deconInput? : DeconFile;
     protected deconOutput? : DeconFile;

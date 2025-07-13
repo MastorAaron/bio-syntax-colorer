@@ -1,38 +1,36 @@
 import * as vscode from "vscode";
 import * as vscUtils from "./vscUtils";
-import { Themes } from "./extension";
+import { Theme } from "./extension";
 import * as def from "./definitions";
 import * as fs from "fs";
+import * as rW from "./ruleWriter";
 
-import { ColorDeconParams, JsonFile, DeconFile, PaletteParams} from "./ruleWriter";
+import { ColorDeconParams, JsonFile, DeconFile, PaletteParams, FileMeta} from "./ruleWriter";
 import { PaletteGenerator } from "./paletteGen";
 
 export class PaletteDeconstructor extends PaletteGenerator{
-    private inputPath: JsonFile;
+    private inputPath: rW.ColorFile;
+    private theme: Theme;
     
 
    constructor(context: vscode.ExtensionContext, params: ColorDeconParams) {
-
-        const outputFile = `${params.palFlavor.toLowerCase()}-deconstruct.json` as DeconFile;
+        const meta = new FileMeta(params.paletteFile);
         const colorParams: PaletteParams = {
            jsonKind: "palettes",
-           fileKind: params.fileKind, 
-           
-            palFlavor: params.palFlavor.toLowerCase(),
-            descript: `Deconstructed version of ${params.palFlavor}`,
+            descript: `Deconstructed version of ${meta.theme}`,
             paletteFile: params.paletteFile,
-            deconPalFile: outputFile
+            deconPalFile: meta.genDeconFile()
         };
 
         super(context, colorParams);
-        this.palFlavor = params.palFlavor as Themes;
+        this.theme = meta.theme as Theme;
         this.inputPath = params.paletteFile;
         this.finalizePathSetup();
-        this.deconOutput = outputFile;
+        this.deconOutput = meta.genDeconFile();
     }
 
     override genOutputFileStr(): DeconFile{
-        return `${this.palFlavor.toLowerCase()}-deconstruct.json` as  DeconFile;
+        return `${this.theme.toLowerCase()}-deconstruct.json` as  DeconFile;
     }
     
     // private pullRuleColor(tokenType : string, letter : string, fileScope : string, palettePath : def.PaletteFilePath): def.ColorHex{
@@ -44,7 +42,7 @@ export class PaletteDeconstructor extends PaletteGenerator{
     //     return colorHex as def.ColorHex;
     // }
 
-    private pullRulePalette(palettePath : JsonFile):def.ColorRule[]{
+    private pullRulePalette(palettePath : rW.ColorFile):def.ColorRule[]{
         return this.patcher.loadColors(palettePath);
     }
     
@@ -89,7 +87,7 @@ export class PaletteDeconstructor extends PaletteGenerator{
     override writeFileTopper(){
         this.writeToFile(`{`);
         this.writeToFile(`"$schema": "./schemas/deconstruct.schema.json",`);
-        this.writeToFile(`"description": "${this.capFront(this.palFlavor)} Decon Palette",`);
+        this.writeToFile(`"description": "${this.capFront(this.theme)} Decon Palette",`);
     }
 
     private genDeconMap(){

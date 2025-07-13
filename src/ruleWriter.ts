@@ -2,46 +2,58 @@ import * as vscode from "vscode";
 import * as def from "./definitions";
 import * as fs from "fs";
 import * as path from "path";
-import { PatchColors } from "./patch";
+import { getPatcherInstance, PatchColors } from "./patch";
 import { RegExBuilder } from "./regExBuilder";
-import { Themes } from "./extension";
+import { Theme as Theme } from "./extension";
 import { vscUtils } from "./vscUtils";
+
+export const LANG_REGEX = "(fasta|fastq)";
+export const THEME_REGEX = "(warm|cool|cold)";
+
+export const LANGFILE_REGEX = new RegExp(`^${LANG_REGEX}\\.tmLanguage\\.json$`);
+export const COLORFILE_REGEX = new RegExp(`^${LANG_REGEX}-colors-${THEME_REGEX}\\.json$`);
+export const DECONFILE_REGEX = new RegExp(`^${THEME_REGEX}-Deconstruct\\.json$`);
 
 export type RuleType  = "syntaxes" | "palettes" | "decon";
 export type LangFile  = `${Lang}.tmLanguage.json`;
 export type Lang  = "fasta" | "fastq" | "else";
-export type ColorFile = `${Lang}-${string}-colors.json`;
+export type ColorFile = `${Lang}-colors-${Theme}.json`;
 export type DeconFile = `${string}-Deconstruct.json`; // type StripFile = `${string}-stripped.json` ;
 export type JsonFile = LangFile | ColorFile | DeconFile; //| StripFile;
 
 export class FileMeta {
     lang!: Lang;
-    theme?: Themes;
+    theme?: Theme;
     jsonKind!: RuleType;
     filePath: JsonFile;
     variants?: string[];
 
     constructor(filePath: string) {
         this.filePath = filePath as JsonFile;
-        this.parseFilePath(filePath as JsonFile);
+        this.validateFilePath(filePath as JsonFile);
     }
 
-    private parseFilePath(filePath: JsonFile){
+    public validateFilePath(filePath: JsonFile){
+
         if (filePath.endsWith(".tmLanguage.json")) {
-            this.parseLangFile(filePath as LangFile);
-        } else if (filePath.endsWith("-colors.json")) {
-            this.parseColorFile(filePath as ColorFile);
+            this.decomposeLangFile(filePath as LangFile);
+            
+        // } else if (filePath.match(COLORFILE_REGEX)) {
+        }else if (filePath.endsWith("-colors-warm.json")) {
+            this.decomposeColorFile(filePath as ColorFile);
+        
         } else if (filePath.endsWith("-Deconstruct.json")) {
-            this.parseDeconFile(filePath as DeconFile);
+            this.decomposeDeconFile(filePath as DeconFile);
+    
         } else {
             throw new Error(`Unrecognized file format: ${filePath}`);
         }
         this.setVariants();
     }
-    private parseLangFile(filePath: LangFile){
+    private decomposeLangFile(filePath: LangFile){
         this.jsonKind = "syntaxes";
-        const match = filePath.match(/^(.+)\.tmLanguage\.json$/);
-        
+        const match = filePath.match(LANGFILE_REGEX);
+
         if (match){ 
             this.lang = match[1] as Lang;
         }else{
@@ -49,23 +61,24 @@ export class FileMeta {
         }
     } 
     
-    private parseColorFile(filePath: ColorFile){
+    private decomposeColorFile(filePath: ColorFile){
         this.jsonKind = "palettes";
-        const match = filePath.match(/^(.+)-(.+)-colors\.json$/);
+        const match = filePath.match(COLORFILE_REGEX);
+
         if (match) {
             this.lang = match[1] as Lang;
-            this.theme = match[2] as Themes;
+            this.theme = match[2] as Theme;
         }else{
             throw new Error(`Invalid ColorFile format: ${filePath}`);
         }
     } 
     
-    private parseDeconFile(filePath: DeconFile){
+    private decomposeDeconFile(filePath: DeconFile){
         this.jsonKind = "decon";
-        const match = filePath.match(/^(.+)-(.+)-Deconstruct\.json$/);
+        const match = filePath.match(DECONFILE_REGEX);
         if (match) {
             this.lang = match[1] as Lang;
-            this.theme = match[2] as Themes;
+            this.theme = match[2] as Theme;
         } else {
             throw new Error(`Invalid DeconFile format: ${filePath}`);
         }
@@ -80,15 +93,27 @@ export class FileMeta {
         } 
     }
 
-    public filePartner(){
+    public filePartner(): JsonFile{ //MAYBE TOO GENERIC USE THE HELPERS TO BE EXPLICIT
         if(this.jsonKind === "palettes" || this.jsonKind === "decon"){
-            return `${this.lang}.tmLanguage.json` as LangFile;
+            return this.genLangPath();
         }
         if(this.jsonKind === "syntaxes"){
-            return `${this.lang}-${this.theme}-colors.json` as ColorFile;
+            return this.genColorPath();
         }else{
             throw new Error(`Unrecognized file format: ${this.filePath}`);
         }
+    } 
+    
+    public genLangPath(){
+        return `${this.lang}.tmLanguage.json` as LangFile;
+    }
+
+    public genColorPath(){
+        return `${this.lang}-colors-${this.theme}.json` as ColorFile;
+    }
+    
+    public genDeconFile(){
+        return `${this.theme!.toLowerCase()}-deconstruct.json` as DeconFile;
     }
 }
 
@@ -96,7 +121,7 @@ export interface LangParams{
     jsonKind: "syntaxes";
 
     variants: string[];
-    palFlavor: Themes;
+    palFlavor: Theme;
     
     tmLangFile : LangFile;//langFile  = `${lang}.tmLanguage.json`
     stripRuleFile?: DeconFile;
@@ -140,12 +165,13 @@ export abstract class RuleWriter{
     protected fileType: Lang;
     protected JSONType: RuleType;
 
+    protected patcher: PatchColors;
     protected regi = new RegExBuilder(false); 
-    protected patcher  = new PatchColors(this.context);
     
-    constructor(protected context: vscode.ExtensionContext, fileKind: Lang, jsonKind: RuleType){
+constructor(protected context: vscode.ExtensionContext, fileKind: Lang, jsonKind: RuleType){
         this.fileType =fileKind;
         this.JSONType = jsonKind;
+        this.patcher = getPatcherInstance();
     }
 
     public clear(): void {
@@ -192,7 +218,7 @@ export abstract class RuleWriter{
         return name as def.GenericScope;
     }
 
-    public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
+    public pullRule(tokenName: string, palettePath: ColorFile): def.ColorRule | null {
         const palette = this.patcher.loadColors(palettePath);
         const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
         if (!scope) {

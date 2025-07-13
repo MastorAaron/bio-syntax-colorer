@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 
 import { version } from "../package.json";
+import { ColorFile, FileMeta } from "./ruleWriter";
 
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
@@ -11,19 +12,27 @@ import { vscUtils, themeUtils } from "./vscUtils";
 import colorMath from "./colorInverter";
 // import hoverOver from "./hoverOver";
 
-const DEFAULT_PALETTE = "fasta-colors-warm.json";
+// const DEFAULT_PALETTE = "fasta-colors-warm.json";
 
 export class PatchColors{
     // private static readonly DEFAULT_PALETTE = DEFAULT_PALETTE ;
     private vscCOUT = vscUtils.vscCOUT;
+    private colorUtil = new colorMath(this.context);
     private globalConfig = vscUtils.globalConfig;
     private editorConfig = vscUtils.editorConfig;
     private currCustomization = vscUtils.currCustomization;
-    private colorUtil = new colorMath(this.context);
 
 
-    constructor(private context: vscode.ExtensionContext) {
+
+    constructor( private context: vscode.ExtensionContext,
+        private metaFile: FileMeta) {
+        
+        if (this.metaFile.jsonKind !== "palettes") {
+            throw new Error("PatchColors initialized with non-palette metaFile.");
+        }
+
         this.vscCOUT(`PatchColors initialized with context: ${this.context.extensionPath}`);
+        this.vscCOUT(`PatchColors initialized with palette: ${this.metaFile.filePath}`);
     }
 
     public versionTagRule(rule: def.ColorRule): def.ColorRule{
@@ -58,7 +67,7 @@ export class PatchColors{
         return tagged;                          //Print FileName or Palette Name instead
     }
 
-    public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
+    public loadColors(filename = this.metaFile.filePath as ColorFile): def.ColorRule[]{
         const colorPath = path.isAbsolute(filename)
         ? filename
         : path.join(this.context.extensionPath, "palettes", path.basename(filename));
@@ -74,7 +83,7 @@ export class PatchColors{
         return rules;
     }
 
-    public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
+    public pullRule(tokenName: string, palettePath: ColorFile): def.ColorRule | null {
         const palette = this.loadColors(palettePath);
         const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
         if (!scope) {
@@ -190,7 +199,7 @@ export class PatchColors{
         this.vscCOUT("Custom token colors applied.");
     }
 
-    public async patchTokenColors(fileName : string= DEFAULT_PALETTE): Promise<void> {
+    public async patchTokenColors(fileName: ColorFile = this.metaFile.filePath as ColorFile): Promise<void> {
         try{
             let rules    = this.loadColors(fileName);
             let tagged   = this.tagColorsGenRules(rules)
@@ -232,6 +241,24 @@ export class PatchColors{
             vscode.ConfigurationTarget.Workspace
         );
     }
+}
+
+    export function initPatcher(context?: vscode.ExtensionContext, metaFile?: FileMeta, forceReinit = false): PatchColors {
+        if (forceReinit || !patcherInstance) {
+            console.log("[BioNotation] Initializing PatchColors singleton.");
+            patcherInstance = new PatchColors(context!, metaFile!);
+        }
+        return getPatcherInstance(context, metaFile);
+    }
+
+    export function getPatcherInstance(context?: vscode.ExtensionContext, metaFile?: FileMeta): PatchColors {
+    if (!patcherInstance) {
+        if (!context || !metaFile) {
+            throw new Error("PatchColors instance has not been initialized yet.");
+        }
+        patcherInstance = new PatchColors(context, metaFile);
+    }
+    return patcherInstance;
 }
 
 let patcherInstance: PatchColors;
