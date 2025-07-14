@@ -13,18 +13,19 @@ export class PaletteDeconstructor extends PaletteGenerator{
     private theme: Theme;
     
 
-   constructor(context: vscode.ExtensionContext, params: ColorDeconParams) {
-        const meta = new FileMeta(params.paletteFile);
+   constructor(context: vscode.ExtensionContext, paletteFile: rW.ColorFile) {
+        const meta = new FileMeta(paletteFile);
         const colorParams: PaletteParams = {
-           jsonKind: "palettes",
+            jsonKind: "palettes",
             descript: `Deconstructed version of ${meta.theme}`,
-            paletteFile: params.paletteFile,
+            paletteFile,
             deconPalFile: meta.genDeconFile()
         };
 
         super(context, colorParams);
         this.theme = meta.theme as Theme;
-        this.inputPath = params.paletteFile;
+        this.inputPath = paletteFile
+        
         this.finalizePathSetup();
         this.deconOutput = meta.genDeconFile();
     }

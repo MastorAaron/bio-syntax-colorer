@@ -12,45 +12,50 @@ export const THEME_REGEX = "(warm|cool|cold)";
 
 export const LANGFILE_REGEX = new RegExp(`^${LANG_REGEX}\\.tmLanguage\\.json$`);
 export const COLORFILE_REGEX = new RegExp(`^${LANG_REGEX}-colors-${THEME_REGEX}\\.json$`);
-export const DECONFILE_REGEX = new RegExp(`^${THEME_REGEX}-Deconstruct\\.json$`);
+export const DECONFILE_REGEX = new RegExp(`^${THEME_REGEX}-deconstruct\\.json$`);
 
 export type RuleType  = "syntaxes" | "palettes" | "decon";
 export type LangFile  = `${Lang}.tmLanguage.json`;
 export type Lang  = "fasta" | "fastq" | "else";
 export type ColorFile = `${Lang}-colors-${Theme}.json`;
-export type DeconFile = `${string}-Deconstruct.json`; // type StripFile = `${string}-stripped.json` ;
+export type DeconFile = `${string}-deconstruct.json`; // type StripFile = `${string}-stripped.json` ;
 export type JsonFile = LangFile | ColorFile | DeconFile; //| StripFile;
 
 export class FileMeta {
-    lang!: Lang;
-    theme?: Theme;
-    jsonKind!: RuleType;
-    filePath: JsonFile;
-    variants?: string[];
+    //Public by default
+        lang!: Lang;
+        theme?: Theme;
+        jsonKind!: RuleType;
+        filePath: JsonFile;
+        fullFilePath!: JsonFile;
+        variants?: string[];
 
     constructor(filePath: string) {
         this.filePath = filePath as JsonFile;
         this.validateFilePath(filePath as JsonFile);
+        this.fullFilePath=filePath as JsonFile;
+        this.setVariants();
     }
 
     public validateFilePath(filePath: JsonFile){
-
-        if (filePath.endsWith(".tmLanguage.json")) {
-            this.decomposeLangFile(filePath as LangFile);
-            
-        // } else if (filePath.match(COLORFILE_REGEX)) {
-        }else if (filePath.endsWith("-colors-warm.json")) {
-            this.decomposeColorFile(filePath as ColorFile);
+        const base = path.basename(filePath);
+        vscUtils.print(`[FileMeta] validateFilePath → full="${filePath}"   base="${base}"`);
         
-        } else if (filePath.endsWith("-Deconstruct.json")) {
-            this.decomposeDeconFile(filePath as DeconFile);
+        if (LANGFILE_REGEX.test(base)) {
+            this.extractFromLangFile(base as LangFile);
+            
+        //filePath.match(COLORFILE_REGEX) //returns an array
+        }else if (COLORFILE_REGEX.test(base)) {
+            this.extractFromColorFile(base as ColorFile);
+        
+        } else if (DECONFILE_REGEX.test(base)) {
+            this.extractFromDeconFile(base as DeconFile);
     
         } else {
             throw new Error(`Unrecognized file format: ${filePath}`);
         }
-        this.setVariants();
     }
-    private decomposeLangFile(filePath: LangFile){
+    private extractFromLangFile(filePath: LangFile){
         this.jsonKind = "syntaxes";
         const match = filePath.match(LANGFILE_REGEX);
 
@@ -61,7 +66,7 @@ export class FileMeta {
         }
     } 
     
-    private decomposeColorFile(filePath: ColorFile){
+    private extractFromColorFile(filePath: ColorFile){
         this.jsonKind = "palettes";
         const match = filePath.match(COLORFILE_REGEX);
 
@@ -73,7 +78,7 @@ export class FileMeta {
         }
     } 
     
-    private decomposeDeconFile(filePath: DeconFile){
+    private extractFromDeconFile(filePath: DeconFile){
         this.jsonKind = "decon";
         const match = filePath.match(DECONFILE_REGEX);
         if (match) {

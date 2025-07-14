@@ -33,10 +33,19 @@ describe("File verification", () => {
     test("File verification", () => {
         expect(fileManager.filePath === "fasta-colors-warm.json" as rW.ColorFile).toBe(true);
     });
+    test("File verification", () => {
+        expect(fileManager.filePath == "fasta-colors-warm.json").toBe(true);
+    });
     
     test("Theme? ", () => {
         expect(fileManager.theme === "warm" as Theme).toBe(true);
+    }); 
+    test("Theme? ", () => {
+        expect(fileManager.theme == "warm").toBe(true);
     });
+    // test("Theme? ", () => {
+    //     expect(fileManager.theme == "Warm").toBe(false);
+    // });
    test("Lang? ", () => {
         expect(fileManager.lang === "fasta" as rW.Lang).toBe(true);
     }); 

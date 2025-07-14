@@ -18,7 +18,7 @@ export class PaletteGenerator extends RuleWriter{
     constructor(context: vscode.ExtensionContext, params : PaletteParams){
         const meta = new rW.FileMeta(params.paletteFile);
 
-        if (meta.jsonKind !== "syntaxes") {
+        if (meta.jsonKind !== "palettes") {
             throw new Error(`Invalid file passed to LangGenerator: ${params.paletteFile}`);
         }
 

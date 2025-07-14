@@ -68,10 +68,22 @@ export class PatchColors{
     }
 
     public loadColors(filename = this.metaFile.filePath as ColorFile): def.ColorRule[]{
-        const colorPath = path.isAbsolute(filename)
-        ? filename
-        : path.join(this.context.extensionPath, "palettes", path.basename(filename));
-    
+       // resolve the expected on-disk location
+        const candidate = path.isAbsolute(filename)
+            ? filename
+            : path.join(this.context.extensionPath, "palettes", path.basename(filename));
+
+        // ——— DEBUG OUTPUT ———
+        this.vscCOUT(
+          `[PatchColors] loadColors → filename="${filename}"`,
+          `context="${this.context.extensionPath}"`,
+          `resolved="${candidate}"`,
+          `exists=${fs.existsSync(candidate)}`
+        );
+
+        let colorPath = candidate;
+
+
         // path.join(context.extensionPath, "fasta-colors.json")
         if (!fs.existsSync(colorPath)) {
             throw new Error(`Color file not found: ${colorPath}`);

@@ -24,18 +24,18 @@ import { config } from "process";
 const DEFAULT_PALETTE = "fasta-colors-warm.json";
 
 export type Theme = 
-    // "Default" |
-    "Warm" |
-    "Cool" | 
-    "Cold" ;
-    // "CoolComp" |
-    // "CoolInvert";
+    // "default" |
+    "warm" |
+    "cool" | 
+    "cold" ;
+    // "coolComp" |
+    // "coolInvert";
 
 const PaletteMap: Record<Theme, ColorFile> = {
     // "Default": "fasta-colors.json"as def.PaletteFilePath,
-    "Warm": "fasta-colors-warm.json"as ColorFile,
-    "Cool": "fasta-colors-cool.json"as ColorFile,
-    "Cold": "fasta-colors-cold.json"as ColorFile
+    "warm": "fasta-colors-warm.json"as ColorFile,
+    "cool": "fasta-colors-cool.json"as ColorFile,
+    "cold": "fasta-colors-cold.json"as ColorFile
     // "CoolComp": "fasta-colors-cold-comp.json" as def.PaletteFilePath,
     // "CoolInvert": "fasta-colors-cold-inverted.json" as def.PaletteFilePath
 }
@@ -57,25 +57,30 @@ export class BioNotation{
     private vscCOUT = vscUtils.vscCOUT;
     // private patchTokenColors: (fileName?: string) => Promise<void>;
     // private removeTokenColors: () => Promise<void>;
-    private patcher = getPatcherInstance();
+    private patcher: PatchColors;
 
     constructor(private context: vscode.ExtensionContext, meta: rW.FileMeta){
         // this.patchTokenColors = this.patcher.patchTokenColors.bind(this.patcher);
         // this.removeTokenColors = this.patcher.removeTokenColors.bind(this.patcher);
-        this.activePalette = meta.filePath as ColorFile;
         // this.activePalette =  DEFAULT_PALETTE as ColorFile;//TODO: set Sanger Colors as Default
                                                 //TODO: create Sanger Colors Pallete
                                                 //TODO: create Illuminia Colors Pallete
+        
+        initPatcher(context, meta);  
+        this.patcher = getPatcherInstance(this.context, meta);
+        
+        this.activePalette = meta.filePath as ColorFile;
 
         this.theme = meta.theme!;                                                
         this.tmLang = new LangFileEditor(this.context);
-
-        this.setLangGen(meta);
-        this.setPaletteGen(meta);
         
+        const metaLang = new rW.FileMeta("fasta.tmLanguage.json");
+        this.setLangGen(metaLang);
+        this.setPaletteGen(meta);
         
         this.registerCommands();
         hoverOver.registerProvider();
+
     }
 
     private setLangGen(meta: rW.FileMeta){
@@ -460,19 +465,19 @@ export function activate(context: vscode.ExtensionContext) {
 
         const metaFileColors = new rW.FileMeta("fasta-colors-warm.json");  
         // const metaFileLang = new rW.FileMeta("fasta.tmLanguage.json");
-        initPatcher(context, metaFileColors);  
-
-        // bioNotationInstance = new BioNotation(context, metaFileColors);
-        // // bioNotationInstance = new BioNotation(context, metaFileColors, metaFileLang);
-        // bioNotationInstance.activate();
-    } catch (err) {
-        console.error("BioNotation activation failed:", err);
+        
+        bioNotationInstance = new BioNotation(context, metaFileColors);
+        // bioNotationInstance = new BioNotation(context, metaFileColors, metaFileLang);
+        bioNotationInstance.activate();
+    } catch (err: any) {
+        console.error("BioNotation activation failed:", err.message);
+        console.error(err.stack);
         vscode.window.showInformationMessage(`BioNotation activation failed: ${err}`);
     }
 }
 
-// export function deactivate() {
-//     if (bioNotationInstance) {
-//         bioNotationInstance.deactivate();
-//     }
-// }
+export function deactivate() {
+    if (bioNotationInstance) {
+        bioNotationInstance.deactivate();
+    }
+}

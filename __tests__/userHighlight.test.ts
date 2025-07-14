@@ -7,6 +7,7 @@ import { boolUtils } from "../src/booleans";
 
 import { PatchColors } from "../src/patch";
 import * as def from "../src/definitions";
+import * as rW from "../src/ruleWriter";
 
 jest.mock('vscode', () => ({
     window: {
@@ -167,12 +168,14 @@ const NeonBlue      : def.ColorHex = "#1F51FF";
 const NeonMagneta   : def.ColorHex = "#FF00FF";
 
 describe("PatchColors Tagging", () => {
+    let meta;
     let patcher;
     let taggedRule: def.ColorRule;
     let updatedPalette: def.ColorRule[];
     
     beforeEach(() => {
-        patcher = new PatchColors(vscUtils.mockContext());
+        meta = new rW.FileMeta("fasta-colors-warm.json");
+        patcher = new PatchColors(vscUtils.mockContext(),meta);
         const scopeName = genHLNameScope("ATGN");
 
         const colorRule: def.ColorRule = {
@@ -199,14 +202,12 @@ describe("PatchColors Tagging", () => {
     });
 
     test("Write updated palette to file and check content", () => {
-        fs.writeFileSync("fasta-colors-warm.json", JSON.stringify({ tokenColors: updatedPalette }, null, 2));
+        fs.writeFileSync("./palettes/fasta-colors-warm.json", JSON.stringify({ tokenColors: updatedPalette }, null, 2));
 
-        const fileContents = JSON.parse(fs.readFileSync("fasta-colors-warm.json", "utf8"));
+        const fileContents = JSON.parse(fs.readFileSync("./palettes/fasta-colors-warm.json", "utf8"));
         const found = fileContents.tokenColors.find((rule : def.ColorRule) => rule.scope === taggedRule.scope);
         expect(found).toBeDefined();
     });
 });
 
-describe("", () => {
-
-});     
+//   

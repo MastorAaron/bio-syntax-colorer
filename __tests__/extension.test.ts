@@ -6,37 +6,37 @@ import { vscUtils } from '../src/vscUtils';
 // const { vscUtils } = require('../src/vscUtils');
 // const { BioNotation } = require('../src/extension');
 import { BioNotation } from '../src/extension';
-import {  } from '../src/vscUtils';
+import * as rW from '../src/ruleWriter';
 
 
 const { vscCOUT, editorConfig, showInterface, mockContext} = vscUtils;
 
 
-// jest.mock('vscode', () => ({
-//     window: {
-//         showInformationMessage: jest.fn(),
-//         // showQuickPick: jest.fn()
-//         showQuickPick: jest.fn(async (options) => {
-//             console.log("Simulated QuickPick with options:", options);
-//             return "Aminos";  // Simulated user selection
-//         })
-//     },
-//     workspace: {
-//         getConfiguration: jest.fn().mockReturnValue({
-//             get: jest.fn(),
-//             update: jest.fn()
-//         })
-//     },
-//        commands: {
-//         registerCommand: jest.fn()
-//     },
-//     languages: {
-//         registerHoverProvider: jest.fn()
-//     },
-//     ConfigurationTarget: {
-//         Workspace: 'Workspace'  // Dummy constant just to satisfy the assignment
-//     }
-// }));
+jest.mock('vscode', () => ({
+    window: {
+        showInformationMessage: jest.fn(),
+        // showQuickPick: jest.fn()
+        showQuickPick: jest.fn(async (options) => {
+            console.log("Simulated QuickPick with options:", options);
+            return "Aminos";  // Simulated user selection
+        })
+    },
+    workspace: {
+        getConfiguration: jest.fn().mockReturnValue({
+            get: jest.fn(),
+            update: jest.fn()
+        })
+    },
+       commands: {
+        registerCommand: jest.fn()
+    },
+    languages: {
+        registerHoverProvider: jest.fn()
+    },
+    ConfigurationTarget: {
+        Workspace: 'Workspace'  // Dummy constant just to satisfy the assignment
+    }
+}));
 
 // //For Actual function testing
 // jest.mock('../src/vscUtils', () => {
@@ -215,9 +215,10 @@ describe('MockContext', () => {
 
 describe('Actual toggleAlphabet', () => {
     let bioNotation:  BioNotation;
+    const meta = new rW.FileMeta("fasta-colors-warm.json");
 
     test('handles realTime Selection', async () => {
-        bioNotation = new BioNotation(vscUtils.mockContext());
+        bioNotation = new BioNotation(vscUtils.mockContext(),meta);
 
         await bioNotation.toggleAlphabet();
     });

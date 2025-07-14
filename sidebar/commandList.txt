@@ -7,6 +7,7 @@ npm install
 code --install-extension bio-colorer-0.0.XX.vsix
 code --install-extension bio-colorer-$(node -p "require('./package.json').version").vsix
 
+code --list-extensions
 $ code --uninstall-extension "the a177.bio-colorer"
 
 Add the following line to view color palletes as a slider
