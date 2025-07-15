@@ -38,6 +38,9 @@
             "P": "#FFFF00",
             "O": "#FF5733",
             "X": "#4682B4"
+        },
+        "hlATGN": {
+            "highLightRule": "#D4D4D4"
         }
     },
     "fastq": {

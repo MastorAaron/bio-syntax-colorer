@@ -97,7 +97,13 @@ export class PatchColors{
 
     public pullRule(tokenName: string, palettePath: ColorFile): def.ColorRule | null {
         const palette = this.loadColors(palettePath);
-        const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
+
+        // try the raw key (for things like "aTitle"/"qTitle"), then uppercase for single-letter tokens
+        const scope =
+        def.tokenMap[tokenName as def.tokenType] ??
+        def.tokenMap[tokenName.toUpperCase() as def.tokenType];
+
+        // const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
         if (!scope) {
             this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
             return null;
@@ -255,12 +261,11 @@ export class PatchColors{
     }
 }
 
-    export function initPatcher(context?: vscode.ExtensionContext, metaFile?: FileMeta, forceReinit = false): PatchColors {
+    export function initPatcher(context?: vscode.ExtensionContext, metaFile?: FileMeta, forceReinit = false): void {
         if (forceReinit || !patcherInstance) {
             console.log("[BioNotation] Initializing PatchColors singleton.");
             patcherInstance = new PatchColors(context!, metaFile!);
         }
-        return getPatcherInstance(context, metaFile);
     }
 
     export function getPatcherInstance(context?: vscode.ExtensionContext, metaFile?: FileMeta): PatchColors {

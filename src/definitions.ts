@@ -45,7 +45,6 @@ export interface ColorRule {
         background?: ColorHex; //optional Background color
         fontStyle?: string; //optional Font style
     };
-    
 }
 
 export type RegEx = string;
@@ -328,7 +327,7 @@ export function getRegEx(letter: string, currAlpha: alphabet, directName: boolea
     }
     return letter;
 }
-
+//Orignal
 export const nukeRegExMap : Record<ntExtd,string>= {
     'N': "[NRYSWKMBDHVACGTU-*]",
 
@@ -341,7 +340,7 @@ export const nukeRegExMap : Record<ntExtd,string>= {
     'W': "[WTAU]",
 
     'K': "[KTUG]",
-    'M': "[NAC]",
+    'M': "[MAC]",
 
     'B': "[BCGTUY]",
     'D': "[DAGTURW]",

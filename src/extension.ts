@@ -358,9 +358,6 @@ export class BioNotation{
         await this.patcher.patchTokenColors(fileName);
         this.vscCOUT(`BioNotation colors switched for ${fileName}.`);
     }
-    
-
-
 
     public genHLNameScope(kmer: string): def.NameScope{
         if(kmer.length < MAX_LEN_DISPLAY){
@@ -399,8 +396,6 @@ export class BioNotation{
         fs.writeFileSync(this.activePalette, JSON.stringify({ tokenColors: updatedPalette }, null, 2));
     }
 
-
-
     // public async addTokenToOverLayOri(pattern : string) {
     //    const doc = vscUtils.getActiveDoc();
     //     if (!doc) {
@@ -433,7 +428,7 @@ export class BioNotation{
     //     await this.patcher.patchTokenColors(paletteGen.genOutputFileStr());
     // }
 
-    public async activate(): Promise<void> {
+    public async setUp(): Promise<void> {
         if(await this.isActive()){ 
             await this.patcher.patchTokenColors(this.activePalette); // Only apply if enabled
             this.vscCOUT("BioNotation colors auto-applied on activation.");
@@ -442,7 +437,7 @@ export class BioNotation{
         }
     }
     
-    public async deactivate(): Promise<void> {
+    public async breakDown(): Promise<void> {
         await this.patcher.removeTokenColors(); // Always remove
         await this.updateEnabledFlag(false); // Clear flag
         this.vscCOUT("BioNotation colors removed on deactivation.");
@@ -468,7 +463,7 @@ export function activate(context: vscode.ExtensionContext) {
         
         bioNotationInstance = new BioNotation(context, metaFileColors);
         // bioNotationInstance = new BioNotation(context, metaFileColors, metaFileLang);
-        bioNotationInstance.activate();
+        bioNotationInstance.setUp();
     } catch (err: any) {
         console.error("BioNotation activation failed:", err.message);
         console.error(err.stack);
@@ -476,8 +471,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
 }
 
-export function deactivate() {
+export async function deactivate() {
     if (bioNotationInstance) {
-        bioNotationInstance.deactivate();
+        await bioNotationInstance.breakDown();
     }
 }

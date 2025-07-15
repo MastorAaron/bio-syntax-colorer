@@ -2,6 +2,8 @@
 __tests__/
 .vscode/
 .vscode/c_cpp_properties.json
+devTools/**
+palettes/decon/**
 
 # Ignore mocks
 dist/__mocks__/
@@ -27,6 +29,10 @@ sidebar/
 *.vscodeIgnore
 
 # Archive clutter
+*.tsbuildinfo
 *.zip
 *.vsix
 *.log
+
+# ignore libraries
+node_modules/

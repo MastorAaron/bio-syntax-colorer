@@ -23,9 +23,9 @@ export class RegExBuilder{
 
     public genTypedRegEx(strand: string, map: Record<string, string>, allCase : boolean = true, block : boolean = true): string {
         const blocked = block ? "+" : ""; 
-        const casePrefix = allCase ? `(?i)` : "";
+        const caseSuffix = allCase ? `/i` : "";
 
-        return `${casePrefix}${this.genHighLightRegEx(strand, map)}${blocked}`;
+        return `${this.genHighLightRegEx(strand, map)}${caseSuffix}${blocked}`;
     }
 
     public genNukeRegEx(strand : string, allCase : boolean =true, block : boolean=true): string{
