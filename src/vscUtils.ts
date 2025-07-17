@@ -3,15 +3,55 @@ import * as def from "./definitions";
 import * as fs from "fs";
 import * as path from "path";
 
-export type syntaxFilePath = string & { readonly __syntaxFilePath: unique symbol };
 
 interface TokenCustomization {
     textMateRules?: def.ColorRule[];
     [key: string]: unknown;
 }
 
-export const DARK_FG: def.colorHex  = "#D4D4D4";
-export const LIGHT_FG: def.colorHex = "#57606C";
+export const DARK_FG : def.ColorHex = "#D4D4D4";
+export const LIGHT_FG: def.ColorHex = "#57606C";
+
+export const NeonYellow    : def.ColorHex = "#FFFF33";
+export const NeonGreen     : def.ColorHex = "#39FF14";
+export const NeonBlue      : def.ColorHex = "#1F51FF";
+export const NeonMagneta   : def.ColorHex = "#FF00FF";
+
+const NeonsColors = [NeonYellow,NeonGreen,NeonBlue,NeonMagneta];
+export type Neons = (typeof NeonsColors)[number];
+
+export const themeUtils = {
+    themeKind(){
+        return vscode.window.activeColorTheme.kind;
+    },
+    
+    isDark(): boolean{
+        return this.themeKind() === vscode.ColorThemeKind.Dark;
+    },
+        
+    isLight(): boolean{
+        return this.themeKind() === vscode.ColorThemeKind.Light;
+    },
+    
+    defaultTextColor(): def.ColorHex {
+        return this.isDark() ? DARK_FG : LIGHT_FG;
+    },
+
+    highLightColors(color : string): def.ColorHex {
+        switch(color){
+            case "Neon Yellow":
+                return NeonYellow;
+            case "Neon Green":
+                return NeonGreen;
+            case "Neon Blue":
+                return NeonBlue;            
+            case "Neon Magneta":
+                return NeonMagneta;
+            default:
+                return NeonYellow;
+        }
+    }
+};
 export namespace vscUtils{
 
     export function vscCOUT(...args: unknown[]): void {
@@ -33,10 +73,9 @@ export namespace vscUtils{
             console.log(toPrint);
         }else if(stream === "vsc"){
             vscCOUT(toPrint);
+        }else{
+            throw new Error(`Unknown stream`);
         }
-        // else if(stream === "else"){
-        //     (toPrint);
-        // }
     }
     
     export function globalConfig(): vscode.WorkspaceConfiguration{
@@ -56,113 +95,28 @@ export namespace vscUtils{
         return typeof scope === "string" && scope.startsWith("source.fasta.");
     }
     
-    export async function showInterface(dropDownOptions: Array<string>, searchBarText: string): Promise<string | undefined>{
+    export async function showInterface(dropDownOptions: string[], searchBarText: string): Promise<string | undefined>{
         return await vscode.window.showQuickPick(
             dropDownOptions,
             { placeHolder: searchBarText }
         );
     }
-
-    // export function mockContext(){
-    //     return { extensionPath: "./" } as unknown as vscode.ExtensionContext;
-    // }
+    
+    export async function showInputBox(userText: string, givenEx: string=""): Promise<string | undefined>{
+        return await vscode.window.showInputBox({
+            prompt: userText,
+            placeHolder: givenEx
+        });
+    }
 
     export function mockContext(): vscode.ExtensionContext {
-    return {
-        extensionPath: "./",
-        subscriptions: []
-    } as unknown as vscode.ExtensionContext;
-}
+        return {
+            extensionPath: "./",
+            subscriptions: []
+        } as unknown as vscode.ExtensionContext;
+    }
 
 } 
-
-
-export const themeUtils = {
-    themeKind(){
-        return vscode.window.activeColorTheme.kind;
-    },
-    
-    isDark(): boolean{
-        return this.themeKind() === vscode.ColorThemeKind.Dark;
-    },
-        
-    isLight(): boolean{
-        return this.themeKind() === vscode.ColorThemeKind.Light;
-    },
-    
-    defaultTextColor(): def.colorHex {
-        return this.isDark() ? DARK_FG : LIGHT_FG;
-    }
-};
-
-interface FastaLang {
-    repository?:{
-        keywords?:{
-            patterns?: Array<def.PatternRule>;
-        };
-
-    };
-    [key: string]: unknown;
-}
-
-export class LangHandler{
-    private langPath: syntaxFilePath;
-    
-    constructor(private context : vscode.ExtensionContext){
-        this.langPath = path.join(this.context.extensionPath,  "syntaxes", "fasta.tmLanguage.json") as syntaxFilePath;
-    }
-
-    public loadLangFile(): FastaLang {
-        const raw = fs.readFileSync(this.langPath, "utf8");
-        return JSON.parse(raw);
-    }
-
-    public savelang(lang : FastaLang): void {
-        fs.writeFileSync(this.langPath, JSON.stringify(lang, null,2));
-    }
-
-    private getPatternRepo(lang : FastaLang): def.PatternRule[]{
-        // "repository": {
-        //     "keywords": {
-        //         "patterns": []
-        //     }
-        // }
-        lang.repository = lang.repository || {};
-        lang.repository.keywords = lang.repository.keywords || {};
-        lang.repository.keywords.patterns = lang.repository.keywords.patterns || [];
-        return lang.repository.keywords.patterns;
-    }
-
-    public appendPattern(pattern: def.PatternRule): void{
-        const langJSON = this.loadLangFile();
-
-        //Ensure Repos exist
-        const patternArr = this.getPatternRepo(langJSON);
-       
-        patternArr.push(pattern);
-        vscUtils.vscCOUT(`Appended lang pattern:`, pattern);
-
-        this.savelang(langJSON);
-    }
-
-    public removePattern(pattern: def.TagCategory){
-        const langJSON = this.loadLangFile();
-        const patternArr = this.getPatternRepo(langJSON);
-
-        const filtered = patternArr.filter(
-          (rule: def.PatternRule ) =>
-                typeof rule.name !== "string" || 
-                (typeof pattern === "string" && !rule.name.includes(pattern))
-        );
-        langJSON.repository!.keywords!.patterns = filtered;
-
-        this.savelang(langJSON);
-    }
-
-    public removeHighLightPatterns(){
-        this.removePattern("highLightRule");
-    }
-}
 
 export class RegExBuilder{
     constructor(private allowExtended=true){}

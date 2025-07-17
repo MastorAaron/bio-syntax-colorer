@@ -218,6 +218,11 @@ export class PatchColors{
     public async removeTokenColors(): Promise<void> { 
         const config = this.workspaceConfig;
         const customization = this.currCustomization(config);
+        const plainCustomization = JSON.parse(JSON.stringify(customization));
+
+        delete plainCustomization["textMateRules"];
+        delete plainCustomization["[*Light*]"];
+        delete plainCustomization["[*Dark*]"];
         // const customization = config.get("editor.tokenColorCustomizations") || {};
         
         const rules = 

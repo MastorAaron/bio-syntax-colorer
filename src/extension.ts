@@ -7,27 +7,20 @@
 
 // import { patchTokenColors, removeTokenColors, loadColors, vscCOUT } from "./patch";
 import * as vscode from "vscode";
-import { vscUtils, themeUtils } from "./vscUtils";
+import { vscUtils, themeUtils, Neons } from "./vscUtils";
 import * as str from "./stringUtils";
 import { PatchColors } from "./patch";
 
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
+import highLightOverlay from "./highlightOverlay";
+
 import { FileMeta, JsonFile, ColorFile, PaletteFilePath } from "./fileMeta";
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
 export const Themes = ["warm", "cool", "cold", "hades", "jadedragon" ];
 export type Theme = (typeof Themes)[number];
-
-const PaletteMap: Record<Theme, ColorFile> = {
-    // "Default": "fasta-colors.json"as ColorFile,
-    "warm": "fasta-colors-warm.json"as ColorFile,
-    "cool": "fasta-colors-cool.json"as ColorFile,
-    "cold": "fasta-colors-cold.json"as ColorFile
-    // "CoolComp": "fasta-colors-cold-comp.json" as ColorFile,
-    // "CoolInvert": "fasta-colors-cold-inverted.json" as ColorFile
-}
 
 //TODO: Use classes in .ts files for better foundation and maintainability
 //TODO: Add functions to be run on an uninstall event to clean up settings and token colors
@@ -56,30 +49,26 @@ export class BioNotation{
         //TODO: create Sanger Colors Pallete
         //TODO: set Sanger Colors as Default
         //TODO: create Illuminia Colors Pallete
-
-        this.selectPalette = this.selectPalette.bind(this);
-        this.toggleColorOverlay = this.toggleColorOverlay.bind(this);
-        this.toggleAlphabet = this.toggleAlphabet.bind(this);
-        this.clearColors = this.clearColors.bind(this);
-        this.applyColors = this.applyColors.bind(this);
-
         this.registerCommands();
         hoverOver.registerProvider();
     }
 
     private registerCommands(): void {
         this.context.subscriptions.push(
-            vscode.commands.registerCommand("bioNotation.selectPalette", this.selectPalette),
-            vscode.commands.registerCommand("bioNotation.toggleColorsOverlay", this.toggleColorOverlay),
-            vscode.commands.registerCommand("bioNotation.toggleAlphabet", this.toggleAlphabet),
-            vscode.commands.registerCommand("bioNotation.clearColors", this.clearColors),
-            vscode.commands.registerCommand("bioNotation.applyColors", this.applyColors)
+            vscode.commands.registerCommand("bioNotation.selectPalette", this.selectPalette.bind(this)),
+            vscode.commands.registerCommand("bioNotation.toggleColorsOverlay", this.toggleColorOverlay.bind(this)),
+            vscode.commands.registerCommand("bioNotation.toggleAlphabet", this.toggleAlphabet.bind(this)),
+            vscode.commands.registerCommand("bioNotation.clearColors", this.clearColors.bind(this)),
+            vscode.commands.registerCommand("bioNotation.applyColors", this.applyColors.bind(this)),
+            vscode.commands.registerCommand("bioNotation.onUninstall", this.onUninstall.bind(this)),
+            vscode.commands.registerCommand("bioNotation.toggleHighLight", this.toggleHighLight.bind(this)),
+
+             
+             //TODO extract Method from RegExBuilder.test
         );
     }
             
-    private async updateEnabledFlag(bool : boolean): Promise<void> {   
-        await vscode.workspace.getConfiguration().update("bioNotation.enabled", bool, this.targetConfigWorkspace);
-    }
+ 
 
     public async clearColors(): Promise<void> {
         await this.patcher.removeTokenColors();
@@ -96,27 +85,164 @@ export class BioNotation{
             this.vscCOUT("BioNotation activated via toggle.");
         }
     }
+
+    private printSelectLine(selection : string, alpha : string): void{
+        this.vscCOUT(`${selection}:   BioNotation isolated all ${selection} ${alpha}.`);
+    }
+
+    private printSelectionHighLight(selection: string) {
+        const nukeStr = "Nucleic acids";
+        const aminoStr = "Amino acids";
+
+        const map: Record<string, () => void> = {
+            "Swap Text Colors and Highlight Colors":       
+            () => this.vscCOUT("Swapped: BioNotation text colors for highlighted blocks by toggle."),
+            "Clear Highlight Colors":       () => this.vscCOUT("Cleared: BioNotation's highlighted blocks."),
+            "Find Entered Pattern: kmer, Codon, letter, etc":       
+            () => this.vscCOUT("Kmer:   BioNotation registered user entry as pattern."),
+            
+            "N: Nonpolar/Alipathic":   () => this.printSelectLine(selection, aminoStr),
+            "P: Polar":   () => this.printSelectLine(selection, aminoStr),
+            "A: Aromatic":   () => this.printSelectLine(selection, aminoStr),
+            "R: Ringed":     () => this.printSelectLine(selection, aminoStr),
+            "+: Positive\\Basic:":   () => this.printSelectLine(selection, aminoStr),
+            "-: Negative\\Acidic:":   () => this.printSelectLine(selection, aminoStr),
+
+            "B: B Drift: Asx: Asn or Asp":    () => this.printSelectLine(selection, aminoStr),
+            "J: J Drift: (Iso)leucine: L or I":    () => this.printSelectLine(selection, aminoStr),
+            "Z: Z Drift: Glx: Gln or Glu":    () => this.printSelectLine(selection, aminoStr),
+            
+            "R: Purine":     () => this.printSelectLine(selection, nukeStr),
+            "Y: Pyrimidine": () => this.printSelectLine(selection, nukeStr),
+            
+            "S: Strong Bonds":     () => this.printSelectLine(selection, nukeStr),
+            "W: Weak Bonds":       () => this.printSelectLine(selection, nukeStr),
+            
+            "M: Amino":      () => this.printSelectLine(selection, nukeStr),
+            "K: Ketone":     () => this.printSelectLine(selection, nukeStr),
+            
+            "B: Not A":      () => this.printSelectLine(selection, nukeStr),
+            "D: Not C":      () => this.printSelectLine(selection, nukeStr),
+            "H: Not G":      () => this.printSelectLine(selection, nukeStr),
+            "V: Not T/U":      () => this.printSelectLine(selection, nukeStr)
+        };
+
+        if (map[selection]) {
+            map[selection]();
+        } else {
+            this.vscCOUT(`Invalid input: ${selection}.`);
+        }
+    }
+    
+    private printSelectionAlpha(selection : string){
+        if(selection === "Ambiguous"){
+            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
+        }else if(selection === "Nucleotides"){
+            this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
+        }else if(selection === "Aminos"){
+            this.vscCOUT("Protein:   BioNotation registered letters as Amino Acids on toggle.");
+        }else{
+            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
+        }
+    }
+ 
+
+    private async secondChoice(options : string[], lang : string) : Promise<[def.HLSelect, string] | undefined>{
+        const secondSelection = await vscUtils.showInterface(options, `Choose ${lang} Highlight`) as def.HLSelect;
+            if (!secondSelection) return;
+        this.printSelectionHighLight(secondSelection);
+        return [secondSelection, `${lang}`];
+    }
+
+
+    public async hLUserChoice(): Promise<[def.HLSelect, string] | undefined> {
+        const firstSelection = await vscUtils.showInterface([...def.HLight.topLevelOptions], "Choose or Type Highlight Category") as def.HLSelect;
+            if (!firstSelection) return;
+
+        if (firstSelection === def.kmerText as def.HLSelect) {
+            const result = await this.secondChoice([...def.HLight.alphaSubOptions], "Alphabet"); 
+            // const secondSelection = await vscUtils.showInterface([...def.HLight.alphaSubOptions], "Choose Alphabet") as def.HLSelect;
+            if (!result) return;//     if (!secondSelection) return;  // this.printSelectionHighLight(secondSelection);
+            const [secondSelection] = result;
+            return [firstSelection, secondSelection as def.HLSelect];
+        }
+
+        if (firstSelection === def.aminoText  as def.HLSelect) {
+            return await this.secondChoice([...def.HLight.aminoSubOptions], "Amino");
+        }
+
+        if (firstSelection === def.nukeText as def.HLSelect) {
+            return await this.secondChoice([...def.HLight.nucleotideSubOptions], "Nucleotide");
+        }
+        
+        if (firstSelection === def.clearText as def.HLSelect) {
+            await this.clearHighLightOverlays();
+            return;
+        }
+
+        this.printSelectionHighLight(firstSelection);
+        return [firstSelection, "ambiguous"];
+    }
+
+    public async hLColorChoice(): Promise<Neons | undefined> {
+        const colorChoice = await vscUtils.showInterface([       
+            "Neon Yellow",
+            "Neon Green",
+            "Neon Blue",
+            "Neon Magneta"], "Choose Highlight Category") as def.ColorHex;
+        return themeUtils.highLightColors(colorChoice)
+    }
+            
+    public async patternChoice(selection: def.HLSelect, alpha: string): Promise<string| undefined> {
+        if(selection === def.kmerText as def.HLSelect)
+            return await vscUtils.showInputBox("Enter a kmer/Codon/pattern","ATG, GCT, etc.");
+        
+        if(alpha == "Nucleotide" || alpha == "Amino"){
+            return selection[0];
+        }
+        return undefined;
+    }   
    
+    private async toggleHighLight(): Promise<void> {
+        const result = await this.hLUserChoice();
+            if (!result) return;
+        const [selection, alpha] = result;
+
+        const pattern = await this.patternChoice(selection, alpha);
+            if (!pattern) return;
+
+        const color = await this.hLColorChoice();
+            if (!color) return;
+
+        highLightOverlay.applyHighLight(pattern, color);
+        this.vscCOUT(`Applied runtime highlight overlay for pattern: ${pattern} with color: ${color}.`);
+    }
+
+    private async clearHighLightOverlays(): Promise<void> {
+        highLightOverlay.clearAllHighLights();
+        this.vscCOUT("Cleared all highlight blocks.");
+    }
+
+    private findInArr(selection: string, arr: string[]){
+        return arr.find(each => selection.includes(each)); //Works for small len arrays not the best for larger data
+    }
+
     private extractAlphabet(selection: string){
-        return def.hoverAlpha.find(eachAlpha => selection.includes(eachAlpha)); //Works for small len arrays not the best for larger data
+        return this.findInArr(selection, def.hoverAlpha);
+        // return def.hoverAlpha.find(eachAlpha => selection.includes(eachAlpha)); //Works for small len arrays not the best for larger data
     }
 
     public async toggleAlphabet(){
-        //["Ambiguous", "Nucleotides", "Aminos"];
-        // const searchBarText = 
-        // const dropDownOptions: def.alphabet[] = 
-        const dropDownOptions: string[] = 
-        ["Determine Alphabet for HoverOver Info:",
-            "\tProtein: Aminos",
-            "\tDNA/RNA: Nucleotides",
-            "\tDefault: Ambigious"];
+        const dropDownOptions: string[] = [
+            "Determine Alphabet for HoverOver Info:",
+            "Protein:     Aminos",
+            "DNA/RNA: Nucleotides",
+            "Default:     Ambigious"
+        ];
         
         const selection = await vscUtils.showInterface(dropDownOptions, "Ambiguous\tNucleotides\tAminos");
         const alpha = this.extractAlphabet(selection!);
-            // const selection = await vscode.window.showQuickPick(options, 
-            //     { placeHolder: "Select Notation Mode\nAminos\nNucleotides" }
-            // );
-        
+         
         await hoverOver.switchAlphabets(alpha as def.Alphabet);
         
         this.vscCOUT(`BioNotation registered alphabet as: ${alpha}`);
@@ -163,14 +289,14 @@ export class BioNotation{
         this.vscCOUT(`BioNotation colors switched to ${choice} palette.`);
     }
 
-    public palettePathORI(choice: string | Theme): ColorFile | undefined {
-        const fileName = PaletteMap[choice?.toLowerCase() as Theme];
-        if(!fileName){
-            this.vscCOUT(`Palette "${choice}" not found.`);
-            return;
-        }
-        return fileName;
-    }
+    // public palettePathORI(choice: string | Theme): ColorFile | undefined {
+    //     const fileName = PaletteMap[choice?.toLowerCase() as Theme];
+    //     if(!fileName){
+    //         this.vscCOUT(`Palette "${choice}" not found.`);
+    //         return;
+    //     }
+    //     return fileName;
+    // }
     
     public palettePath(theme: Theme): ColorFile | undefined {
       this.vscCOUT(`palettePath creating new meta for theme: ${theme}`);
@@ -217,6 +343,31 @@ export class BioNotation{
         await this.updateEnabledFlag(false); // Clear flag
         this.vscCOUT("BioNotation colors removed on deactivation.");
     }
+
+    private async updateEnabledFlag(bool : boolean): Promise<void> {   
+        await vscode.workspace.getConfiguration().update("bioNotation.enabled", bool, this.targetConfigWorkspace);
+    }
+
+    private async removeHoverAlphaFlag(): Promise<void> {  
+        await this.removeWorkSpaceFlag("bioNotation.alphabet"); 
+    }
+
+    private async removeEnabledFlag(): Promise<void> {  
+        // await vscode.workspace.getConfiguration().update("bioNotation.enabled", undefined, this.targetConfigWorkspace);
+        await this.removeWorkSpaceFlag("bioNotation.enabled"); 
+    }
+    
+    private async removeWorkSpaceFlag(param :string): Promise<void> {   
+        await vscode.workspace.getConfiguration().update(param, undefined, this.targetConfigWorkspace);
+    }
+
+    public async onUninstall(): Promise<void>{
+        await this.removeHoverAlphaFlag();
+        await this.clearColors();
+        await this.removeEnabledFlag();
+        //   "bioNotation.alphabet": "Nucleotides",
+    }
+
 }
 
 let bioNotationInstance: BioNotation;

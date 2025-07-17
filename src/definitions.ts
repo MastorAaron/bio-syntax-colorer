@@ -1,25 +1,25 @@
-export type colorHex = `#${string}`;
+export type ColorHex = `#${string}`;
 
-export type fastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
-export type fastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
+export type FastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
+export type FastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
 
-export type tokenScope = fastAScope | fastQScope;
-export type headerScope = `fast${'a' | 'q'}.title`;
-export type nameScope = tokenScope | headerScope; 
+export type TokenScope = FastAScope | FastQScope;
+export type HeaderScope = `fast${'a' | 'q'}.title`;
+export type NameScope = TokenScope | HeaderScope; 
 
 
 export interface ColorRule {
     name: string;      //optional Name
-    scope: nameScope;     //optional Scope
+    scope: NameScope;     //optional Scope
     comment?: string;     //optional Comment
     settings: {
-        foreground: colorHex;
-        background?: colorHex; //optional Background color
+        foreground: ColorHex;
+        background?: ColorHex; //optional Background color
         fontStyle?: string; //optional Font style
     };
 }
 export interface PatternRule {
-    name: nameScope;      
+    name: NameScope;      
     match: string; 
 }
 
@@ -248,7 +248,7 @@ export const fileTypes = ["aTitle","qTitle"] as const
 export type fileTitles = (typeof fileTypes)[number];
 export type tokenType = aminos | fileTitles; 
 
-export const tokenMap : Record<tokenType,nameScope>= {
+export const tokenMap : Record<tokenType,NameScope>= {
     "aTitle":"fasta.title",
     "qTitle":"fastq.title",
     'A': "source.fasta.ntA",
@@ -341,3 +341,58 @@ export function arrayToStr(strArr : Array<string> | string): string{
     }
     return newStr;
 }
+
+export const kmerText  = "Find Entered Pattern: kmer, Codon, letter, etc" as const;
+export const swapText  = "Swap Text Colors and Highlight Colors" as const;
+export const clearText = "Clear Highlight Colors" as const;
+
+export const nukeText  = "Nucleotide Categories" as const;
+export const aminoText = "Amino Properties" as const;
+export const aaAlpha   = "Amino acids" as const;
+export const ntAlpha   = "Nucleic acids" as const;
+
+export const HLight = { //HighLightOptions
+    topLevelOptions: [
+        kmerText,
+        // swapText,
+        clearText,
+        nukeText,
+        aminoText
+    ] as const,
+
+    alphaSubOptions: [
+        aaAlpha,
+        ntAlpha
+    ] as const,
+
+    aminoSubOptions: [
+        "N: Nonpolar/Alipathic  LIMVAPG",
+        "P: Polar               STNCQ",
+        "A: Aromatic            WYF",
+        "R: Ringed              WYFHP",
+        "+: Positive\\Basic:    KRH and sometimes O",
+        "-: Negative\\Acidic:   ED",
+        "B: B Drift:            Asx: Asn or Asp",
+        "Z: Z Drift:            Glx: Gln or Glu",
+        "J: J Drift:            (Iso)leucine: L or I"
+    ] as const,
+
+    nucleotideSubOptions: [
+        "R: Purines:        A or G",
+        "Y: Pyrimidine      C or T/U",
+        "S: Strong Bonds    C or G",
+        "W: Weak Bonds      A or T/U",
+        "K: Ketone Group    G or T/U",
+        "M: Amino Group     A or C",
+        "B: Not A           C, G, or T/U",
+        "D: Not C           A, G, or T/U",
+        "H: Not G           A, C, or T/U",
+        "V: Not T/U         A, C, or G"
+    ] as const
+};
+
+export type HLSelect =
+    typeof HLight.topLevelOptions[number] |
+    typeof HLight.alphaSubOptions[number] |
+    typeof HLight.aminoSubOptions[number] |
+    typeof HLight.nucleotideSubOptions[number];
