@@ -50,7 +50,7 @@ export const aaWild      = ['X'] as const;
 
 export const nucleotides = ['A','C','G','T','U'] as const;
 export const nukeSymbols = ['-'] as const;
-export const aaSymbols = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
+export const aaSymbols   = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
                                                    //TODO: Update for parts of FastQ files
                                                    //TODO: Quality Scores, ignore lines, etc 
 export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
@@ -67,7 +67,7 @@ export const extendedNukes = [
     ...nukeWild
 ] as const;
 
-export type typesAA = (typeof aaProperty)[number];//'R' Ringed
+export type typesAA    = (typeof aaProperty)[number];//'R' Ringed
 
 export type nonPolarAA = (typeof aaAliphatic)[number];
 export type polarAA    = (typeof aaPolar)[number];
@@ -77,13 +77,13 @@ export type posAA      = (typeof aaPositive)[number];
 export type negAA      = (typeof aaNegative)[number];
 
 export type recodedAA = (typeof aaRecoded)[number];
-export type driftsAA = (typeof aaDrifts)[number];
-export type wildAA = (typeof aaWild)[number];
+export type driftsAA  = (typeof aaDrifts)[number];
+export type wildAA    = (typeof aaWild)[number];
 
 
-export type aa = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
+export type aa      = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
 export type aaAmbig = driftsAA | wildAA;
-export type aaExtd = aaAmbig | recodedAA;
+export type aaExtd  = aaAmbig | recodedAA;
 
 export type ntSyms = (typeof nukeSymbols)[number];
 export type aaSyms = (typeof aaSymbols)[number];
@@ -91,11 +91,11 @@ export type aaSyms = (typeof aaSymbols)[number];
 export type aminos = aa | aaExtd | aaSyms;
 
 
-export type nt     = (typeof nucleotides)[number];
+export type nt       = (typeof nucleotides)[number];
 
-export type ntNots = (typeof nukeNots)[number];
+export type ntNots   = (typeof nukeNots)[number];
 export type ntStrgth = (typeof nukeBondStrgth)[number];
-export type ntFunct = (typeof functGroupNukes)[number];
+export type ntFunct  = (typeof functGroupNukes)[number];
 export type ntRingQt = (typeof ringStructNukes)[number];
 
 export type ntWild = (typeof nukeWild)[number];
@@ -204,7 +204,10 @@ export const conflictInfoMap : Record<nukes,string>= {
     '-': "Gap or Minus Sign"
 }
 
-export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" ;
+// export type Alphabet =  ;
+
+export const hoverAlpha = ["Nucleotides", "Aminos", "Ambiguous"];
+export type Alphabet = (typeof hoverAlpha)[number];
 export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
@@ -338,5 +341,3 @@ export function arrayToStr(strArr : Array<string> | string): string{
     }
     return newStr;
 }
-
-export type PaletteFilePath = string & { readonly __paletteFilePath: unique symbol };

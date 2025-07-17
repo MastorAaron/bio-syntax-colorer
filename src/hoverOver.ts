@@ -9,10 +9,10 @@ const path = require('path');
 export class HoverObj{ 
     private static instance: HoverObj;
     
-    private DEFAULT_ALPHABET: def.alphabet = "Ambiguous"
+    private DEFAULT_ALPHABET: def.Alphabet = "Ambiguous"
 
     private vscCOUT = vscUtils.vscCOUT;
-    private currAlpha: def.alphabet = this.DEFAULT_ALPHABET; // Default mode
+    private currAlpha: def.Alphabet = this.DEFAULT_ALPHABET; // Default mode
     private activeToken: def.ColorRule | undefined;
     
     constructor() {
@@ -28,14 +28,14 @@ export class HoverObj{
     }
      
     private initAlpha(): void {
-        const storedAlpha = vscode.workspace.getConfiguration().get<def.alphabet>("bioNotation.alphabet");
+        const storedAlpha = vscode.workspace.getConfiguration().get<def.Alphabet>("bioNotation.alphabet");
         if (storedAlpha) {
             this.currAlpha = storedAlpha;
         }
 }
 
-    public getCurrAlpha(): def.alphabet {
-        const storedAlpha = vscode.workspace.getConfiguration().get<def.alphabet>("bioNotation.alphabet");
+    public getCurrAlpha(): def.Alphabet {
+        const storedAlpha = vscode.workspace.getConfiguration().get<def.Alphabet>("bioNotation.alphabet");
         return storedAlpha || this.currAlpha;
     }
     private onHover(contents: string, pos: Position): vscode.Hover | undefined {
@@ -74,7 +74,7 @@ export class HoverObj{
         });
     }
 
-    public async switchAlphabets(selection: def.alphabet) {
+    public async switchAlphabets(selection: def.Alphabet) {
         if (selection === "Ambiguous" || selection === "Nucleotides" || selection === "Aminos") {
             this.currAlpha = selection;
             await vscode.workspace.getConfiguration().update(

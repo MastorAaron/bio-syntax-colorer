@@ -8,28 +8,25 @@
 // import { patchTokenColors, removeTokenColors, loadColors, vscCOUT } from "./patch";
 import * as vscode from "vscode";
 import { vscUtils, themeUtils } from "./vscUtils";
-import {PatchColors} from "./patch";
+import * as str from "./stringUtils";
+import { PatchColors } from "./patch";
 
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
+import { FileMeta, JsonFile, ColorFile, PaletteFilePath } from "./fileMeta";
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
-export type PaletteName = 
-    // "Default" |
-    "Warm" |
-    "Cool" | 
-    "Cold" ;
-    // "CoolComp" |
-    // "CoolInvert";
+export const Themes = ["warm", "cool", "cold", "hades", "jadedragon" ];
+export type Theme = (typeof Themes)[number];
 
-const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
-    // "Default": "fasta-colors.json"as def.PaletteFilePath,
-    "Warm": "fasta-colors-warm.json"as def.PaletteFilePath,
-    "Cool": "fasta-colors-cool.json"as def.PaletteFilePath,
-    "Cold": "fasta-colors-cold.json"as def.PaletteFilePath
-    // "CoolComp": "fasta-colors-cold-comp.json" as def.PaletteFilePath,
-    // "CoolInvert": "fasta-colors-cold-inverted.json" as def.PaletteFilePath
+const PaletteMap: Record<Theme, ColorFile> = {
+    // "Default": "fasta-colors.json"as ColorFile,
+    "warm": "fasta-colors-warm.json"as ColorFile,
+    "cool": "fasta-colors-cool.json"as ColorFile,
+    "cold": "fasta-colors-cold.json"as ColorFile
+    // "CoolComp": "fasta-colors-cold-comp.json" as ColorFile,
+    // "CoolInvert": "fasta-colors-cold-inverted.json" as ColorFile
 }
 
 //TODO: Use classes in .ts files for better foundation and maintainability
@@ -40,19 +37,25 @@ const PaletteMap: Record<PaletteName, def.PaletteFilePath> = {
 export class BioNotation{ 
     private patcher: PatchColors;
     private targetConfigWorkspace = vscode.ConfigurationTarget.Workspace;
-    private activePalette: def.PaletteFilePath;
+    private readonly defaultPalette: PaletteFilePath;
+    private activePalette: FileMeta;
+    private meta : FileMeta;
    
     private vscCOUT = vscUtils.vscCOUT;
-    private patchTokenColors: (fileName?: string) => Promise<void>;
-    private removeTokenColors: () => Promise<void>;
+    // private patchTokenColors: (fileName?: string) => Promise<void>;
+    // private removeTokenColors: () => Promise<void>;
 
-    constructor(private context: vscode.ExtensionContext) {
-        this.patcher = new PatchColors(context);
-        this.patchTokenColors = this.patcher.patchTokenColors.bind(this.patcher);
-        this.removeTokenColors = this.patcher.removeTokenColors.bind(this.patcher);
-        this.activePalette = PaletteMap["Warm"] ||  "fasta-colors-warm.json" as def.PaletteFilePath;;//TODO: set Sanger Colors as Default
-                                                //TODO: create Sanger Colors Pallete
-                                                //TODO: create Illuminia Colors Pallete
+    constructor(private context: vscode.ExtensionContext, fileName:string) {
+        this.meta = new FileMeta(fileName as JsonFile, context);
+        this.defaultPalette = this.meta.fullFilePath;
+        this.vscCOUT(`File path: ${this.meta.fullFilePath}`)
+        this.patcher = new PatchColors(context, this.meta);
+        // this.patchTokenColors = this.patcher.patchTokenColors.bind(this.patcher);
+        // this.removeTokenColors = this.patcher.removeTokenColors.bind(this.patcher);
+        this.activePalette = this.meta// ||  "fasta-colors-cool.json" as ColorRule;
+        //TODO: create Sanger Colors Pallete
+        //TODO: set Sanger Colors as Default
+        //TODO: create Illuminia Colors Pallete
 
         this.selectPalette = this.selectPalette.bind(this);
         this.toggleColorOverlay = this.toggleColorOverlay.bind(this);
@@ -79,7 +82,7 @@ export class BioNotation{
     }
 
     public async clearColors(): Promise<void> {
-        await this.removeTokenColors();
+        await this.patcher.removeTokenColors();
         await this.updateEnabledFlag(false);
         this.vscCOUT("BioNotation colors cleared.");
     }
@@ -94,25 +97,35 @@ export class BioNotation{
         }
     }
    
+    private extractAlphabet(selection: string){
+        return def.hoverAlpha.find(eachAlpha => selection.includes(eachAlpha)); //Works for small len arrays not the best for larger data
+    }
+
     public async toggleAlphabet(){
-        const options: def.alphabet[] = ["Ambiguous", "Nucleotides", "Aminos"];
-        const userText = def.arrayToStr(["Determine Alphabet for HoverOver Info:",
-                                        "\tProtein: Aminos",
-                                        "\tDNA/RNA: Nucleotides",
-                                        "\tDefault: Ambigious"]);
+        //["Ambiguous", "Nucleotides", "Aminos"];
+        // const searchBarText = 
+        // const dropDownOptions: def.alphabet[] = 
+        const dropDownOptions: string[] = 
+        ["Determine Alphabet for HoverOver Info:",
+            "\tProtein: Aminos",
+            "\tDNA/RNA: Nucleotides",
+            "\tDefault: Ambigious"];
         
-        const selection = await vscUtils.showInterface(options, userText);
+        const selection = await vscUtils.showInterface(dropDownOptions, "Ambiguous\tNucleotides\tAminos");
+        const alpha = this.extractAlphabet(selection!);
             // const selection = await vscode.window.showQuickPick(options, 
             //     { placeHolder: "Select Notation Mode\nAminos\nNucleotides" }
             // );
+        
+        await hoverOver.switchAlphabets(alpha as def.Alphabet);
+        
+        this.vscCOUT(`BioNotation registered alphabet as: ${alpha}`);
 
-        await hoverOver.switchAlphabets(selection as def.alphabet);
-
-        if(selection === "Ambiguous"){
+        if(alpha === "Ambiguous"){
             this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
-        }else if(selection === "Nucleotides"){
+        }else if(alpha === "Nucleotides"){
             this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
-        }else if(selection === "Aminos"){
+        }else if(alpha === "Aminos"){
             this.vscCOUT("Protein:   BioNotation registered letters as Amino Acids on toggle.");
         }else{
             this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
@@ -125,14 +138,14 @@ export class BioNotation{
         // Only treat *true* as active
     }
 
-    public async applyColors(fileName: string= this.activePalette ): Promise<void> {
-        await this.patchTokenColors(fileName);
+    public async applyColors(fileName: string = this.activePalette.fileName ): Promise<void> {
+        await this.patcher.patchTokenColors(fileName);
         await this.updateEnabledFlag(true);
         this.vscCOUT("BioNotation colors applied.");
     }
 
     public async selectPalette(): Promise<void> {
-        const paletteOptions = Object.keys(PaletteMap) as PaletteName[];
+        const paletteOptions = str.capAll(Themes);
     
         const choice = await vscode.window.showQuickPick(paletteOptions, {
             placeHolder: "Select a BioNotation color palette:",
@@ -143,45 +156,64 @@ export class BioNotation{
             this.vscCOUT("No valid palette selected.");
             return;
         }
-        const fileName = this.palettePath(choice);
+        const fileName = this.palettePath(choice.toLowerCase());
         if(!fileName) return;
     
         await this.switchPalettes(fileName);
         this.vscCOUT(`BioNotation colors switched to ${choice} palette.`);
     }
 
-    public palettePath(choice: string | PaletteName): def.PaletteFilePath | undefined {
-        const fileName = PaletteMap[choice as PaletteName];
+    public palettePathORI(choice: string | Theme): ColorFile | undefined {
+        const fileName = PaletteMap[choice?.toLowerCase() as Theme];
         if(!fileName){
             this.vscCOUT(`Palette "${choice}" not found.`);
             return;
         }
         return fileName;
     }
+    
+    public palettePath(theme: Theme): ColorFile | undefined {
+      this.vscCOUT(`palettePath creating new meta for theme: ${theme}`);
+        try {
+            const newMeta = this.meta.genNewColorFile(theme);
+            const fileName = newMeta.fileName;
+            this.vscCOUT(`Generated filename: ${fileName}`);
+            this.activePalette = newMeta;
+            return fileName as ColorFile;
+        } catch (error) {
+            this.vscCOUT(`Error creating FileMeta: ${error}`);
+            return;
+        }
+    }
 
-    public async switchPalettes(fileName : def.PaletteFilePath): Promise<void> {
-        await this.removeTokenColors();
+    public async switchPalettes(fileName : JsonFile): Promise<void> {
+        if (!(await this.isActive())) {
+            this.vscCOUT("Cannot switch palettes when BioNotation is inactive.");
+            return;
+        }
+        await this.patcher.removeTokenColors();
         await this.updateEnabledFlag(true); // Ensure enabled before applying new palette
         // const fileName = PaletteMap.get(PaletteName);
         
-        this.activePalette = fileName;
-        await this.patchTokenColors(fileName);
+        this.activePalette = new FileMeta(fileName, this.context);
+        this.patcher = new PatchColors(this.context, this.activePalette);
+        await this.patcher.patchTokenColors(fileName);
         this.vscCOUT(`BioNotation colors switched for ${fileName}.`);
     }
     
-    public async activate(): Promise<void> {
+    public async setUp(): Promise<void> {
         // this.registerCommands(); //Redundant
         
         if(await this.isActive()){ 
-            await this.patchTokenColors(this.activePalette); // Only apply if enabled
+            await this.patcher.patchTokenColors(this.activePalette.fileName); // Only apply if enabled
             this.vscCOUT("BioNotation colors auto-applied on activation.");
         }else{
             this.vscCOUT("Error: Cannot activate Unless you Toggle On.");
         }
     }
     
-    public async deactivate(): Promise<void> {
-        await this.removeTokenColors(); // Always remove
+    public async breakDown(): Promise<void> {
+        await this.patcher.removeTokenColors(); // Always remove
         await this.updateEnabledFlag(false); // Clear flag
         this.vscCOUT("BioNotation colors removed on deactivation.");
     }
@@ -190,12 +222,12 @@ export class BioNotation{
 let bioNotationInstance: BioNotation;
 
 export function activate(context: vscode.ExtensionContext) {
-    bioNotationInstance = new BioNotation(context);
-    bioNotationInstance.activate();
+    bioNotationInstance = new BioNotation(context,"fasta-colors-warm.json");
+    bioNotationInstance.setUp();
 }
 
 export function deactivate() {
     if (bioNotationInstance) {
-        bioNotationInstance.deactivate();
+        bioNotationInstance.breakDown();
     }
 }

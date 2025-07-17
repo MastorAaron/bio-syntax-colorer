@@ -1,0 +1,209 @@
+{
+  "name": "Jade Dragon",
+  "description": "Jade Dragon Palette",
+  "tokenColors": [
+{
+    "name": "Header",
+    "scope": "fasta.title",
+    "settings": {
+        "foreground": "#00A878"
+    }
+},
+{
+    "name": "Adenine OR Alanine",
+    "scope": "source.fasta.ntA",
+    "settings": {
+        "foreground": "#FB3640"
+    }
+},
+{
+    "name": "Cytosine OR Cysteine",
+    "scope": "source.fasta.ntC",
+    "settings": {
+        "foreground": "#F7D488"
+    }
+},
+{
+    "name": "Guanine OR Glycine",
+    "scope": "source.fasta.ntG",
+    "settings": {
+        "foreground": "#0F6FFF"
+    }
+},
+{
+    "name": "Thymine OR Threonine",
+    "scope": "source.fasta.ntT",
+    "settings": {
+        "foreground": "#2B7A68"
+    }
+},
+{
+    "name": "Uracil OR Selenocysteine",
+    "scope": "source.fasta.ntU",
+    "settings": {
+        "foreground": "#087F8C"
+    }
+},
+{
+    "name": "Any Nuke or Asparagine",
+    "scope": "source.fasta.ntN",
+    "settings": {
+        "foreground": "#A6979C"
+    }
+},
+{
+    "name": "Arginine OR Purine",
+    "scope": "source.fasta.ntR",
+    "settings": {
+        "foreground": "#FFD700"
+    }
+},
+{
+    "name": "Tyrosine OR Pyrimidine",
+    "scope": "source.fasta.ntY",
+    "settings": {
+        "foreground": "#7B0828"
+    }
+},
+{
+    "name": "Asx: Asn or Asp OR not A",
+    "scope": "source.fasta.ntB",
+    "settings": {
+        "foreground": "#996888"
+    }
+},
+{
+    "name": "Aspartate OR not C",
+    "scope": "source.fasta.ntD",
+    "settings": {
+        "foreground": "#FF3C38"
+    }
+},
+{
+    "name": "Histidine OR not G",
+    "scope": "source.fasta.ntH",
+    "settings": {
+        "foreground": "#8BFFFE"
+    }
+},
+{
+    "name": "Valine OR not T/U",
+    "scope": "source.fasta.ntV",
+    "settings": {
+        "foreground": "#0C372F"
+    }
+},
+{
+    "name": "Lysine OR Ketone",
+    "scope": "source.fasta.ntK",
+    "settings": {
+        "foreground": "#3E6990"
+    }
+},
+{
+    "name": "Methionine OR Amino",
+    "scope": "source.fasta.ntM",
+    "settings": {
+        "foreground": "#D34E24"
+    }
+},
+{
+    "name": "Serine OR Strong",
+    "scope": "source.fasta.ntS",
+    "settings": {
+        "foreground": "#EA5B5B"
+    }
+},
+{
+    "name": "Tryptophan OR Weak",
+    "scope": "source.fasta.ntW",
+    "settings": {
+        "foreground": "#183642"
+    }
+},
+{
+    "name": "Gap or Minus Sign",
+    "scope": "source.fasta.symGap",
+    "settings": {
+        "foreground": "#B8B8B8"
+    }
+},
+{
+    "name": "Stop Codon",
+    "scope": "source.fasta.symStop",
+    "settings": {
+        "foreground": "#B8B8B8"
+    }
+},
+{
+    "name": "Phenylalanine",
+    "scope": "source.fasta.aaF",
+    "settings": {
+        "foreground": "#321C20"
+    }
+},
+{
+    "name": "Glutamic Acid",
+    "scope": "source.fasta.aaE",
+    "settings": {
+        "foreground": "#ED4630"
+    }
+},
+{
+    "name": "Glx: Gln or Glu",
+    "scope": "source.fasta.aaZ",
+    "settings": {
+        "foreground": "#7F5F0F"
+    }
+},
+{
+    "name": "(Iso)leucine: L or I",
+    "scope": "source.fasta.aaJ",
+    "settings": {
+        "foreground": "#6E1960"
+    }
+},
+{
+    "name": "Isoleucine",
+    "scope": "source.fasta.aaI",
+    "settings": {
+        "foreground": "#4B0E06"
+    }
+},
+{
+    "name": "Leucine",
+    "scope": "source.fasta.aaL",
+    "settings": {
+        "foreground": "#F69A8E"
+    }
+},
+{
+    "name": "Proline",
+    "scope": "source.fasta.aaP",
+    "settings": {
+        "foreground": "#5486B6"
+    }
+},
+{
+    "name": "Glutamine",
+    "scope": "source.fasta.aaQ",
+    "settings": {
+        "foreground": "#DE996C"
+    }
+},
+{
+    "name": "Pyrrolysine",
+    "scope": "source.fasta.aaO",
+    "settings": {
+        "foreground": "#A9C3DA"
+    }
+},
+{
+    "name": "Any Amino Acid",
+    "scope": "source.fasta.aaX",
+    "settings": {
+        "foreground": "#18293A"
+    }
+}
+  ]
+}

@@ -6,7 +6,9 @@ import { version } from "../package.json";
 
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
+
 import { vscUtils, themeUtils } from "./vscUtils";
+import { FileMeta, PaletteFilePath, JsonFile, ColorFile } from "./fileMeta";
 
 import colorMath from "./colorInverter";
 // import hoverOver from "./hoverOver";
@@ -16,13 +18,12 @@ const DEFAULT_PALETTE = "fasta-colors.json";
 export class PatchColors{
     // private static readonly DEFAULT_PALETTE = DEFAULT_PALETTE ;
     private vscCOUT = vscUtils.vscCOUT;
-    private globalConfig = vscUtils.globalConfig;
-    private editorConfig = vscUtils.editorConfig;
+    private workspaceConfig = vscUtils.editorConfig();
     private currCustomization = vscUtils.currCustomization;
     private colorUtil = new colorMath(this.context);
 
 
-    constructor(private context: vscode.ExtensionContext) {
+    constructor(private context: vscode.ExtensionContext, private meta: FileMeta) {
         this.vscCOUT(`PatchColors initialized with context: ${this.context.extensionPath}`);
     }
 
@@ -58,23 +59,33 @@ export class PatchColors{
         return tagged;                          //Print FileName or Palette Name instead
     }
 
-    public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
-        const colorPath = path.isAbsolute(filename)
-        ? filename
-        : path.join(this.context.extensionPath, "palettes", path.basename(filename));
+    // public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
+    //     const colorPath = path.isAbsolute(filename)
+    //     ? filename
+    //     : path.join(this.context.extensionPath, "palettes", path.basename(filename));
+
     
+    //     // path.join(context.extensionPath, "fasta-colors.json")
+    //     return this.loadColorsFromPath(colorPath as PaletteFilePath);
+    // }
+
+    public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
         // path.join(context.extensionPath, "fasta-colors.json")
+        return this.loadColorsFromPath(this.meta.fullFilePath as PaletteFilePath);
+    }
+
+    public loadColorsFromPath(colorPath: PaletteFilePath): def.ColorRule[]{
         if (!fs.existsSync(colorPath)) {
             throw new Error(`Color file not found: ${colorPath}`);
         }
         const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
         const rules = colors.tokenColors as def.ColorRule[];
+        this.vscCOUT(`Loaded colors from ${colorPath}: ${colors.tokenColors.length} rules`);
         
-        this.vscCOUT(`Loaded colors from ${filename}: ${colors.tokenColors.length} rules`);
         return rules;
     }
 
-    public pullRule(tokenName: string, palettePath: def.PaletteFilePath): def.ColorRule | null {
+    public pullRule(tokenName: string, palettePath: PaletteFilePath): def.ColorRule | null {
         const palette = this.loadColors(palettePath);
         const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
         if (!scope) {
@@ -149,7 +160,7 @@ export class PatchColors{
     // }
     
     public mergeRules(newRules : def.ColorRule[]){
-        const customization = this.currCustomization(this.globalConfig());
+        const customization = this.currCustomization(vscUtils.globalConfig());
         
         const existing = Array.isArray(customization.textMateRules)
         ? customization.textMateRules
@@ -179,7 +190,7 @@ export class PatchColors{
 
     
     private async applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
-        const config = this.editorConfig();
+        const config = this.workspaceConfig;
         
         this.vscCOUT(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
         await config.update(
@@ -205,7 +216,7 @@ export class PatchColors{
     }
     
     public async removeTokenColors(): Promise<void> { 
-        const config = this.editorConfig();
+        const config = this.workspaceConfig;
         const customization = this.currCustomization(config);
         // const customization = config.get("editor.tokenColorCustomizations") || {};
         

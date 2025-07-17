@@ -128,22 +128,6 @@
         {
           "name": "source.fasta.aaX",
           "match": "[Xx]+"
-        },
-                {
-          "name": "source.fastq.plusLine",
-          "match": "^\\+.*"
-        },
-        {
-          "name": "source.fastq.quality.low",
-          "match": "[!-0]+"
-        },
-        {
-          "name": "source.fastq.quality.mid",
-          "match": "[1-K]+"
-        },
-        {
-          "name": "source.fastq.quality.high",
-          "match": "[L-~]+"
         }
       ]
     }
