@@ -25,7 +25,7 @@ export type DeconFile = `${Theme}-deconstruct.json`; // type StripFile = `${stri
 export type JsonFile = LangFile | ColorFile | DeconFile; //| StripFile;
 
 
-export type PaletteFilePath = string & { readonly __paletteFilePath: unique symbol }; // Used for external paths
+export type FilePath = string & { readonly __paletteFilePath: unique symbol }; // Used for external paths
 
 export class FileMeta {
         
@@ -33,7 +33,7 @@ export class FileMeta {
         lang!: Lang;
         theme?: Theme;
         jsonKind!: RuleType;
-        fullFilePath!: PaletteFilePath;
+        fullFilePath!: FilePath;
         variants?: string[];
 
     constructor(public fileName: JsonFile, private context: vscode.ExtensionContext) {
@@ -44,7 +44,7 @@ export class FileMeta {
 
     private genFullFilePath(){
         const folder = (this.jsonKind == "decon")? "palettes/decon" :  this.jsonKind;
-        this.fullFilePath = path.join(this.context.extensionPath, folder, this.fileName) as PaletteFilePath;
+        this.fullFilePath = path.join(this.context.extensionPath, folder, this.fileName) as FilePath;
     }
 
     public isTmLangFile(base : string){

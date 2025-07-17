@@ -68,6 +68,19 @@ export namespace vscUtils{
         vscode.window.showInformationMessage(formatted);
     }
 
+    // export const vscUtils = {
+    //     vscCOUT: function (message: string, forcePopup: boolean = false) {
+    //         const outputChannel = vscode.window.createOutputChannel("BioNotation");
+    //         outputChannel.appendLine(message);
+    //         debugLog.push(message);
+    //         fs.appendFileSync("vscUtilsDebugLog.txt", `${message}\n`);
+    //         if (forcePopup) {
+    //             vscode.window.showInformationMessage(message);
+    //         }
+    //     }
+    // };
+
+
     export function print(toPrint:string, stream:string="console"){
         if(stream === "console"){
             console.log(toPrint);

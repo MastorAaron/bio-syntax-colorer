@@ -8,7 +8,7 @@ import { boolUtils } from "./booleans";
 import * as def from "./definitions";
 
 import { vscUtils, themeUtils } from "./vscUtils";
-import { FileMeta, PaletteFilePath, JsonFile, ColorFile } from "./fileMeta";
+import { FileMeta, FilePath, JsonFile, ColorFile } from "./fileMeta";
 
 import colorMath from "./colorInverter";
 // import hoverOver from "./hoverOver";
@@ -71,10 +71,10 @@ export class PatchColors{
 
     public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
         // path.join(context.extensionPath, "fasta-colors.json")
-        return this.loadColorsFromPath(this.meta.fullFilePath as PaletteFilePath);
+        return this.loadColorsFromPath(this.meta.fullFilePath as FilePath);
     }
 
-    public loadColorsFromPath(colorPath: PaletteFilePath): def.ColorRule[]{
+    public loadColorsFromPath(colorPath: FilePath): def.ColorRule[]{
         if (!fs.existsSync(colorPath)) {
             throw new Error(`Color file not found: ${colorPath}`);
         }
@@ -85,16 +85,16 @@ export class PatchColors{
         return rules;
     }
 
-    public pullRule(tokenName: string, palettePath: PaletteFilePath): def.ColorRule | null {
-        const palette = this.loadColors(palettePath);
-        const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
-        if (!scope) {
-            this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
-            return null;
-        }
-        return palette.find(rule => rule.scope === scope) || null;
-    }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
-    //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
+    // public pullRule(tokenName: string, palettePath: FilePath): def.ColorRule | null {
+    //     const palette = this.loadColors(palettePath);
+    //     const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
+    //     if (!scope) {
+    //         this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
+    //         return null;
+    //     }
+    //     return palette.find(rule => rule.scope === scope) || null;
+    // }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
+    // //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
         
         public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
             if(!rule || !rule.settings) return null;

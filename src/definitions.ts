@@ -2,11 +2,13 @@ export type ColorHex = `#${string}`;
 
 export type FastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
 export type FastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
+export type GenericScope =`source.${string}.${string}`
 
 export type TokenScope = FastAScope | FastQScope;
 export type HeaderScope = `fast${'a' | 'q'}.title`;
-export type NameScope = TokenScope | HeaderScope; 
+export type NameScope = TokenScope | HeaderScope| GenericScope; 
 
+export type RegEx = string;
 
 export interface ColorRule {
     name: string;      //optional Name
@@ -48,12 +50,18 @@ export const aaRecoded   = ['O','U'] as const; //UGA  for U
 export const aaDrifts    = ['B', 'Z', 'J'] as const;
 export const aaWild      = ['X'] as const;
 
-export const nucleotides = ['A','C','G','T','U'] as const;
+export const nukeTrio    = ['A','C','G'] as const;
+export const nukeDuo     = ['T','U'] as const;
+export const nucleotides = [...nukeTrio, ...nukeDuo]
 export const nukeSymbols = ['-'] as const;
-export const aaSymbols   = ['*','-'] as const;//TODO: Stop Codon is Amino not Nuke
-                                                   //TODO: Update for parts of FastQ files
-                                                   //TODO: Quality Scores, ignore lines, etc 
+export const symbols     = ['@','>','*','+','-'] as const;
+export const symString   = ["Title","Stop","Gap"] as const;
+export const aaSymbols   = ['*','-'] as const;
+//TODO: Update for parts of FastQ files
+//TODO: Quality Scores, ignore lines, etc 
+
 export const nukeNots        = ['B', 'D', 'H', 'V'] as const;
+export const pyrimidines     = ['Y', 'T', 'C','U']
 export const nukeBondStrgth  = ['S', 'W'] as const;
 export const functGroupNukes = ['K', 'M'] as const;
 export const ringStructNukes = ['R', 'Y'] as const; 
@@ -85,12 +93,15 @@ export type aa      = negAA | posAA | aroAA | ringAA | polarAA | nonPolarAA;
 export type aaAmbig = driftsAA | wildAA;
 export type aaExtd  = aaAmbig | recodedAA;
 
+export type syms    = (typeof symbols)[number];
+export type symStrs = (typeof symString)[number];
 export type ntSyms = (typeof nukeSymbols)[number];
 export type aaSyms = (typeof aaSymbols)[number];
 
 export type aminos = aa | aaExtd | aaSyms;
 
-
+export type ntTrio = (typeof nukeTrio )[number];
+export type ntDuo  = (typeof nukeDuo)[number];
 export type nt       = (typeof nucleotides)[number];
 
 export type ntNots   = (typeof nukeNots)[number];
@@ -100,7 +111,7 @@ export type ntRingQt = (typeof ringStructNukes)[number];
 
 export type ntWild = (typeof nukeWild)[number];
 
-export type ntExtd = ntNots | ntStrgth | ntFunct | ntRingQt | ntWild ; 
+export type ntExtd = ntDuo | ntNots | ntStrgth | ntFunct | ntRingQt | ntWild; 
 
 export type nukes  = nt | ntExtd  | ntSyms;
 
@@ -207,7 +218,7 @@ export const conflictInfoMap : Record<nukes,string>= {
 // export type Alphabet =  ;
 
 export const hoverAlpha = ["Nucleotides", "Aminos", "Ambiguous"];
-export type Alphabet = (typeof hoverAlpha)[number];
+export type HoverAlphabet = (typeof hoverAlpha)[number];
 export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
@@ -231,6 +242,8 @@ export const nukeRegExMap : Record<ntExtd,string>= {
 
     'R': "[RAG]",
     'Y': "[YTCU]",
+    'U': "[UT]",
+    'T': "[TU]",
 
     'S': "[SGC]",
     'W': "[WTAU]",
@@ -248,46 +261,12 @@ export const fileTypes = ["aTitle","qTitle"] as const
 export type fileTitles = (typeof fileTypes)[number];
 export type tokenType = aminos | fileTitles; 
 
-export const tokenMap : Record<tokenType,NameScope>= {
-    "aTitle":"fasta.title",
-    "qTitle":"fastq.title",
-    'A': "source.fasta.ntA",
-    'C': "source.fasta.ntC",
-    'G': "source.fasta.ntG",
-    'T': "source.fasta.ntT",
-    'U': "source.fasta.ntU",
-
-    'X': "source.fasta.aaX",
-    'N': "source.fasta.ntN",
-    
-    'R': "source.fasta.ntR",
-    'Y': "source.fasta.ntY",
-    
-    'B': "source.fasta.ntB",
-    'D': "source.fasta.ntD",
-    'H': "source.fasta.ntH",
-    'V': "source.fasta.ntV",
-    
-    'K': "source.fasta.ntK",
-    'M': "source.fasta.ntM",
-    
-    'S': "source.fasta.ntS",
-    'W': "source.fasta.ntW",
-    
-    '-': "source.fasta.symGap",
-    '*': "source.fasta.symStop",
-
-    'F': "source.fasta.aaF",
-    'E': "source.fasta.aaE",
-    'Z': "source.fasta.aaZ",
-    
-    'J': "source.fasta.aaJ",
-    'I': "source.fasta.aaI",
-    'L': "source.fasta.aaL",
-    'P': "source.fasta.aaP",
-    
-    'Q': "source.fasta.aaQ",
-    'O': "source.fasta.aaO",
+export const symbolLookUpMap : Record<syms,string>= {
+    '*':"Stop",
+    '-':"Gap",
+    '@':"",
+    '+':"",
+    '>':""
 }
 
 export function isNeg(value: unknown): value is negAA {
@@ -326,6 +305,10 @@ export function isNuke(value: unknown): value is nukes {
     return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, aaSymbols);
 }
 
+export function isSymbol(value: unknown): value is nukes {
+    return isMemberOf(value, symbols) || isMemberOf(value,symString);
+}
+
 export function isMemberOf<Template extends string | ColorRule | PatternRule>(value: unknown, group: readonly Template[]): value is Template {
     return typeof value === "string" && group.includes(value as Template);
 }
@@ -338,6 +321,18 @@ export function arrayToStr(strArr : Array<string> | string): string{
     let newStr="";
     for(const each of strArr){
         newStr+=each+'\n';
+    }
+    return newStr;
+}
+
+export function arrayToArrStr(strArr : string[]): string{
+    let newStr="";
+    for(let i=0; i<strArr.length; i++){
+        const each = strArr[i];
+        newStr+=`"${each}"`;
+        if(i < strArr.length-1){
+            newStr+=','
+        }
     }
     return newStr;
 }
@@ -366,10 +361,10 @@ export const HLight = { //HighLightOptions
     ] as const,
 
     aminoSubOptions: [
-        "N: Nonpolar/Alipathic  LIMVAPG",
-        "P: Polar               STNCQ",
-        "A: Aromatic            WYF",
-        "R: Ringed              WYFHP",
+        "N: Nonpolar/Alipathic: LIMVAPG",
+        "P: Polar:              STNCQ",
+        "A: Aromatic:           WYF",
+        "R: Ringed:             WYFHP",
         "+: Positive\\Basic:    KRH and sometimes O",
         "-: Negative\\Acidic:   ED",
         "B: B Drift:            Asx: Asn or Asp",
@@ -396,3 +391,17 @@ export type HLSelect =
     typeof HLight.alphaSubOptions[number] |
     typeof HLight.aminoSubOptions[number] |
     typeof HLight.nucleotideSubOptions[number];
+
+    export const tokenStripMap : Record<string,Record<string,string[]>>= {
+    "fasta":{ 
+        "title": ['>'] ,
+        "nt"   : ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
+        "sym"  : ['Gap','Stop'] , // '-': "symGap", // '*': "symStop",
+        "aa"   : ['F','E','Z','J','I','L','P','Q','O','X'] ,
+    },
+    "fastq": {
+        "title"  : ['@'] ,
+        "plus"   : ["Line"] ,
+        "quality": ["low","mid","high"]
+    } 
+}

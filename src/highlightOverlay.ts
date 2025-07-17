@@ -8,8 +8,9 @@ export class HighLightOverlayController {
         return vscode.window.activeTextEditor;
     }
 
-    private extractMatchRanges(pattern: string, doc : vscode.TextDocument){
-        const regEx = new RegExp(pattern, "gi");
+    private extractMatchRanges(patternOrRegEx: string  | RegExp, doc : vscode.TextDocument){
+        const regEx = typeof patternOrRegEx === "string" ? new RegExp(patternOrRegEx, "gi") : patternOrRegEx;
+        // const regEx = new RegExp(patternOrRegEx, "gi");
         const ranges: vscode.Range[] = [];
 
         for(let i=0; i< doc.lineCount; i++){
@@ -36,16 +37,16 @@ export class HighLightOverlayController {
         return highLightType;
     }
 
-    public applyHighLight(pattern: string, color: string){
+    public applyHighLight(patternOrRegEx: string | RegExp, color: string){
         const editor = this.getConfig();
         if(!editor) return;
         const doc = editor.document;
        
-        const ranges = this.extractMatchRanges(pattern,doc);
-        const highLightType = this.defineHighLight(pattern, color);
+        const ranges = this.extractMatchRanges(patternOrRegEx,doc);
+        const highLightType = this.defineHighLight(patternOrRegEx.toString(), color);
 
         editor.setDecorations(highLightType, ranges);
-        this.activehighLights.set(pattern, ranges);
+        this.activehighLights.set(patternOrRegEx.toString(), ranges);
     }
 
     public clearAllHighLights(){
