@@ -23,9 +23,9 @@ export class LangGenerator extends RuleWriter{
     }
 
     // export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
-    public genRegEx(letter: string, tokenType: string): def.RegEx {
-        const reg = this.regi.regExSwitch(letter, tokenType);
-            if (!reg) throw new Error(`Unknown alphabet: ${tokenType}`);
+    public genRegEx(letter: string, alphabet: string): def.RegEx {
+        const reg = this.regi.regExSwitch(letter, alphabet);
+            if (!reg) throw new Error(`Unknown alphabet: ${alphabet}`);
         return reg;
     }
     

@@ -74,15 +74,19 @@ export class HoverObj{
         });
     }
 
+    public async setAlphabet(selection: def.HoverAlphabet){
+        this.currAlpha = selection;
+        await vscode.workspace.getConfiguration().update(
+            "bioNotation.alphabet",
+            selection,
+            vscode.ConfigurationTarget.Workspace
+            );
+        this.vscCOUT(`BioNotation alphabet mode set to: ${selection}`);
+    }
+
     public async switchAlphabets(selection: def.HoverAlphabet) {
         if (selection === "Ambiguous" || selection === "Nucleotides" || selection === "Aminos") {
-            this.currAlpha = selection;
-            await vscode.workspace.getConfiguration().update(
-                "bioNotation.alphabet",
-                selection,
-                vscode.ConfigurationTarget.Workspace
-                );
-            this.vscCOUT(`BioNotation alphabet mode set to: ${selection}`);
+           await this.setAlphabet(selection);
         }else{
             this.vscCOUT("Error: no valid Alphabet selection\n",
                 `Fallback is Default: ${this.DEFAULT_ALPHABET}`

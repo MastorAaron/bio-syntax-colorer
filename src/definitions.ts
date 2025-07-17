@@ -249,12 +249,12 @@ export const nukeRegExMap : Record<ntExtd,string>= {
     'W': "[WTAU]",
 
     'K': "[KTUG]",
-    'M': "[NAC]",
+    'M': "[MAC]",
 
-    'B': "[BCGTU]",
-    'D': "[DAGTU]",
-    'H': "[HACTU]",
-    'V': "[VACG]",
+    'B': "[BCGTUY]",
+    'D': "[DAGTURW]",
+    'H': "[HACTUYWM]",
+    'V': "[VACGRSM]",
 }
 
 export const fileTypes = ["aTitle","qTitle"] as const
@@ -362,14 +362,15 @@ export const HLight = { //HighLightOptions
 
     aminoSubOptions: [
         "N: Nonpolar/Alipathic: LIMVAPG",
-        "P: Polar:              STNCQ",
+        "P: Polar:              STNCQ and sometimes U",
         "A: Aromatic:           WYF",
         "R: Ringed:             WYFHP",
         "+: Positive\\Basic:    KRH and sometimes O",
         "-: Negative\\Acidic:   ED",
-        "B: B Drift:            Asx: Asn or Asp",
-        "Z: Z Drift:            Glx: Gln or Glu",
-        "J: J Drift:            (Iso)leucine: L or I"
+        
+        "B: B Drift:            Asx: Asn or Asp: N or D",
+        "Z: Z Drift:            Glx: Gln or Glu: Q or E",
+        "J: J Drift:            (Iso)leucine: Leu or Ile: L or I"
     ] as const,
 
     nucleotideSubOptions: [
@@ -379,6 +380,9 @@ export const HLight = { //HighLightOptions
         "W: Weak Bonds      A or T/U",
         "K: Ketone Group    G or T/U",
         "M: Amino Group     A or C",
+        
+        "N: All Nucleotides A, C, G, or T/U",
+
         "B: Not A           C, G, or T/U",
         "D: Not C           A, G, or T/U",
         "H: Not G           A, C, or T/U",

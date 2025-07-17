@@ -104,20 +104,21 @@ export class BioNotation{
     }
 
     private printSelectionHighLight(selection: string, alpha: string ) {
-        const nukeStr = "Nucleic acids";
-        const aminoStr = "Amino acids";
+        const nukeStr = "Nucleotides";
+        const aminoStr = "Aminos";
 
-        
-        if(alpha == "Aminos" as def.HoverAlphabet){
+        if(alpha === "Aminos" || alpha === "Amino Properties"){
             this.printSelectLine(selection, aminoStr);
-        } else if(alpha == "Nucleotides" as def.HoverAlphabet){
+        } else if(alpha === "Nucleotides" || alpha === "Nucleotide Categories"){
+            this.printSelectLine(selection, nukeStr);
+        } else if(alpha === "Alphabet" ){
             this.printSelectLine(selection, nukeStr);
         } else if(this.arrIsSubOfString(selection,["Clear"])){
             this.vscCOUT("Cleared: BioNotation's highlighted blocks.");
         } else if(this.arrIsSubOfString(selection,["Kmer"])){
             this.vscCOUT("Kmer:   BioNotation registered user entry as pattern.");
         } else {
-            this.vscCOUT(`Invalid input: ${selection}.`);
+            this.vscCOUT(`[printSelection]: Invalid input: ${selection}.`);
         }
     }
     
@@ -142,6 +143,63 @@ export class BioNotation{
     }
 
     public async hLUserChoice(): Promise<[def.HLSelect, string] | undefined> {
+        // const currAlpha = hoverOver.getCurrAlpha();
+        // if(currAlpha === "Ambiguous" as def.HoverAlphabet){
+        //     return await this.hLAmbigUserChoice();
+        // }else if(currAlpha === "Nucleotides" as def.HoverAlphabet){
+        //     return await this.hLNukeUserChoice();
+        // }else if(currAlpha === "Aminos" as def.HoverAlphabet){
+        //     return await this.hLAmbigUserChoice();
+        // }else{
+        //     this.vscCOUT(`[hLUserChoice]: Invalid input: ${currAlpha}.`);
+            return await this.hLAmbigUserChoice();
+        // }
+    }
+
+    private async hLAmbigUserChoice(): Promise<[def.HLSelect, string] | undefined> {
+        const firstSelection = await vscUtils.showInterface([...def.HLight.topLevelOptions], "Choose or Type Highlight Category") as def.HLSelect;
+            if (!firstSelection) return;
+
+        if (firstSelection === def.kmerText as def.HLSelect) {
+            const result = await this.secondChoice([...def.HLight.alphaSubOptions], "Alphabet"); 
+            // const secondSelection = await vscUtils.showInterface([...def.HLight.alphaSubOptions], "Choose Alphabet") as def.HLSelect;
+            if (!result) return;//     if (!secondSelection) return;  // this.printSelectionHighLight(secondSelection);
+            const [secondSelection, junk] = result;
+            hoverOver.setAlphabet(secondSelection);
+            return [firstSelection, secondSelection as def.HLSelect];
+        }
+
+        if (firstSelection === def.aminoText  as def.HLSelect) {
+            const result = await this.secondChoice([...def.HLight.aminoSubOptions], def.aminoText);
+            if (!result) return;
+            let [secondSelection, lang] = result;
+            //Distinguish Amino Properties
+            if(secondSelection[0] ==  'B' || secondSelection[0] ==  'J' || secondSelection[0] ==  'Z'){
+                lang = "Aminos";
+            }
+            hoverOver.setAlphabet("Aminos");
+            return [secondSelection, lang as def.HLSelect];
+            
+        }
+        
+        if (firstSelection === def.nukeText as def.HLSelect) {
+            hoverOver.setAlphabet("Nucleotides");
+            return await this.secondChoice([...def.HLight.nucleotideSubOptions], def.nukeText);
+        }
+        
+        if (firstSelection === def.clearText as def.HLSelect) {
+            await this.clearHighLightOverlays();
+            return;
+        }
+        
+        // TODO: Limit the language choices based on getCurrAlpha() from HoverOver?
+        
+        // this.printSelectionHighLight(firstSelection, lang);
+        hoverOver.setAlphabet("Ambiguous");
+        return [firstSelection, "Ambiguous"];
+    }
+    
+    private async hLNukeUserChoice(): Promise<[def.HLSelect, string] | undefined> {
         const firstSelection = await vscUtils.showInterface([...def.HLight.topLevelOptions], "Choose or Type Highlight Category") as def.HLSelect;
             if (!firstSelection) return;
 
@@ -153,12 +211,8 @@ export class BioNotation{
             return [firstSelection, secondSelection as def.HLSelect];
         }
 
-        if (firstSelection === def.aminoText  as def.HLSelect) {
-            return await this.secondChoice([...def.HLight.aminoSubOptions], "Aminos");
-        }
-
         if (firstSelection === def.nukeText as def.HLSelect) {
-            return await this.secondChoice([...def.HLight.nucleotideSubOptions], "Nucleotides");
+            return await this.secondChoice([...def.HLight.nucleotideSubOptions], def.nukeText);
         }
         
         if (firstSelection === def.clearText as def.HLSelect) {
@@ -168,7 +222,7 @@ export class BioNotation{
 
         // TODO: Limit the language choices based on getCurrAlpha() from HoverOver
 
-        // this.printSelectionHighLight(firstSelection, alpha);
+        // this.printSelectionHighLight(firstSelection, lang);
         return [firstSelection, "Ambiguous"];
     }
 
@@ -185,7 +239,7 @@ export class BioNotation{
         if(selection === def.kmerText as def.HLSelect)
             return await vscUtils.showInputBox("Enter a kmer/Codon/pattern","ATG, GCT, etc.");
         
-        if(alpha === "Nucleotides" || alpha === "Aminos"){
+        if(alpha === "Nucleotide Categories" || alpha === "Aminos" || alpha === "Amino Properties"){
             return selection[0];
         }
         return undefined;
@@ -197,6 +251,7 @@ export class BioNotation{
         const [selection, alpha] = result;
 
         this.vscCOUT(`Alpha passed to patternChoice: ${alpha}`);
+        this.vscCOUT(`Selection passed to patternChoice: ${selection}`);
         const pattern = await this.patternChoice(selection, alpha);
             if (!pattern) return;
 

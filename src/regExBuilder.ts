@@ -44,8 +44,7 @@ export class RegExBuilder{
         return this.genTypedRegEx(strand, def.aminoPropertyRegExMap,allCase,block);
     }
 
-
-    public regExSwitch(strand: string, alpha: def.HoverAlphabet){
+    public regExSwitch(strand: string, alpha: string){
         vscUtils.vscCOUT(`regExSwitch → strand: ${strand}, alpha: ${alpha}`);
         vscUtils.vscCOUT(`alpha check =`, alpha === "Nucleotides", alpha === "Aminos", alpha === "Aminos Properties");
 
@@ -60,13 +59,14 @@ export class RegExBuilder{
         switch(alpha){
             case "Nucleotides":
             case "Nucleotide Categories":
-                
+            case "Nucleic acids":
                 console.log(`Map check:`, def.nukeRegExMap);
                 console.log(`genNukeRegEx map key check for S:`, def.nukeRegExMap["S"]);
                 return this.genNukeRegEx(strand, allCase, block);
+            case "Amino acids":
             case "Aminos":
                 return this.genAminoRegEx(strand, allCase, block)
-            case "Aminos Properties":
+            case "Amino Properties":
                 return this.genAminoPropertyRegEx(strand, allCase, block);
             default:
                 vscUtils.vscCOUT("regExSwitch used default");
