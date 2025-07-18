@@ -1,0 +1,62 @@
+{
+"$schema": "../schemas/deconstruct.schema.json",
+"description": "Jade Dragon Decon Palette",
+    "fasta": {
+        "title": {
+            ">": "#00A878"
+        },
+        "nt": {
+            "A": "#FB3640",
+            "C": "#F7D488",
+            "G": "#0F6FFF",
+            "T": "#2B7A68",
+            
+            "U": "#087F8C",
+            
+            "N": "#A6979C",
+            
+            "R": "#FFD700",
+            "Y": "#7B0828",
+            
+            "B": "#996888",
+            "D": "#FF3C38",
+            "H": "#8BFFFE",
+            "V": "#0C372F",
+            
+            "K": "#3E6990",
+            "M": "#D34E24",
+            "S": "#EA5B5B",
+            "W": "#183642"
+        },
+        "sym": {
+            "Gap" : "#B8B8B8",
+            "Stop": "#B8B8B8"
+        },
+        "aa": {
+            "E": "#ED4630",
+            "Q": "#DE996C",
+            "Z": "#7F5F0F",
+            "F": "#321C20",
+            
+            "L": "#F69A8E",
+                "I": "#4B0E06",
+                "J": "#6E1960",
+            "P": "#5486B6",
+            "O": "#A9C3DA",
+            "X": "#18293A"
+        }
+    },
+    "fastq": {
+        "title": {
+            "@": "#8D93C7"
+        },
+        "plus": {
+            "Line": "#CD7F32"
+        },
+        "quality": {
+            "low" : "#0000FF",
+            "mid" : "#7851A9",
+            "high": "#FFD700"
+        }
+    }
+    }

@@ -1,32 +1,45 @@
 import * as vscode from "vscode";
 import * as def from "./definitions";
-import * as rW from "./ruleWriter";
+// import * as rW from "./ruleWriter";
+import { RuleWriter, PaletteParams } from "./ruleWriter";
 import * as fs from "fs";
 
-import { RuleWriter, PaletteParams, JsonFile, DeconFile } from "./ruleWriter";
 import { vscUtils, themeUtils } from "./vscUtils";
 import { HoverObj } from "./hoverOver";
 import { Theme } from "./extension";
+import { FileMeta, LangFile, DeconFile, ColorFile, JsonFile, Lang, RuleType, FilePath } from "./fileMeta";
+
+export interface DeconstructedPalette {
+  [language: string]: {
+    [tokenGroup: string]: {
+      [token: string]: string;
+    };
+  };
+}
 
 export class PaletteGenerator extends RuleWriter{
     protected fileDescript : string; 
-    protected palFlavor : Theme;
+    protected theme : Theme;
+    private deconMeta?: FileMeta;
 
     private deconInput? : DeconFile;
     protected deconOutput? : DeconFile;
 
     constructor(context: vscode.ExtensionContext, params : PaletteParams){
-        const meta = new rW.FileMeta(params.paletteFile);
+        const meta = new FileMeta(params.paletteFile,context);
 
         if (meta.jsonKind !== "palettes") {
             throw new Error(`Invalid file passed to LangGenerator: ${params.paletteFile}`);
         }
 
         super(context, meta.lang, "palettes");
-
-        this.palFlavor = meta.theme!;
+        this.theme = meta.theme!;
         this.fileDescript = params.descript;
-        this.deconInput = params.deconPalFile;
+        
+        if (params.deconFile) {
+            this.deconMeta = new FileMeta(params.deconFile, context);
+        }
+        this.finalizePathSetup();
     }
 
     private deterFontSytle(tokenType : string): string{
@@ -34,13 +47,13 @@ export class PaletteGenerator extends RuleWriter{
     }
 
     override genOutputFileStr(): JsonFile{
-        return `${this.fileType}-colors-${this.palFlavor}.json` as JsonFile;
+        return `${this.fileType}-colors-${this.theme}.json` as ColorFile;
     }
     
     private pullDeconColor( lang : string, tokenType : string, letter : string ): def.ColorHex{
         const palette = this.pullDeconPalette();
 
-        const tokenGroup = palette[lang]?.[tokenType];
+        const tokenGroup = palette[lang]?.[tokenType] || palette[lang]?.[tokenType.toLowerCase()];
             if (!tokenGroup) {
                 throw new Error(`Token group '${tokenType}' not found in palette for ${lang}`);
             }
@@ -54,9 +67,9 @@ export class PaletteGenerator extends RuleWriter{
 
     private genColorRule( lang : string, tokenType : string, letter : string ): def.ColorRule {
         //Use Ambigous Descriptions from Defintions as Name parameter 
-        const currAlpha = def.deterAlpha(tokenType);
+        // const currAlpha = def.deterAlpha(tokenType);
 
-        const name = def.getDescription(letter, currAlpha,`./null.${this.fileType}` as def.FilePath,true).trim();
+        const name = def.getDescription(letter, "Ambigous" as def.Alphabet,`./null.${this.fileType}` as FilePath,true).trim();
         const scope = this.genPatternNameScope(letter, tokenType) as def.NameScope;
             const colorHex = this.pullDeconColor( lang, tokenType, letter );
             const foreground = `${colorHex}` as def.ColorHex;
@@ -66,7 +79,7 @@ export class PaletteGenerator extends RuleWriter{
         return {name,scope,settings};
     }
 
-    public readFromFile(filePath : JsonFile | DeconFile): string{
+    public readFromFile(filePath : FilePath): string{
         return fs.readFileSync(filePath, "utf8");      
     }
 
@@ -89,11 +102,11 @@ export class PaletteGenerator extends RuleWriter{
         vscUtils.print(`Color bound to Rule for ${letter} (${tokenType}) to (${this.actualPalFile})`);
     }
 
-        private pullDeconPalette():def.DeconstructedPalette{
-        if (!this.deconInput) {
+    private pullDeconPalette():DeconstructedPalette{
+        if (!this.deconMeta?.fullFilePath) {
             throw new Error("No deconstructed palette file provided.");
         }
-        const raw = this.readFromFile(this.deconInput);      
+        const raw = this.readFromFile(this.deconMeta.fullFilePath);      
         return JSON.parse(raw);
     }
 
@@ -131,7 +144,7 @@ export class PaletteGenerator extends RuleWriter{
 }
     override writeFileTopper(){
         this.writeToFile("{");
-        this.writeToFile(`  "name": "${this.capFront(this.palFlavor!)}",`);
+        this.writeToFile(`  "name": "${this.capFront(this.theme!)}",`);
         this.writeToFile(`  "description": "${this.fileDescript}",`);
         this.writeToFile(`  "tokenColors": [`);
     }
@@ -141,25 +154,32 @@ export class PaletteGenerator extends RuleWriter{
         this.writeToFile(`}`);
     }
     
-    public writeRules(lang : string){
+    private writeTokens(lang : string){
         const entries = Object.entries(def.tokenStripMap[lang]);
-        this.writeFileTopper();
-
         const total = entries.reduce((sum, [, tokens]) => sum + tokens.length, 0);
-        let count = 0;
-
+        
+        let commaCtr = 0;
         for(let i = 0; i < entries.length; i++){
             const [ tokenType , tokens ] = entries[i];
             
             for(let j = 0; j < tokens.length; j++){
                 const token = tokens[j];
-                count++;
+                commaCtr++;
 
-                const comma = count < total ? "," : "";
-                this.writeRule(token, tokenType, comma);
+                const comma = (commaCtr < total) ? "," : "";
+                // this.writeRule(token, tokenType, comma);
+                this.writeRule(lang, tokenType, token, comma);
             }
         }
-        this.writeFileEnd();
     }
 
+    public writeRules(lang : string){
+        this.writeFileTopper();
+        if(lang == "fastq"){
+            this.writeTokens("fasta");
+            this.writeToFile(`,`)
+        }
+        this.writeTokens(lang);
+        this.writeFileEnd();
+    }
 }

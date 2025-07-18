@@ -1,0 +1,245 @@
+{
+  "name": "Jadedragon",
+  "description": "Jade Dragon Palette",
+  "tokenColors": [
+{
+    "name": "Header",
+    "scope": "fastq.title",
+    "settings": {
+        "foreground": "#00A878"
+    }
+},
+{
+    "name": "Adenine OR Alanine",
+    "scope": "source.fastq.ntA",
+    "settings": {
+        "foreground": "#FB3640"
+    }
+},
+{
+    "name": "Cytosine OR Cysteine",
+    "scope": "source.fastq.ntC",
+    "settings": {
+        "foreground": "#F7D488"
+    }
+},
+{
+    "name": "Guanine OR Glycine",
+    "scope": "source.fastq.ntG",
+    "settings": {
+        "foreground": "#0F6FFF"
+    }
+},
+{
+    "name": "Thymine OR Threonine",
+    "scope": "source.fastq.ntT",
+    "settings": {
+        "foreground": "#2B7A68"
+    }
+},
+{
+    "name": "Uracil OR Selenocysteine",
+    "scope": "source.fastq.ntU",
+    "settings": {
+        "foreground": "#087F8C"
+    }
+},
+{
+    "name": "Any Nuke or Asparagine",
+    "scope": "source.fastq.ntN",
+    "settings": {
+        "foreground": "#A6979C"
+    }
+},
+{
+    "name": "Arginine OR Purine",
+    "scope": "source.fastq.ntR",
+    "settings": {
+        "foreground": "#FFD700"
+    }
+},
+{
+    "name": "Tyrosine OR Pyrimidine",
+    "scope": "source.fastq.ntY",
+    "settings": {
+        "foreground": "#7B0828"
+    }
+},
+{
+    "name": "Asx: Asn or Asp OR not A",
+    "scope": "source.fastq.ntB",
+    "settings": {
+        "foreground": "#996888"
+    }
+},
+{
+    "name": "Aspartate OR not C",
+    "scope": "source.fastq.ntD",
+    "settings": {
+        "foreground": "#FF3C38"
+    }
+},
+{
+    "name": "Histidine OR not G",
+    "scope": "source.fastq.ntH",
+    "settings": {
+        "foreground": "#8BFFFE"
+    }
+},
+{
+    "name": "Valine OR not T/U",
+    "scope": "source.fastq.ntV",
+    "settings": {
+        "foreground": "#0C372F"
+    }
+},
+{
+    "name": "Lysine OR Ketone",
+    "scope": "source.fastq.ntK",
+    "settings": {
+        "foreground": "#3E6990"
+    }
+},
+{
+    "name": "Methionine OR Amino",
+    "scope": "source.fastq.ntM",
+    "settings": {
+        "foreground": "#D34E24"
+    }
+},
+{
+    "name": "Serine OR Strong",
+    "scope": "source.fastq.ntS",
+    "settings": {
+        "foreground": "#EA5B5B"
+    }
+},
+{
+    "name": "Tryptophan OR Weak",
+    "scope": "source.fastq.ntW",
+    "settings": {
+        "foreground": "#183642"
+    }
+},
+{
+    "name": "Gap or Minus Sign",
+    "scope": "source.fastq.symGap",
+    "settings": {
+        "foreground": "#B8B8B8"
+    }
+},
+{
+    "name": "Stop Codon",
+    "scope": "source.fastq.symStop",
+    "settings": {
+        "foreground": "#B8B8B8"
+    }
+},
+{
+    "name": "Phenylalanine",
+    "scope": "source.fastq.aaF",
+    "settings": {
+        "foreground": "#321C20"
+    }
+},
+{
+    "name": "Glutamic Acid",
+    "scope": "source.fastq.aaE",
+    "settings": {
+        "foreground": "#ED4630"
+    }
+},
+{
+    "name": "Glx: Gln or Glu",
+    "scope": "source.fastq.aaZ",
+    "settings": {
+        "foreground": "#7F5F0F"
+    }
+},
+{
+    "name": "(Iso)leucine: L or I",
+    "scope": "source.fastq.aaJ",
+    "settings": {
+        "foreground": "#6E1960"
+    }
+},
+{
+    "name": "Isoleucine",
+    "scope": "source.fastq.aaI",
+    "settings": {
+        "foreground": "#4B0E06"
+    }
+},
+{
+    "name": "Leucine",
+    "scope": "source.fastq.aaL",
+    "settings": {
+        "foreground": "#F69A8E"
+    }
+},
+{
+    "name": "Proline",
+    "scope": "source.fastq.aaP",
+    "settings": {
+        "foreground": "#5486B6"
+    }
+},
+{
+    "name": "Glutamine",
+    "scope": "source.fastq.aaQ",
+    "settings": {
+        "foreground": "#DE996C"
+    }
+},
+{
+    "name": "Pyrrolysine",
+    "scope": "source.fastq.aaO",
+    "settings": {
+        "foreground": "#A9C3DA"
+    }
+},
+{
+    "name": "Any Amino Acid",
+    "scope": "source.fastq.aaX",
+    "settings": {
+        "foreground": "#18293A"
+    }
+}
+,
+{
+    "name": "Header",
+    "scope": "fastq.title",
+    "settings": {
+        "foreground": "#8D93C7"
+    }
+},
+{
+    "name": "Line",
+    "scope": "source.fastq.plusLine",
+    "settings": {
+        "foreground": "#CD7F32"
+    }
+},
+{
+    "name": "Phred Score: Low Quality Read Score",
+    "scope": "source.fastq.quality.low",
+    "settings": {
+        "foreground": "#0000FF"
+    }
+},
+{
+    "name": "Phred Score: Medium Quality Read Score",
+    "scope": "source.fastq.quality.mid",
+    "settings": {
+        "foreground": "#7851A9"
+    }
+},
+{
+    "name": "Phred Score: High Quality Read Score",
+    "scope": "source.fastq.quality.high",
+    "settings": {
+        "foreground": "#FFD700"
+    }
+}
+  ]
+}

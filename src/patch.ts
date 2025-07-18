@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 
 import { version } from "../package.json";
-import { ColorFile, FileMeta } from "./ruleWriter";
+import { ColorFile, FileMeta } from "./fileMeta";
 
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
@@ -32,7 +32,7 @@ export class PatchColors{
         }
 
         this.vscCOUT(`PatchColors initialized with context: ${this.context.extensionPath}`);
-        this.vscCOUT(`PatchColors initialized with palette: ${this.metaFile.filePath}`);
+        this.vscCOUT(`PatchColors initialized with palette: ${this.metaFile.fullFilePath}`);
     }
 
     public versionTagRule(rule: def.ColorRule): def.ColorRule{
@@ -67,7 +67,7 @@ export class PatchColors{
         return tagged;                          //Print FileName or Palette Name instead
     }
 
-    public loadColors(filename = this.metaFile.filePath as ColorFile): def.ColorRule[]{
+    public loadColors(filename = this.metaFile.fullFilePath as ColorFile): def.ColorRule[]{
        // resolve the expected on-disk location
         const candidate = path.isAbsolute(filename)
             ? filename
@@ -217,7 +217,7 @@ export class PatchColors{
         this.vscCOUT("Custom token colors applied.");
     }
 
-    public async patchTokenColors(fileName: ColorFile = this.metaFile.filePath as ColorFile): Promise<void> {
+    public async patchTokenColors(fileName: ColorFile = this.metaFile.fullFilePath as ColorFile): Promise<void> {
         try{
             let rules    = this.loadColors(fileName);
             let tagged   = this.tagColorsGenRules(rules)

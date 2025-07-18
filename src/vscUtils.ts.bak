@@ -59,10 +59,10 @@ export namespace vscUtils{
         return typeof scope === "string" && scope.startsWith("source.fasta.");
     }
     
-    export async function showInterface(dropDownOptions: string[], searchBarText: string): Promise<string | undefined>{
+    export async function showInterface(options: string[], userText: string): Promise<string | undefined>{
         return await vscode.window.showQuickPick(
-            dropDownOptions,
-            { placeHolder: searchBarText }
+            options,
+            { placeHolder: userText }
         );
     }
     

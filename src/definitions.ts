@@ -1,4 +1,5 @@
 import { boolUtils } from "./booleans";
+import { FilePath } from "./fileMeta";
 
 export type ColorHex = `#${string}`;
 
@@ -28,13 +29,7 @@ export interface FlatTokenPalette {
   tokenColors: TokenColorRule[];
 }
 
-export interface DeconstructedPalette {
-  [language: string]: {
-    [tokenGroup: string]: {
-      [token: string]: string;
-    };
-  };
-}
+
 
 export interface ColorRule {
     name: string;      
@@ -47,10 +42,10 @@ export interface ColorRule {
     };
 }
 
-export type RegEx = string;
+
 export interface PatternRule {
     name: NameScope;      
-    match: RegEx; 
+    match: RegExp; 
 }
 
 export function isColorRule(obj: any): obj is ColorRule {
@@ -189,7 +184,9 @@ export const symInfoMap : Record<string,string[]>= {
     '@'  : ["Header"],
     '>'  : ["Header"],
     '*'  : ["Stop Codon"],
+    'Stop'  : ["Stop Codon"],
     '-'  : ["Gap or Minus Sign"],
+    "Gap"  : ["Gap or Minus Sign"],
     '+'  : ["Sequence_ID line"],
     "low": ["Phred Score: Low Quality Read Score"],
     "mid": ["Phred Score: Medium Quality Read Score"],
@@ -267,8 +264,8 @@ export const conflictInfoMap : Record<nukes,string[]>= {
     
     '-':["Gap or Minus Sign"]
 }
-
-export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
+export const hoverAlpha = ["Nucleotides", "Aminos", "Ambiguous", "Aminos Properties", "Nucleotide Categories"];
+export type Alphabet = (typeof hoverAlpha)[number];
 export type TagCategory = "version" | "userRule" | "highLightRule";
 
 // export const symbolRegExMap : Record<syms,string>= {
@@ -286,11 +283,11 @@ export const symbolLookUpMap : Record<syms,string>= {
     '>':""
 }
 
-export function getDescription(letter: string, currAlpha: alphabet, file : FilePath, directName :boolean=false): string{
+export function getDescription(letter: string, currAlpha: Alphabet, file : FilePath, directName :boolean=false): string{
     return arrayToStr(getInfoMap(letter, currAlpha, file, directName));
 }
 
-export function getInfoMap(letter: string, currAlpha: alphabet, fileName: FilePath, directName: boolean=false): Array<string | nukes | aminos>{
+export function getInfoMap(letter: string, currAlpha: Alphabet, fileName: string, directName: boolean=false): Array<string | nukes | aminos>{
     if (currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
         return nukeInfoMap[letter as nukes] || letter;
     } 
@@ -312,7 +309,7 @@ export function getInfoMap(letter: string, currAlpha: alphabet, fileName: FilePa
     return [letter];
 }
 
-export function getRegEx(letter: string, currAlpha: alphabet, directName: boolean=false): string | nukes | aminos{
+export function getRegEx(letter: string, currAlpha: Alphabet, directName: boolean=false): string | nukes | aminos{
     if (currAlpha === "Nucleotides" ) {
         return nukeRegExMap[letter as ntExtd] || letter;
     } 
@@ -344,8 +341,8 @@ export const nukeRegExMap : Record<ntExtd,string>= {
 
     'B': "[BCGTUY]",
     'D': "[DAGTURW]",
-    'H': "[HACTUYW]",
-    'V': "[VACGRS]",
+    'H': "[HACTUYWM]",
+    'V': "[VACGRSM]",
 }
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
@@ -412,9 +409,9 @@ export const tokenMap : Record<tokenType,NameScope>= {
 
 export const tokenStripMap : Record<string,Record<string,string[]>>= {
     "fasta":{ 
-        "Title": ['>'] ,
+        "title": ['>'] ,
         "nt":    ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
-        "sym":   ['-','*'] , // '-': "symGap", // '*': "symStop",
+        "sym":   ['Gap','Stop'] , // '-': "symGap", // '*': "symStop",
         "aa" :   ['F','E','Z','J','I','L','P','Q','O','X'] ,
     },
     "fastq": {
@@ -424,14 +421,14 @@ export const tokenStripMap : Record<string,Record<string,string[]>>= {
     } 
 }
 
-export function deterAlpha(token: string): alphabet{
+export function deterAlpha(token: string): Alphabet{
     switch(token){  
         case "nt":
             return "Nucleotides" ;
         case "aa":
             return "Aminos";
         case "sym":
-        case "Title":
+        case "title":
             return "Ambiguous";
         default:
             console.log(`${token} not in any known Def.Alphabet currently`);
@@ -491,7 +488,7 @@ export function isAmino(value: unknown): value is nukes {
 }
 
 export function isSymbol(value: unknown): value is nukes {
-    return isMemberOf(value, symbols);
+    return isMemberOf(value, symbols) || isMemberOf(value,symString);
 }
 
 export function isMemberOf<Template extends string | ColorRule | PatternRule>(value: unknown, group: readonly Template[]): value is Template {
@@ -522,8 +519,7 @@ export function arrayToArrStr(strArr : string[]): string{
     return newStr;
 }
 
-export type PaletteFilePath = string & { readonly __paletteFilePath: unique symbol };
-export type FilePath = string & { readonly __paletteFilePath: unique symbol };
+// export type FilePath = string & { readonly __paletteFilePath: unique symbol };
 
 export const kmerText = "Find Entered Pattern: kmer, Codon, letter, etc" as const;
 export const nukeText = "Nucleotide Categories" as const;

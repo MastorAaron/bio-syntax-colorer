@@ -1,5 +1,5 @@
 {
-"$schema": "./schemas/deconstruct.schema.json",
+"$schema": "../schemas/deconstruct.schema.json",
 "description": "Cool Decon Palette",
     "fasta": {
         "title": {

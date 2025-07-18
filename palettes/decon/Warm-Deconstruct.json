@@ -1,6 +1,6 @@
 {
-"$schema": "./deconstruct.schema.json",
-"description": "Warm Palette",
+"$schema": "../schemas/deconstruct.schema.json",
+"description": "Warm Decon Palette",
     "fasta" :{
         "title":{
             "<": "#E6DB74"
@@ -28,8 +28,8 @@
             "W" : "#800080"
         },
         "sym":{
-            "*" : "#474747",
-            "-" : "#474747"
+            "*" :  "#B8B8B8",
+            "-" :  "#B8B8B8"
         },
         "aa": {               
             "E" : "#12B9CF",

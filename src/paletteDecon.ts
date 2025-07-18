@@ -4,22 +4,21 @@ import { Theme } from "./extension";
 import * as def from "./definitions";
 import * as fs from "fs";
 import * as rW from "./ruleWriter";
+import { FileMeta, LangFile, DeconFile, ColorFile, JsonFile, Lang, RuleType } from "./fileMeta";
 
-import { ColorDeconParams, JsonFile, DeconFile, PaletteParams, FileMeta} from "./ruleWriter";
+import { ColorDeconParams, PaletteParams } from "./ruleWriter";
 import { PaletteGenerator } from "./paletteGen";
 
 export class PaletteDeconstructor extends PaletteGenerator{
-    private inputPath: rW.ColorFile;
-    private theme: Theme;
-    
+    private inputPath: ColorFile;
 
-   constructor(context: vscode.ExtensionContext, paletteFile: rW.ColorFile) {
-        const meta = new FileMeta(paletteFile);
+    constructor(context: vscode.ExtensionContext, paletteFile: ColorFile) {
+        const meta = new FileMeta(paletteFile, context);
         const colorParams: PaletteParams = {
-            jsonKind: "palettes",
+            // jsonKind: "palettes",
             descript: `Deconstructed version of ${meta.theme}`,
             paletteFile,
-            deconPalFile: meta.genDeconFile()
+            deconFile: meta.genDeconFile()
         };
 
         super(context, colorParams);
@@ -43,7 +42,7 @@ export class PaletteDeconstructor extends PaletteGenerator{
     //     return colorHex as def.ColorHex;
     // }
 
-    private pullRulePalette(palettePath : rW.ColorFile):def.ColorRule[]{
+    private pullRulePalette(palettePath : ColorFile):def.ColorRule[]{
         return this.patcher.loadColors(palettePath);
     }
     

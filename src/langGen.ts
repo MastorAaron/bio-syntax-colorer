@@ -1,16 +1,17 @@
 import * as vscode from "vscode";
 import * as def from "./definitions";
 import * as rW from "./ruleWriter";
-import { RuleWriter, ColorDeconParams, JsonFile, DeconFile } from "./ruleWriter";
+import { LangFile, FileMeta, JsonFile, DeconFile } from "./fileMeta";
+import { RuleWriter, ColorDeconParams } from "./ruleWriter";
 import { vscUtils, themeUtils } from "./vscUtils";
 
 export class LangGenerator extends RuleWriter{
     private variants: string[];
-    private tmLangFile: rW.LangFile;
+    private tmLangFile: LangFile;
     // private tmLangFile: rW.langFile;
 
     constructor(context: vscode.ExtensionContext, params : rW.LangParams){
-        const meta = new rW.FileMeta(params.tmLangFile);
+        const meta = new FileMeta(params.tmLangFile,context);
 
         if (meta.jsonKind !== "syntaxes") {
             throw new Error(`Invalid file passed to LangGenerator: ${params.tmLangFile}`);
@@ -18,11 +19,11 @@ export class LangGenerator extends RuleWriter{
 
         super(context, meta.lang, "syntaxes");
         this.variants = params.variants;
-        this.tmLangFile = params.tmLangFile as rW.LangFile;
+        this.tmLangFile = params.tmLangFile as LangFile;
     }
 
     // export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
-    private genRegEx(letter : string | def.alphabet, tokenType=""): def.RegEx{
+    private genRegEx(letter : string | def.Alphabet, tokenType=""): def.RegEx{
         switch(tokenType){  
             case "nt":
             case "Nucleotides":

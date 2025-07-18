@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as def from "./definitions";
 import { boolUtils } from "./booleans";
+import { FilePath } from "./fileMeta";
 import { vscUtils } from "./vscUtils";
 import { Position } from "vscode";
 
@@ -11,10 +12,10 @@ const path = require('path');
 export class HoverObj{ 
     private static instance: HoverObj;
     
-    private DEFAULT_ALPHABET: def.alphabet = "Ambiguous"
+    private DEFAULT_ALPHABET: def.Alphabet = "Ambiguous"
 
     private vscCOUT = vscUtils.vscCOUT;
-    private currAlpha: def.alphabet = this.DEFAULT_ALPHABET; // Default mode
+    private currAlpha: def.Alphabet = this.DEFAULT_ALPHABET; // Default mode
     private activeToken: def.ColorRule | undefined;
     
     constructor() {
@@ -30,14 +31,14 @@ export class HoverObj{
     }
      
     private initAlpha(): void {
-        const storedAlpha = vscode.workspace.getConfiguration().get<def.alphabet>("bioNotation.alphabet");
+        const storedAlpha = vscode.workspace.getConfiguration().get<def.Alphabet>("bioNotation.alphabet");
         if (storedAlpha) {
             this.currAlpha = storedAlpha;
         }
 }
 
-    public getCurrAlpha(): def.alphabet {
-        const storedAlpha = vscode.workspace.getConfiguration().get<def.alphabet>("bioNotation.alphabet");
+    public getCurrAlpha(): def.Alphabet {
+        const storedAlpha = vscode.workspace.getConfiguration().get<def.Alphabet>("bioNotation.alphabet");
         return storedAlpha || this.currAlpha;
     }
     private onHover(contents: string, pos: Position): vscode.Hover | undefined {
@@ -64,7 +65,7 @@ export class HoverObj{
                     const letter = line[pos.character].toUpperCase(); // const letter = word[pos.character];
                     if (!letter) return;
                     
-                    const description = def.getDescription(letter,this.currAlpha,doc.fileName as def.FilePath);
+                    const description = def.getDescription(letter,this.currAlpha,doc.fileName as FilePath);
                     return this.onHover(description, pos);
                 }catch(err){
                     this.vscCOUT("Error in hoverOver.ts: " + err);
@@ -77,7 +78,7 @@ export class HoverObj{
         });
     }
 
-    public async switchAlphabets(selection: def.alphabet) {
+    public async switchAlphabets(selection: def.Alphabet) {
         if (selection === "Ambiguous" || selection === "Nucleotides" || selection === "Aminos") {
             this.currAlpha = selection;
             await vscode.workspace.getConfiguration().update(

@@ -9,7 +9,9 @@ jest.unmock("fs");
 import * as fs from "fs";
 import * as path from "path";
 
-import type { ColorFile } from "../src/ruleWriter";
+import type { ColorFile } from "../src/fileMeta";
+import { FileMeta } from "../src/fileMeta";
+// import type { ColorFile } from "../src/ruleWriter";
 import { initPatcher } from "../src/patch";
 
 jest.mock("vscode", () => ({
@@ -35,7 +37,7 @@ jest.mock("vscode", () => ({
 
       beforeAll(() => {
       // 1) Let FileMeta parse the palette filename
-      const meta = new rW.FileMeta(warmFile as ColorFile);
+      const meta = new FileMeta(warmFile as ColorFile,vscUtils.mockContext());
       // 2) Seed the PatchColors singleton exactly once
       initPatcher(testContext, meta);
     });

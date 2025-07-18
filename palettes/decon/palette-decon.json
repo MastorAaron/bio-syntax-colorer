@@ -1,0 +1,36 @@
+{
+"$schema": "../schemas/deconstruct.schema.json",
+"description": "Colors some used for Jade Dragon",
+"notes": {
+        "colors":{
+            "Jasmine"      : "#F7D488",
+            "EgyptianBlue" : "#29339B",
+            "Earth Yellow" : "#F3C178",
+            "Claret"       : "#7B0828",
+            
+            "Imperial Red" : "#FB3640",
+            "Vermillon"    : "#FF3C38",
+            "Rose Quartz"  : "#A6979C",
+            "Seasalt"      : "#FAF9F9",
+
+            "Dark Cyan"    :"#129490",
+            "Rand Purple"  :"#770077",
+            "Emerald"      :"#70B77E",
+            "BuffCustom"   :"#EE00AA",
+            "Buff"         :"#E0A890",
+
+            "Jade"         :"#00A878",
+            "Dark Green"   :"#022D25",
+            "Dark Green2"  :"#0C372F",
+            "Turquoise"    :"#45F0DF",
+            "Keppel"       :"#63C3AF",
+            "Mint Green"   :"#D6FEF7",
+            "Viridian"     :"#2B7A68",
+            "Platinum"     :"#D3D5D7",
+            "Gun Metal"    :"#183642",
+            "Van Dyke"     :"#472D30",
+        "Chinese Violet"   :"#996888",
+            "Teal"         :"#087F8C"
+            }
+        }
+    }

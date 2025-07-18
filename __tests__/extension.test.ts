@@ -108,7 +108,7 @@ function print(toPrint:string, stream:string="console"){
 }
 
 function handleCurrAlpha(expectStr: string, time: string){
-    const currAlpha: def.alphabet = hoverOver.getCurrAlpha();
+    const currAlpha: def.Alphabet = hoverOver.getCurrAlpha();
     print(`${time}: ${currAlpha}`);
     expect(currAlpha).toBe(expectStr);
 }

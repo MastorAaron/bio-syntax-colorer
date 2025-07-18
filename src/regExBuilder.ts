@@ -41,7 +41,7 @@ export class RegExBuilder{
     }
 
 
-    public regExSwitch(strand: string, alpha: def.alphabet){
+    public regExSwitch(strand: string, alpha: def.Alphabet){
         const allCase : boolean = true;
         const block : boolean = false;
         switch(alpha){
