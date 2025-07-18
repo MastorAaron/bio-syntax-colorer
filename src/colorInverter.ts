@@ -2,13 +2,17 @@ import * as vscode from "vscode";
 import { vscUtils } from "./vscUtils";
 
 export class colorMath{ 
-    private vscCOUT = vscUtils.vscCOUT;
    
-    constructor(private context: vscode.ExtensionContext) {
-        this.vscCOUT("colorMath initialized");
+    // constructor() {
+    //     console.log("colorMath initialized");
+    //     vscUtils.print("colorMath initialized");
+    // }
+
+    private constructor() {
+        throw new Error("colorMath is a static utility class and should not be instantiated.");
     }
-    
-    public invertHexColor(hexStr: string): string {
+        
+    public static invertHexColor(hexStr: string): string {
         if (hexStr.length !== 6) return "#FF00FF";  // Failsafe
         let [r, g, b] = this.hexStrToRGB(hexStr);
         return this.rgbToHex(
@@ -18,7 +22,7 @@ export class colorMath{
         );
     }
 
-    public complementaryHex(hexStr:string):string{
+    public static complementaryHex(hexStr:string):string{
         const [r, g, b] = this.hexStrToRGB(hexStr);
         // convert RGB to HLS (note: colorsys uses H, L, S)
         const [h, l, s] = this.rgbToHLS(r, g, b); //Hue, Luminance, Saturation
@@ -27,26 +31,26 @@ export class colorMath{
         return this.rgbToHex(r2, g2, b2);
     }
 
-    private invertChannel(channel255: number): number {
+    private static invertChannel(channel255: number): number {
         return 1.0 - this.scaleChannelToUnit(channel255);
     }
 
     // Normalize 0-255 channel to 0.0–1.0
-    private scaleChannelToUnit(value: number): number {
+    private static scaleChannelToUnit(value: number): number {
         return value / 255;
     }
     
     // Convert normalized 0.0–1.0 value to 0-255 channel
-    private scaleUnitToChannel(value: number): number {
+    private static scaleUnitToChannel(value: number): number {
         return Math.round(value * 255);
     }
 
-    private channelToHex(pureColor:number): string{
+    private static channelToHex(pureColor:number): string{
         pureColor = this.scaleUnitToChannel(pureColor);
         return pureColor.toString(16).padStart(2, "0").toUpperCase();
     }
 
-    private rgbToHex(r:number, g:number, b:number): string{
+    private static rgbToHex(r:number, g:number, b:number): string{
        const rHex = this.channelToHex(r);
        const gHex = this.channelToHex(g);
        const bHex = this.channelToHex(b);
@@ -54,11 +58,11 @@ export class colorMath{
         return (`#${rHex}${gHex}${bHex}`);
     }
 
-    private parseHexPair(pair: string): number{
+    private static parseHexPair(pair: string): number{
         return parseInt(pair, 16); //hexidecimal base 16
     }
 
-    private hexStrToRGB(hexStr: string): [number,number,number]{
+    private static hexStrToRGB(hexStr: string): [number,number,number]{
         hexStr = this.sanitizeHexStr(hexStr);
         return [
             this.parseHexPair(hexStr.slice(0, 2)),
@@ -67,18 +71,18 @@ export class colorMath{
         ];
     }
 
-    private sanitizeHexStr(hexStr: string): string{
+    private static sanitizeHexStr(hexStr: string): string{
         hexStr = hexStr.replace(/^#/, "").trim();
         if (!/^[0-9a-fA-F]{6}$/.test(hexStr)) {
             const err = `Invalid hex color: '${hexStr}'`;
-            this.vscCOUT(err);
+            vscUtils.print(err);
             throw new Error(err);
         }
         return hexStr;
     }
 
     //Color: (HLS) Hue, Luminance and Saturation //NOTE: adapted from Python's Color Library
-    private rgbToHLS(r:number, g:number, b:number): [number,number,number]{
+    private static rgbToHLS(r:number, g:number, b:number): [number,number,number]{
         r= this.scaleChannelToUnit(r);
         g= this.scaleChannelToUnit(g);
         b= this.scaleChannelToUnit(b);
@@ -121,7 +125,7 @@ export class colorMath{
         return [hue, lum, sat];
     }
     
-    private hlsToRGB(hue:number, lum:number, sat:number): [number,number,number]{ //NOTE: adapted from Python's Color Library
+    private static hlsToRGB(hue:number, lum:number, sat:number): [number,number,number]{ //NOTE: adapted from Python's Color Library
         if(sat === 0.0){
             return [lum,lum,lum];
         }

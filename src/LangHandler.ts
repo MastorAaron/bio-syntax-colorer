@@ -53,7 +53,7 @@ export class LangHandler{
         const patternArr = this.getPatternRepo(langJSON);
        
         patternArr.push(pattern);
-        vscUtils.vscCOUT(`Appended lang pattern:`, pattern);
+        vscUtils.print(`Appended lang pattern:`, pattern);
 
         this.savelang(langJSON);
     }

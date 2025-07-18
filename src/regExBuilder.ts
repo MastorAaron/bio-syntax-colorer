@@ -45,8 +45,8 @@ export class RegExBuilder{
     }
 
     public regExSwitch(strand: string, alpha: string){
-        vscUtils.vscCOUT(`regExSwitch → strand: ${strand}, alpha: ${alpha}`);
-        vscUtils.vscCOUT(`alpha check =`, alpha === "Nucleotides", alpha === "Aminos", alpha === "Aminos Properties");
+        vscUtils.print(`regExSwitch → strand: ${strand}, alpha: ${alpha}`);
+        vscUtils.print(`alpha check =`, alpha === "Nucleotides", alpha === "Aminos", alpha === "Aminos Properties");
 
         vscode.window.showInformationMessage(`Map check: ${JSON.stringify(def.nukeRegExMap)}`);
         vscode.window.showInformationMessage(`genNukeRegEx map key check for S:`, def.nukeRegExMap["S"]);
@@ -66,7 +66,7 @@ export class RegExBuilder{
             case "Amino Properties":
                 return this.genAminoPropertyRegEx(strand, allCase, block);
             default:
-                vscUtils.vscCOUT("regExSwitch used default");
+                vscUtils.print("regExSwitch used default");
                 return strand; 
         }
     }

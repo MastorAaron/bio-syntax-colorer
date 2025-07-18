@@ -10,21 +10,21 @@ import * as def from "./definitions";
 import { vscUtils, themeUtils } from "./vscUtils";
 import { FileMeta, FilePath, JsonFile, ColorFile } from "./fileMeta";
 
-// import colorMath from "./colorInverter";
+
 // import hoverOver from "./hoverOver";
 
 const DEFAULT_PALETTE = "fasta-colors.json";
 
 export class PatchColors{
     // private static readonly DEFAULT_PALETTE = DEFAULT_PALETTE ;
-    private vscCOUT = vscUtils.vscCOUT;
+    private print = vscUtils.print;
     private workspaceConfig = vscUtils.editorConfig();
     private currCustomization = vscUtils.currCustomization;
-    // private colorUtil = new colorMath(this.context);
+    
 
 
     constructor(private context: vscode.ExtensionContext, private meta: FileMeta) {
-        this.vscCOUT(`PatchColors initialized with context: ${this.context.extensionPath}`);
+        this.print(`PatchColors initialized with context: ${this.context.extensionPath}`);
     }
 
     public versionTagRule(rule: def.ColorRule): def.ColorRule{
@@ -80,48 +80,15 @@ export class PatchColors{
         }
         const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
         const rules = colors.tokenColors as def.ColorRule[];
-        this.vscCOUT(`Loaded colors from ${colorPath}: ${colors.tokenColors.length} rules`);
+        this.print(`Loaded colors from ${colorPath}: ${colors.tokenColors.length} rules`);
         
         return rules;
     }
 
-    // public pullRule(tokenName: string, palettePath: FilePath): def.ColorRule | null {
-    //     const palette = this.loadColors(palettePath);
-    //     const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
-    //     if (!scope) {
-    //         this.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
-    //         return null;
-    //     }
-    //     return palette.find(rule => rule.scope === scope) || null;
-    // }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
-    // //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
-        
-    // Deprecated: only relevant for static palette rule edits, not runtime editor decorations.
-        // public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
-        //     if(!rule || !rule.settings) return null;
-            
-    
-        //     const config = vscUtils.editorConfig();
-        //     const defaultFg = themeUtils.defaultTextColor();  // Adjustable for themes
-    
-        //     const textColor  = rule.settings.background || defaultFg 
-        //     const fg = rule.settings.foreground || this.colorUtil.complementaryHex(textColor) || "#FFFFFF";
-    
-        //     return {
-        //         ...rule,
-        //         name: `${rule.name || "highlighted-rule"}`,
-        //         settings: {
-        //             ...rule.settings,
-        //             foreground: textColor ,
-        //             background: fg,
-        //             fontStyle: "bold underline"
-        //         }
-        //     };
-        // }
-    
+
     // public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
     //     if (!boolUtils.isValidRule(rule)){ 
-    //         this.vscCOUT("Invalid rule provided for editing.");
+    //         this.print("Invalid rule provided for editing.");
     //         return rule;
     //     }
     //     const updatedRule: def.ColorRule = {
@@ -134,31 +101,6 @@ export class PatchColors{
     //     return updatedRule;
     // }
    
-    // public toggleHighlight(rule: def.ColorRule){
-    //     if (!boolUtils.isValidRule(rule)) {
-    //         this.vscCOUT("Invalid rule provided for toggling highlight.");
-    //         return rule;
-    //     }
-        
-    //     let currColor = rule.settings?.foreground || "#000000"; // Default to black if no color set
-    //     if (!boolUtils.isValidColor(currColor)) {
-    //         this.vscCOUT(`Invalid color: ${currColor}. Defaulting to red highlight.`);
-    //         currColor = "#FF0000"; // Default to red if current color is invalid
-    //     }
-    
-    //     const updatedRule: def.ColorRule = {
-    //         ...rule,
-    //         settings: {
-    //             ...rule.settings,
-    //             foreground: rule.settings?.foreground === "#FF0000" // Toggle between red and original color
-    //                 ? rule.settings?.foreground // Keep original color
-    //                 : "#FF0000" // Highlight with red
-    //         }
-    //     };
-        
-    //     this.vscCOUT(`Toggled highlight for rule: ${updatedRule.name}`);
-    //     return updatedRule;
-    // }
     
     public mergeRules(newRules : def.ColorRule[]){
         const customization = this.currCustomization(vscUtils.globalConfig());
@@ -172,7 +114,7 @@ export class PatchColors{
             // not !isScoped(rule) || 
             !boolUtils.isAlreadyTagged(rule)
         );
-        // vscCOUT("Final rules to apply:", updatedRules);
+        // print("Final rules to apply:", updatedRules);
         return {
             ...customization,
             textMateRules: filtered.concat(newRules)
@@ -193,26 +135,26 @@ export class PatchColors{
     private async applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
         const config = this.workspaceConfig;
         
-        this.vscCOUT(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
+        this.print(`Writing customization to editor.tokenColorCustomizations: ${customization}`);
         await config.update(
             "tokenColorCustomizations", 
             customization,
             vscode.ConfigurationTarget.Workspace
         );
-        this.vscCOUT("Custom token colors applied.");
+        this.print("Custom token colors applied.");
     }
 
     public async patchTokenColors(fileName : string= DEFAULT_PALETTE): Promise<void> {
         try{
             let rules    = this.loadColors(fileName);
             let tagged   = this.tagColorsGenRules(rules)
-            this.vscCOUT(`Tagged rules: ${fileName}`);//TODO: this prints Tagged rules: [object Object], X 34 not great 
+            this.print(`Tagged rules: ${fileName}`);//TODO: this prints Tagged rules: [object Object], X 34 not great 
             const merged = this.mergeRules(tagged);
             
             await this.applyCustomTokens(merged);
-            this.vscCOUT("BioNotation patch applied.");
+            this.print("BioNotation patch applied.");
         }catch(err){
-            this.vscCOUT(`Failed to apply BioNotation patch: ${err}`)
+            this.print(`Failed to apply BioNotation patch: ${err}`)
         }
     }
     

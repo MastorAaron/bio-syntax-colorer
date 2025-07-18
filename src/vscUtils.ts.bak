@@ -14,7 +14,7 @@ export const DARK_FG: def.ColorHex  = "#D4D4D4";
 export const LIGHT_FG: def.ColorHex = "#57606C";
 export namespace vscUtils{
 
-    export function vscCOUT(...args: unknown[]): void {
+    export function print(...args: unknown[]): void {
         const formatted = args.map(arg => {
         if(typeof arg === "string") return arg;
 
@@ -32,7 +32,7 @@ export namespace vscUtils{
         if(stream === "console"){
             console.log(toPrint);
         }else if(stream === "vsc"){
-            vscCOUT(toPrint);
+            print(toPrint);
         }
         // else if(stream === "else"){
         //     (toPrint);
@@ -140,7 +140,7 @@ export class LangHandler{
         const patternArr = this.getPatternRepo(langJSON);
        
         patternArr.push(pattern);
-        vscUtils.vscCOUT(`Appended lang pattern:`, pattern);
+        vscUtils.print(`Appended lang pattern:`, pattern);
 
         this.savelang(langJSON);
     }

@@ -9,7 +9,7 @@ import { vscUtils } from "./vscUtils";
 
 export const LANG_REGEX = "(fasta|fastq)";
 export const MYTHOS_REGEX = "(hades|jadedragon)";
-export const ALPHA_ONLY_REGEX = "[a-zA-Z]+";
+export const ALPHA_ONLY_REGEX = "[a-zA-Z]";
 export const TEMP_REGEX = "(warm|cool|cold)";
 export const THEME_REGEX = `(${MYTHOS_REGEX}|${TEMP_REGEX})`;
 
@@ -110,7 +110,7 @@ export class FileMeta {
     
     public genNewColorFile(theme: Theme): FileMeta{
         const newFile = `${this.lang}-colors-${theme}.json`
-        vscUtils.vscCOUT(`File Meta created for : ${newFile}`);
+        vscUtils.print(`File Meta created for : ${newFile}`);
         const newMeta = new FileMeta(newFile as ColorFile, this.context);
         return newMeta;
         

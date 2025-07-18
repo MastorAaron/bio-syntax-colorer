@@ -9,6 +9,8 @@ interface TokenCustomization {
     [key: string]: unknown;
 }
 
+export const dev : boolean = true;
+
 export const DARK_FG : def.ColorHex = "#D4D4D4";
 export const LIGHT_FG: def.ColorHex = "#57606C";
 
@@ -53,7 +55,6 @@ export const themeUtils = {
     }
 };
 export namespace vscUtils{
-
     export function vscCOUT(...args: unknown[]): void {
         const formatted = args.map(arg => {
         if(typeof arg === "string") return arg;
@@ -69,7 +70,7 @@ export namespace vscUtils{
     }
 
     // export const vscUtils = {
-    //     vscCOUT: function (message: string, forcePopup: boolean = false) {
+    //     print: function (message: string, forcePopup: boolean = false) {
     //         const outputChannel = vscode.window.createOutputChannel("BioNotation");
     //         outputChannel.appendLine(message);
     //         debugLog.push(message);
@@ -81,13 +82,23 @@ export namespace vscUtils{
     // };
 
 
-    export function print(toPrint:string, stream:string="console"){
-        if(stream === "console"){
-            console.log(toPrint);
-        }else if(stream === "vsc"){
-            vscCOUT(toPrint);
+    export function print(...args: unknown[]){
+          const formatted = args.map(arg => {
+            if(typeof arg === "string") return arg;
+
+            try{
+                return JSON.stringify(arg, null, 2);
+            }catch{
+                return String(arg);  // Fallback for circular refs or edge cases
+                }
+            }).join(" ");
+
+
+        if(dev == true){
+            console.log(formatted);
+            vscCOUT(formatted);
         }else{
-            throw new Error(`Unknown stream`);
+            console.log(formatted);
         }
     }
     

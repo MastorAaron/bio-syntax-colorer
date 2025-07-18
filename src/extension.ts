@@ -5,7 +5,7 @@
  * as well as manage color palettes and check the active state of the extension.
 */
 
-// import { patchTokenColors, removeTokenColors, loadColors, vscCOUT } from "./patch";
+// import { patchTokenColors, removeTokenColors, loadColors, print } from "./patch";
 import * as vscode from "vscode";
 import { vscUtils, themeUtils, Neons } from "./vscUtils";
 import * as str from "./stringUtils";
@@ -13,7 +13,7 @@ import { PatchColors } from "./patch";
 
 import * as def from "./definitions";
 import hoverOver from './hoverOver';
-import highLightOverlay from "./highlightOverlay";
+import highLightOverlay from "./highLightOverlay";
 
 import { LangFile, Lang } from "./fileMeta";
 import { FileMeta, JsonFile, ColorFile, FilePath } from "./fileMeta";
@@ -39,7 +39,7 @@ export class BioNotation{
     private meta: FileMeta;
    
     private langGen! : LangGenerator;
-    private vscCOUT = vscUtils.vscCOUT;
+    private print = vscUtils.print;
     // private patchTokenColors: (fileName?: string) => Promise<void>;
     // private removeTokenColors: () => Promise<void>;
 
@@ -49,7 +49,7 @@ export class BioNotation{
     constructor(private context: vscode.ExtensionContext, fileName:string) {
         this.meta = new FileMeta(fileName as JsonFile, context);
         this.defaultPalette = this.meta.fullFilePath;
-        this.vscCOUT(`File path: ${this.meta.fullFilePath}`)
+        this.print(`File path: ${this.meta.fullFilePath}`)
         this.patcher = new PatchColors(context, this.meta);
         // this.patchTokenColors = this.patcher.patchTokenColors.bind(this.patcher);
         // this.removeTokenColors = this.patcher.removeTokenColors.bind(this.patcher);
@@ -86,21 +86,21 @@ export class BioNotation{
     public async clearColors(): Promise<void> {
         await this.patcher.removeTokenColors();
         await this.updateEnabledFlag(false);
-        this.vscCOUT("BioNotation colors cleared.");
+        this.print("BioNotation colors cleared.");
     }
     
     public async toggleColorOverlay(): Promise<void> {
         if(await this.isActive()){
             await this.clearColors();
-            this.vscCOUT("BioNotation deactivated via toggle.");
+            this.print("BioNotation deactivated via toggle.");
         }else{
             await this.applyColors();
-            this.vscCOUT("BioNotation activated via toggle.");
+            this.print("BioNotation activated via toggle.");
         }
     }
 
     private printSelectLine(selection : string, alpha : string): void{
-        this.vscCOUT(`${selection}:   BioNotation isolated all ${selection} ${alpha}.`);
+        this.print(`${selection}:   BioNotation isolated all ${selection} ${alpha}.`);
     }
 
     private printSelectionHighLight(selection: string, alpha: string ) {
@@ -114,23 +114,23 @@ export class BioNotation{
         } else if(alpha === "Alphabet" ){
             this.printSelectLine(selection, nukeStr);
         } else if(this.arrIsSubOfString(selection,["Clear"])){
-            this.vscCOUT("Cleared: BioNotation's highlighted blocks.");
+            this.print("Cleared: BioNotation's highlighted blocks.");
         } else if(this.arrIsSubOfString(selection,["Kmer"])){
-            this.vscCOUT("Kmer:   BioNotation registered user entry as pattern.");
+            this.print("Kmer:   BioNotation registered user entry as pattern.");
         } else {
-            this.vscCOUT(`[printSelection]: Invalid input: ${selection}.`);
+            this.print(`[printSelection]: Invalid input: ${selection}.`);
         }
     }
     
     private printSelectionAlpha(selection : string){
         if(selection === "Ambiguous"){
-            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
+            this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
         }else if(selection === "Nucleotides"){
-            this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
+            this.print("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
         }else if(selection === "Aminos"){
-            this.vscCOUT("Protein:   BioNotation registered letters as Amino Acids on toggle.");
+            this.print("Protein:   BioNotation registered letters as Amino Acids on toggle.");
         }else{
-            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
+            this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
         }
     }
  
@@ -142,21 +142,7 @@ export class BioNotation{
         return [secondSelection, `${lang}`];
     }
 
-    public async hLUserChoice(): Promise<[def.HLSelect, string] | undefined> {
-        // const currAlpha = hoverOver.getCurrAlpha();
-        // if(currAlpha === "Ambiguous" as def.HoverAlphabet){
-        //     return await this.hLAmbigUserChoice();
-        // }else if(currAlpha === "Nucleotides" as def.HoverAlphabet){
-        //     return await this.hLNukeUserChoice();
-        // }else if(currAlpha === "Aminos" as def.HoverAlphabet){
-        //     return await this.hLAmbigUserChoice();
-        // }else{
-        //     this.vscCOUT(`[hLUserChoice]: Invalid input: ${currAlpha}.`);
-            return await this.hLAmbigUserChoice();
-        // }
-    }
-
-    private async hLAmbigUserChoice(): Promise<[def.HLSelect, string] | undefined> {
+    private async hLUserChoice(): Promise<[def.HLSelect, string] | undefined> {
         const firstSelection = await vscUtils.showInterface([...def.HLight.topLevelOptions], "Choose or Type Highlight Category") as def.HLSelect;
             if (!firstSelection) return;
 
@@ -232,13 +218,26 @@ export class BioNotation{
         return [firstSelection, "Ambiguous"];
     }
 
-    public async hLColorChoice(): Promise<Neons | undefined> {
+    public async hLColorChoice(): Promise<Neons | string | undefined> {
         const colorChoice = await vscUtils.showInterface([       
             "Neon Yellow",
             "Neon Green",
             "Neon Blue",
-            "Neon Magneta"], "Choose Highlight Category") as def.ColorHex;
-        return themeUtils.highLightColors(colorChoice)
+            "Neon Magneta",
+
+            "Complementary Colors of Text Colors",
+            "Use Text Color as Highlight Color"
+    ], "Choose Highlight Category") as def.ColorHex;
+        if(colorChoice.includes("Neon")){
+            return themeUtils.highLightColors(colorChoice);
+        }else if(colorChoice.includes("Comple")){
+            return "Comple";
+        }else if(colorChoice.includes("Highlight")){
+            return "Text";
+        }else{
+            vscUtils.print("[hLColorChoice]: INVALID")
+
+        }
     }
             
     public async patternChoice(selection: def.HLSelect, alpha: string): Promise<string| undefined> {
@@ -256,8 +255,8 @@ export class BioNotation{
             if (!result) return;
         const [selection, alpha] = result;
 
-        this.vscCOUT(`Alpha passed to patternChoice: ${alpha}`);
-        this.vscCOUT(`Selection passed to patternChoice: ${selection}`);
+        this.print(`Alpha passed to patternChoice: ${alpha}`);
+        this.print(`Selection passed to patternChoice: ${selection}`);
         const pattern = await this.patternChoice(selection, alpha);
             if (!pattern) return;
 
@@ -267,12 +266,12 @@ export class BioNotation{
             if (!color) return;
 
         highLightOverlay.applyHighLight(regEx, color);
-        this.vscCOUT(`Applied runtime highlight overlay for pattern: ${pattern} ${regEx} with color: ${color}.`);
+        this.print(`Applied runtime highlight overlay for pattern: ${pattern} ${regEx} with color: ${color}.`);
     }
 
     private async clearHighLightOverlays(): Promise<void> {
         highLightOverlay.clearAllHighLights();
-        this.vscCOUT("Cleared all highlight blocks.");
+        this.print("Cleared all highlight blocks.");
     }
 
     private arrIsSubOfString(selection: string, arr: string[]){
@@ -297,16 +296,16 @@ export class BioNotation{
          
         await hoverOver.switchAlphabets(alpha as def.HoverAlphabet);
         
-        this.vscCOUT(`BioNotation registered alphabet as: ${alpha}`);
+        this.print(`BioNotation registered alphabet as: ${alpha}`);
 
         if(alpha === "Ambiguous"){
-            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
+            this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
         }else if(alpha === "Nucleotides"){
-            this.vscCOUT("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
+            this.print("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
         }else if(alpha === "Aminos"){
-            this.vscCOUT("Protein:   BioNotation registered letters as Amino Acids on toggle.");
+            this.print("Protein:   BioNotation registered letters as Amino Acids on toggle.");
         }else{
-            this.vscCOUT("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
+            this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
         }
     }
 
@@ -319,7 +318,7 @@ export class BioNotation{
     public async applyColors(fileName: string = this.activePalette.fileName ): Promise<void> {
         await this.patcher.patchTokenColors(fileName);
         await this.updateEnabledFlag(true);
-        this.vscCOUT("BioNotation colors applied.");
+        this.print("BioNotation colors applied.");
     }
 
     public async selectPalette(): Promise<void> {
@@ -331,42 +330,42 @@ export class BioNotation{
         });
     
         if(!choice) {
-            this.vscCOUT("No valid palette selected.");
+            this.print("No valid palette selected.");
             return;
         }
         const fileName = this.palettePath(choice.toLowerCase());
         if(!fileName) return;
     
         await this.switchPalettes(fileName);
-        this.vscCOUT(`BioNotation colors switched to ${choice} palette.`);
+        this.print(`BioNotation colors switched to ${choice} palette.`);
     }
 
     // public palettePathORI(choice: string | Theme): ColorFile | undefined {
     //     const fileName = PaletteMap[choice?.toLowerCase() as Theme];
     //     if(!fileName){
-    //         this.vscCOUT(`Palette "${choice}" not found.`);
+    //         this.print(`Palette "${choice}" not found.`);
     //         return;
     //     }
     //     return fileName;
     // }
     
     public palettePath(theme: Theme): ColorFile | undefined {
-      this.vscCOUT(`palettePath creating new meta for theme: ${theme}`);
+      this.print(`palettePath creating new meta for theme: ${theme}`);
         try {
             const newMeta = this.meta.genNewColorFile(theme);
             const fileName = newMeta.fileName;
-            this.vscCOUT(`Generated filename: ${fileName}`);
+            this.print(`Generated filename: ${fileName}`);
             this.activePalette = newMeta;
             return fileName as ColorFile;
         } catch (error) {
-            this.vscCOUT(`Error creating FileMeta: ${error}`);
+            this.print(`Error creating FileMeta: ${error}`);
             return;
         }
     }
 
     public async switchPalettes(fileName : JsonFile): Promise<void> {
         if (!(await this.isActive())) {
-            this.vscCOUT("Cannot switch palettes when BioNotation is inactive.");
+            this.print("Cannot switch palettes when BioNotation is inactive.");
             return;
         }
         await this.patcher.removeTokenColors();
@@ -376,7 +375,8 @@ export class BioNotation{
         this.activePalette = new FileMeta(fileName, this.context);
         this.patcher = new PatchColors(this.context, this.activePalette);
         await this.patcher.patchTokenColors(fileName);
-        this.vscCOUT(`BioNotation colors switched for ${fileName}.`);
+        highLightOverlay.initColorMap();
+        this.print(`BioNotation colors switched for ${fileName}.`);
     }
     
     public async setUp(): Promise<void> {
@@ -384,16 +384,16 @@ export class BioNotation{
         
         if(await this.isActive()){ 
             await this.patcher.patchTokenColors(this.activePalette.fileName); // Only apply if enabled
-            this.vscCOUT("BioNotation colors auto-applied on activation.");
+            this.print("BioNotation colors auto-applied on activation.");
         }else{
-            this.vscCOUT("Error: Cannot activate Unless you Toggle On.");
+            this.print("Error: Cannot activate Unless you Toggle On.");
         }
     }
     
     public async breakDown(): Promise<void> {
         await this.patcher.removeTokenColors(); // Always remove
         await this.updateEnabledFlag(false); // Clear flag
-        this.vscCOUT("BioNotation colors removed on deactivation.");
+        this.print("BioNotation colors removed on deactivation.");
     }
 
     private async updateEnabledFlag(bool : boolean): Promise<void> {   

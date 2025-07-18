@@ -123,7 +123,7 @@ constructor(protected context: vscode.ExtensionContext, meta : FileMeta){
     //     const palette = this.patcher.loadColors(palettePath);
     //     const scope = def.tokenMap[tokenName.toUpperCase() as def.tokenType];
     //     if (!scope) {
-    //         vscUtils.vscCOUT(`Token "${tokenName}" not found in tokenMap.`);
+    //         vscUtils.print(`Token "${tokenName}" not found in tokenMap.`);
     //         return null;
     //     }
     //     return palette.find(rule => rule.scope === scope) || null;

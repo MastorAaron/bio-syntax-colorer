@@ -11,12 +11,12 @@ export class HoverObj{
     
     private DEFAULT_ALPHABET: def.HoverAlphabet = "Ambiguous"
 
-    private vscCOUT = vscUtils.vscCOUT;
+    private print = vscUtils.print;
     private currAlpha: def.HoverAlphabet = this.DEFAULT_ALPHABET; // Default mode
     private activeToken: def.ColorRule | undefined;
     
     constructor() {
-        this.vscCOUT("HoverObj initialized");
+        this.print("HoverObj initialized");
         this.initAlpha();
     }
 
@@ -64,7 +64,7 @@ export class HoverObj{
                     const description = def.arrayToStr(this.getDescription(letter, doc.fileName));
                     return this.onHover(description, pos);
                 }catch(err){
-                    this.vscCOUT("Error in hoverOver.ts: " + err);
+                    this.print("Error in hoverOver.ts: " + err);
                     if (process.env.NODE_ENV === 'development') {
                         console.error("Error: Not in AminoMap", err);
                     }
@@ -81,14 +81,14 @@ export class HoverObj{
             selection,
             vscode.ConfigurationTarget.Workspace
             );
-        this.vscCOUT(`BioNotation alphabet mode set to: ${selection}`);
+        this.print(`BioNotation alphabet mode set to: ${selection}`);
     }
 
     public async switchAlphabets(selection: def.HoverAlphabet) {
         if (selection === "Ambiguous" || selection === "Nucleotides" || selection === "Aminos") {
            await this.setAlphabet(selection);
         }else{
-            this.vscCOUT("Error: no valid Alphabet selection\n",
+            this.print("Error: no valid Alphabet selection\n",
                 `Fallback is Default: ${this.DEFAULT_ALPHABET}`
             )
             this.currAlpha = this.DEFAULT_ALPHABET;
