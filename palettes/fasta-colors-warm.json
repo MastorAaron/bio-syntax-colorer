@@ -22,7 +22,8 @@
             "name": "Adenine OR Alanine", 
             "scope": "source.fasta.ntA", 
             "settings": {
-                "foreground": "#3ED132"
+                "foreground": "#3ED132",
+                "background": "#B8B8B8"
             }
         }, 
         {

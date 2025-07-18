@@ -3,7 +3,7 @@
     "displayName": "Colored BioNotation",
     "description": "Custom overlay intended to Highlight FastA and FastQ files in Dark Mode Warm Color Pallete",
     "publisher": "The_A177",
-    "version": "0.1.50",
+    "version": "0.2.00",
     "repository": {
         "type": "git",
         "url": "https://github.com/MastorAaron/bio-syntax-colorer"
@@ -97,7 +97,7 @@
         "prepare": "npm run build && npx vsce package",
         "clean": "rm -rf dist && python ./devTools/colorSliderToggle.py ./palettes --remove-only && code --uninstall-extension \"the_a177.bio-colorer\"",
         "uninstall": "code --uninstall-extension \"the_a177.bio-colorer\"",
-        "install": "code --install-extension bio-colorer-0.1.50.vsix"
+        "install": "code --install-extension bio-colorer-0.2.00.vsix"
     },
     "devDependencies": {
         "@types/jest": "^30.0.0",

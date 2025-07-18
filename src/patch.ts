@@ -10,7 +10,7 @@ import * as def from "./definitions";
 import { vscUtils, themeUtils } from "./vscUtils";
 import { FileMeta, FilePath, JsonFile, ColorFile } from "./fileMeta";
 
-import colorMath from "./colorInverter";
+// import colorMath from "./colorInverter";
 // import hoverOver from "./hoverOver";
 
 const DEFAULT_PALETTE = "fasta-colors.json";
@@ -20,7 +20,7 @@ export class PatchColors{
     private vscCOUT = vscUtils.vscCOUT;
     private workspaceConfig = vscUtils.editorConfig();
     private currCustomization = vscUtils.currCustomization;
-    private colorUtil = new colorMath(this.context);
+    // private colorUtil = new colorMath(this.context);
 
 
     constructor(private context: vscode.ExtensionContext, private meta: FileMeta) {
@@ -96,27 +96,28 @@ export class PatchColors{
     // }//TODO: Implement Edits to rules as a seperate rule with its own "userEdit" Tag
     // //TODO: For ease of deletion and reset to defaults but also prioritization of `UserEdit`s above Default settings
         
-        public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
-            if(!rule || !rule.settings) return null;
+    // Deprecated: only relevant for static palette rule edits, not runtime editor decorations.
+        // public async ruleHighlight(rule: def.ColorRule): Promise<def.ColorRule | null> {
+        //     if(!rule || !rule.settings) return null;
             
     
-            const config = vscUtils.editorConfig();
-            const defaultFg = themeUtils.defaultTextColor();  // Adjustable for themes
+        //     const config = vscUtils.editorConfig();
+        //     const defaultFg = themeUtils.defaultTextColor();  // Adjustable for themes
     
-            const textColor  = rule.settings.background || defaultFg 
-            const fg = rule.settings.foreground || this.colorUtil.complementaryHex(textColor) || "#FFFFFF";
+        //     const textColor  = rule.settings.background || defaultFg 
+        //     const fg = rule.settings.foreground || this.colorUtil.complementaryHex(textColor) || "#FFFFFF";
     
-            return {
-                ...rule,
-                name: `${rule.name || "highlighted-rule"}`,
-                settings: {
-                    ...rule.settings,
-                    foreground: textColor ,
-                    background: fg,
-                    fontStyle: "bold underline"
-                }
-            };
-        }
+        //     return {
+        //         ...rule,
+        //         name: `${rule.name || "highlighted-rule"}`,
+        //         settings: {
+        //             ...rule.settings,
+        //             foreground: textColor ,
+        //             background: fg,
+        //             fontStyle: "bold underline"
+        //         }
+        //     };
+        // }
     
     // public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
     //     if (!boolUtils.isValidRule(rule)){ 

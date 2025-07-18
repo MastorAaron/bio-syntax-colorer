@@ -48,9 +48,6 @@ export class RegExBuilder{
         vscUtils.vscCOUT(`regExSwitch → strand: ${strand}, alpha: ${alpha}`);
         vscUtils.vscCOUT(`alpha check =`, alpha === "Nucleotides", alpha === "Aminos", alpha === "Aminos Properties");
 
-        const mapCheck = def.nukeRegExMap["S"];
-        vscode.window.showInformationMessage(`Map lookup for S: ${mapCheck}`);
-        vscUtils.vscCOUT(`Map lookup for S: ${mapCheck}`);
         vscode.window.showInformationMessage(`Map check: ${JSON.stringify(def.nukeRegExMap)}`);
         vscode.window.showInformationMessage(`genNukeRegEx map key check for S:`, def.nukeRegExMap["S"]);
 

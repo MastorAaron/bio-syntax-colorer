@@ -161,12 +161,17 @@ export class BioNotation{
             if (!firstSelection) return;
 
         if (firstSelection === def.kmerText as def.HLSelect) {
-            const result = await this.secondChoice([...def.HLight.alphaSubOptions], "Alphabet"); 
-            // const secondSelection = await vscUtils.showInterface([...def.HLight.alphaSubOptions], "Choose Alphabet") as def.HLSelect;
-            if (!result) return;//     if (!secondSelection) return;  // this.printSelectionHighLight(secondSelection);
-            const [secondSelection, junk] = result;
-            hoverOver.setAlphabet(secondSelection);
-            return [firstSelection, secondSelection as def.HLSelect];
+            const currAlpha = hoverOver.getCurrAlpha();
+            if(currAlpha === "Ambiguous" as def.HoverAlphabet){
+                const result = await this.secondChoice([...def.HLight.alphaSubOptions], "Alphabet"); 
+                // const secondSelection = await vscUtils.showInterface([...def.HLight.alphaSubOptions], "Choose Alphabet") as def.HLSelect;
+                if (!result) return;//     if (!secondSelection) return;  // this.printSelectionHighLight(secondSelection);
+                const [secondSelection, junk] = result;
+                hoverOver.setAlphabet(def.convertBetweenAlphs(secondSelection));
+                return [firstSelection, secondSelection as def.HLSelect]; 
+            }else{
+                return [firstSelection, currAlpha as def.HLSelect];
+            }
         }
 
         if (firstSelection === def.aminoText  as def.HLSelect) {
@@ -174,7 +179,8 @@ export class BioNotation{
             if (!result) return;
             let [secondSelection, lang] = result;
             //Distinguish Amino Properties
-            if(secondSelection[0] ==  'B' || secondSelection[0] ==  'J' || secondSelection[0] ==  'Z'){
+            if(this.arrIsSubOfString(secondSelection[0], ['B','J','Z','X'])){
+            // if(secondSelection[0] ==  'B' || secondSelection[0] ==  'J' || secondSelection[0] ==  'Z'|| secondSelection[0] ==  'X'){
                 lang = "Aminos";
             }
             hoverOver.setAlphabet("Aminos");

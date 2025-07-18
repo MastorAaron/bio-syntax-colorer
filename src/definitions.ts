@@ -234,7 +234,7 @@ export const aminoRegExMap : Record<aaAmbig,string>= {
     'B': "[BND]",
     'Z': "[ZQE]",
     'J': "[JLI]",
-    'X': "[XKRHOPWYFEDSTNCQUOLIMVAGBZJX-*]",
+    'X': "[XKRHOPWYFEDSTNCQUOLIMVAGBZJX\\-*]",
 }
 
 export const nukeRegExMap : Record<ntExtd,string>= {
@@ -346,6 +346,7 @@ export const aminoText = "Amino Properties" as const;
 export const aaAlpha   = "Amino acids" as const;
 export const ntAlpha   = "Nucleic acids" as const;
 
+
 export const HLight = { //HighLightOptions
     topLevelOptions: [
         kmerText,
@@ -359,7 +360,8 @@ export const HLight = { //HighLightOptions
         aaAlpha,
         ntAlpha
     ] as const,
-
+    
+    
     aminoSubOptions: [
         "N: Nonpolar/Alipathic: LIMVAPG",
         "P: Polar:              STNCQ and sometimes U",
@@ -368,6 +370,8 @@ export const HLight = { //HighLightOptions
         "+: Positive\\Basic:    KRH and sometimes O",
         "-: Negative\\Acidic:   ED",
         
+        "X: All Amino Acids:    X KRHO PWYFE DSTNCQ LIMVAG BZJ * UO",
+
         "B: B Drift:            Asx: Asn or Asp: N or D",
         "Z: Z Drift:            Glx: Gln or Glu: Q or E",
         "J: J Drift:            (Iso)leucine: Leu or Ile: L or I"
@@ -387,10 +391,22 @@ export const HLight = { //HighLightOptions
         "D: Not C           A, G, or T/U",
         "H: Not G           A, C, or T/U",
         "V: Not T/U         A, C, or G"
-    ] as const
+    ] as const,
+    
 };
 
+export function convertBetweenAlphs(hlAlpha: string): HoverAlphabet{
+    if (hlAlpha === aaAlpha){
+        return "Aminos";
+    }else if (hlAlpha === ntAlpha){
+        return "Nucleotides";
+    }else{
+        return "Ambiguous"
+    }
+}
+
 export type HLSelect =
+
     typeof HLight.topLevelOptions[number] |
     typeof HLight.alphaSubOptions[number] |
     typeof HLight.aminoSubOptions[number] |
