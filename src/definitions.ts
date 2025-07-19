@@ -1,5 +1,7 @@
 export type ColorHex = `#${string}`;
 
+export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
+
 export type FastAScope = `source.fasta.${string}${'' | `.${TagCategory}`}`;
 export type FastQScope = `source.fastq.${'' | `.${string}`}${'' | `.${string}`}`;
 export type GenericScope =`source.${string}.${string}`
@@ -7,8 +9,6 @@ export type GenericScope =`source.${string}.${string}`
 export type TokenScope = FastAScope | FastQScope;
 export type HeaderScope = `fast${'a' | 'q'}.title`;
 export type NameScope = TokenScope | HeaderScope| GenericScope; 
-
-export type RegEx = string;
 
 export interface ColorRule {
     name: string;      //optional Name
@@ -217,9 +217,6 @@ export const conflictInfoMap : Record<nukes,string>= {
 
 // export type Alphabet =  ;
 
-export const hoverAlpha = ["Nucleotides", "Aminos", "Ambiguous"];
-export type HoverAlphabet = (typeof hoverAlpha)[number];
-export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
     'N': "[LIMVAPIG]",
@@ -269,42 +266,6 @@ export const symbolLookUpMap : Record<syms,string>= {
     '>':""
 }
 
-export function isNeg(value: unknown): value is negAA {
-    return isMemberOf(value, aaNegative);
-}
-
-export function isPos(value: unknown): value is posAA {
-    return isMemberOf(value, aaPositive);
-}
-
-export function isAro(value: unknown): value is aroAA {
-    return isMemberOf(value, aaAromatic);
-}
-
-export function isRinged(value: unknown): value is ringAA {
-    return isMemberOf(value, aaRinged);
-}
-
-export function isPolar(value: unknown): value is polarAA {
-    return isMemberOf(value, aaPolar);
-}
-
-export function isNonPolar(value: unknown): value is nonPolarAA {
-    return isMemberOf(value, aaAliphatic);
-}
-
-export function isPurine(value: unknown): boolean { //TODO: Make Purine Type?
-    return isMemberOf(value, ['R','A','G']);
-}
-
-export function isPyrim(value: unknown): boolean {
-    return isMemberOf(value, ['Y','T','C','U']);
-}
-
-export function isNuke(value: unknown): value is nukes {
-    return isMemberOf(value, nucleotides) || isMemberOf(value, extendedNukes) || isMemberOf(value, aaSymbols);
-}
-
 export function isSymbol(value: unknown): value is nukes {
     return isMemberOf(value, symbols) || isMemberOf(value,symString);
 }
@@ -337,82 +298,7 @@ export function arrayToArrStr(strArr : string[]): string{
     return newStr;
 }
 
-export const kmerText  = "Find Entered Pattern: kmer, Codon, letter, etc" as const;
-export const swapText  = "Swap Text Colors and Highlight Colors" as const;
-export const clearText = "Clear Highlight Colors" as const;
-
-export const nukeText  = "Nucleotide Categories" as const;
-export const aminoText = "Amino Properties" as const;
-export const aaAlpha   = "Amino acids" as const;
-export const ntAlpha   = "Nucleic acids" as const;
-
-
-export const HLight = { //HighLightOptions
-    topLevelOptions: [
-        kmerText,
-        // swapText,
-        clearText,
-        nukeText,
-        aminoText
-    ] as const,
-
-    alphaSubOptions: [
-        aaAlpha,
-        ntAlpha
-    ] as const,
-    
-    
-    aminoSubOptions: [
-        "N: Nonpolar/Alipathic: LIMVAPG",
-        "P: Polar:              STNCQ and sometimes U",
-        "A: Aromatic:           WYF",
-        "R: Ringed:             WYFHP",
-        "+: Positive\\Basic:    KRH and sometimes O",
-        "-: Negative\\Acidic:   ED",
-        
-        "X: All Amino Acids:    X KRHO PWYFE DSTNCQ LIMVAG BZJ * UO",
-
-        "B: B Drift:            Asx: Asn or Asp: N or D",
-        "Z: Z Drift:            Glx: Gln or Glu: Q or E",
-        "J: J Drift:            (Iso)leucine: Leu or Ile: L or I"
-    ] as const,
-
-    nucleotideSubOptions: [
-        "R: Purines:        A or G",
-        "Y: Pyrimidine      C or T/U",
-        "S: Strong Bonds    C or G",
-        "W: Weak Bonds      A or T/U",
-        "K: Ketone Group    G or T/U",
-        "M: Amino Group     A or C",
-        
-        "N: All Nucleotides A, C, G, or T/U",
-
-        "B: Not A           C, G, or T/U",
-        "D: Not C           A, G, or T/U",
-        "H: Not G           A, C, or T/U",
-        "V: Not T/U         A, C, or G"
-    ] as const,
-    
-};
-
-export function convertBetweenAlphs(hlAlpha: string): HoverAlphabet{
-    if (hlAlpha === aaAlpha){
-        return "Aminos";
-    }else if (hlAlpha === ntAlpha){
-        return "Nucleotides";
-    }else{
-        return "Ambiguous"
-    }
-}
-
-export type HLSelect =
-
-    typeof HLight.topLevelOptions[number] |
-    typeof HLight.alphaSubOptions[number] |
-    typeof HLight.aminoSubOptions[number] |
-    typeof HLight.nucleotideSubOptions[number];
-
-    export const tokenStripMap : Record<string,Record<string,string[]>>= {
+export const tokenStripMap : Record<string,Record<string,string[]>>= {
     "fasta":{ 
         "title": ['>'] ,
         "nt"   : ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
@@ -425,3 +311,14 @@ export type HLSelect =
         "quality": ["low","mid","high"]
     } 
 }
+
+// export const phredRangesMap : Record<string,Record<string,string[]>>= {
+//     "Sanger":{
+//         "Phred+33":["[!-I]"]//0-40
+//     },
+//     "Illumina": {    
+//          "1.8": {"Phred+33":["[@-h]"]},//0-40
+//      "1.3-1.5": {"Phred+64":["[!-J]"]}//0-41    //Same as 1.3 but with dummy quality scores for unaligned bases using B. This throws off basic regex rules because B has to be handled as “special.”
+//     },
+//     "Solexa":{},
+// }

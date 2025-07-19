@@ -4,6 +4,7 @@ import * as rW from "./ruleWriter";
 import { LangFile, FileMeta, JsonFile, DeconFile } from "./fileMeta";
 import { RuleWriter, ColorDeconParams } from "./ruleWriter";
 import { vscUtils, themeUtils } from "./vscUtils";
+import * as menu from "./menus";
 
 export class LangGenerator extends RuleWriter{
     private variants: string[];
@@ -23,13 +24,13 @@ export class LangGenerator extends RuleWriter{
     }
 
     // export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
-    public genRegEx(letter: string, alphabet: string): def.RegEx {
+    public genRegEx(letter: string, alphabet: string): string {
         const reg = this.regi.regExSwitch(letter, alphabet);
             if (!reg) throw new Error(`Unknown alphabet: ${alphabet}`);
         return reg;
     }
     
-    public genRegBlockEx(letter : string | def.HoverAlphabet, tokenType=""): def.RegEx{
+    public genRegBlockEx(letter : string | menu.HoverAlphabet, tokenType=""): string {
         switch(tokenType){  
             case "nt":
             case "Nucleotides":
@@ -106,21 +107,7 @@ export class LangGenerator extends RuleWriter{
     }
 }
 
-// export class RuleStripper extends PatternRuleGenerator{
-//     constructor(context: vscode.ExtensionContext, params : PatternStripParams){
-//         private inputPath: JsonFile;
-//         const outputFile = `${params.theme}-Strip.json` as  DeconFile;
-//         super(context, {
-//             jsonKind: "strip",
-//             descript: `Stripped version of ${params.theme}`,
-//             theme: "decon",
-//             deconStripFile: outputFile 
-//         });
-
-//         this.inputPath= = params.actualRuleFile;
-//         this.outputFile = outputFile;
-//     }
-// }
+// Map<string,RegExp> PhredMap = {};
 
 
 interface FastaLang {

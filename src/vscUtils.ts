@@ -93,7 +93,6 @@ export namespace vscUtils{
                 }
             }).join(" ");
 
-
         if(dev == true){
             console.log(formatted);
             vscCOUT(formatted);

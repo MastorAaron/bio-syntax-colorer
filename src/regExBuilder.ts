@@ -23,8 +23,6 @@ export class RegExBuilder{
         return regExStr;
     }
 
-   
-
     public genTypedRegEx(strand: string, map: Record<string, string>, allCase : boolean = false, block : boolean = false): string {
         const blocked = block ? "+" : ""; 
         const caseSuffix = allCase ? `/i` : "";

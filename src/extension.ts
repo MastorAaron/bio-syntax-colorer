@@ -12,6 +12,7 @@ import * as str from "./stringUtils";
 import { PatchColors } from "./patch";
 
 import * as def from "./definitions";
+import * as menu from "./menus";
 import hoverOver from './hoverOver';
 import highLightOverlay from "./highLightOverlay";
 
@@ -19,7 +20,6 @@ import { LangFile, Lang } from "./fileMeta";
 import { FileMeta, JsonFile, ColorFile, FilePath } from "./fileMeta";
 import { LangParams, PaletteParams } from "./ruleWriter";
 import { LangFileEditor, LangGenerator } from "./langGen";
-const DEFAULT_PALETTE = "fasta-colors.json";
 
 export const Themes = ["warm", "cool", "cold", "hades", "jadedragon" ];
 export type Theme = (typeof Themes)[number];
@@ -29,7 +29,21 @@ export type Theme = (typeof Themes)[number];
 //TODO: Set up Highlighting for specified letter or Motif in a file
 //TODO: Implement On Hover from Refactored file
 
+export const phredTypes = [ 
+           "Sanger (Phred+33)", 
+    "Illumina 1.3+ (Phred+64)", 
+//     Illumina 1.5
+// Same as 1.3 but with dummy quality scores for unaligned bases using B.
+// This throws off basic regex rules because B has to be handled as “special.”
+    "Illumina 1.8+ (Phred+33)"
 
+    // Oxford Nanopore, PacBio
+    // Solexa (before Illumina adopted Phred)
+
+    ] as const;
+
+export type PhredTypes = (typeof phredTypes)[number];
+const DEFAULT_PHRED = "Illumina 1.8+ (Phred+33)";
 
 export class BioNotation{ 
     private patcher: PatchColors;
@@ -38,6 +52,8 @@ export class BioNotation{
     private activePalette: FileMeta;
     private meta: FileMeta;
    
+    private phredType: string = DEFAULT_PHRED;
+
     private langGen! : LangGenerator;
     private print = vscUtils.print;
     // private patchTokenColors: (fileName?: string) => Promise<void>;
@@ -68,6 +84,7 @@ export class BioNotation{
             vscode.commands.registerCommand("bioNotation.applyColors", this.applyColors.bind(this)),
             vscode.commands.registerCommand("bioNotation.onUninstall", this.onUninstall.bind(this)),
             vscode.commands.registerCommand("bioNotation.toggleHighLight", this.toggleHighLight.bind(this)),
+            vscode.commands.registerCommand("bioNotation.selectQualityType", this.selectQualityType.bind(this))
             //TODO extract Method from RegExBuilder.test
         );
     }
@@ -121,6 +138,12 @@ export class BioNotation{
             this.print(`[printSelection]: Invalid input: ${selection}.`);
         }
     }
+
+    public async selectQualityType(){
+        this.phredType = await vscUtils.showInterface(
+            [...phredTypes], "Choose or Type Highlight Category") as menu.HLSelect;
+
+    }
     
     private printSelectionAlpha(selection : string){
         if(selection === "Ambiguous"){
@@ -135,33 +158,33 @@ export class BioNotation{
     }
  
 
-    private async secondChoice(options : string[], lang : string) : Promise<[def.HLSelect, string] | undefined>{
-        const secondSelection = await vscUtils.showInterface(options, `Choose ${lang} Highlight`) as def.HLSelect;
+    private async secondChoice(options : string[], lang : string) : Promise<[menu.HLSelect, string] | undefined>{
+        const secondSelection = await vscUtils.showInterface(options, `Choose ${lang} Highlight`) as menu.HLSelect;
             if (!secondSelection) return;
         this.printSelectionHighLight(secondSelection, lang);
         return [secondSelection, `${lang}`];
     }
 
-    private async hLUserChoice(): Promise<[def.HLSelect, string] | undefined> {
-        const firstSelection = await vscUtils.showInterface([...def.HLight.topLevelOptions], "Choose or Type Highlight Category") as def.HLSelect;
+    private async hLUserChoice(): Promise<[menu.HLSelect, string] | undefined> {
+        const firstSelection = await vscUtils.showInterface([...menu.HLight.topLevelOptions], "Choose or Type Highlight Category") as menu.HLSelect;
             if (!firstSelection) return;
 
-        if (firstSelection === def.kmerText as def.HLSelect) {
+        if (firstSelection === menu.kmerText as menu.HLSelect) {
             const currAlpha = hoverOver.getCurrAlpha();
-            if(currAlpha === "Ambiguous" as def.HoverAlphabet){
-                const result = await this.secondChoice([...def.HLight.alphaSubOptions], "Alphabet"); 
-                // const secondSelection = await vscUtils.showInterface([...def.HLight.alphaSubOptions], "Choose Alphabet") as def.HLSelect;
+            if(currAlpha === "Ambiguous" as menu.HoverAlphabet){
+                const result = await this.secondChoice([...menu.HLight.alphaSubOptions], "Alphabet"); 
+                // const secondSelection = await vscUtils.showInterface([...menu.HLight.alphaSubOptions], "Choose Alphabet") as menu.HLSelect;
                 if (!result) return;//     if (!secondSelection) return;  // this.printSelectionHighLight(secondSelection);
                 const [secondSelection, junk] = result;
-                hoverOver.setAlphabet(def.convertBetweenAlphs(secondSelection));
-                return [firstSelection, secondSelection as def.HLSelect]; 
+                hoverOver.setAlphabet(menu.convertBetweenAlphs(secondSelection));
+                return [firstSelection, secondSelection as menu.HLSelect]; 
             }else{
-                return [firstSelection, currAlpha as def.HLSelect];
+                return [firstSelection, currAlpha as menu.HLSelect];
             }
         }
 
-        if (firstSelection === def.aminoText  as def.HLSelect) {
-            const result = await this.secondChoice([...def.HLight.aminoSubOptions], def.aminoText);
+        if (firstSelection === menu.aminoText  as menu.HLSelect) {
+            const result = await this.secondChoice([...menu.HLight.aminoSubOptions], menu.aminoText);
             if (!result) return;
             let [secondSelection, lang] = result;
             //Distinguish Amino Properties
@@ -170,16 +193,16 @@ export class BioNotation{
                 lang = "Aminos";
             }
             hoverOver.setAlphabet("Aminos");
-            return [secondSelection, lang as def.HLSelect];
+            return [secondSelection, lang as menu.HLSelect];
             
         }
         
-        if (firstSelection === def.nukeText as def.HLSelect) {
+        if (firstSelection === menu.nukeText as menu.HLSelect) {
             hoverOver.setAlphabet("Nucleotides");
-            return await this.secondChoice([...def.HLight.nucleotideSubOptions], def.nukeText);
+            return await this.secondChoice([...menu.HLight.nucleotideSubOptions], menu.nukeText);
         }
         
-        if (firstSelection === def.clearText as def.HLSelect) {
+        if (firstSelection === menu.clearText as menu.HLSelect) {
             await this.clearHighLightOverlays();
             return;
         }
@@ -190,33 +213,7 @@ export class BioNotation{
         hoverOver.setAlphabet("Ambiguous");
         return [firstSelection, "Ambiguous"];
     }
-    
-    private async hLNukeUserChoice(): Promise<[def.HLSelect, string] | undefined> {
-        const firstSelection = await vscUtils.showInterface([...def.HLight.topLevelOptions], "Choose or Type Highlight Category") as def.HLSelect;
-            if (!firstSelection) return;
 
-        if (firstSelection === def.kmerText as def.HLSelect) {
-            const result = await this.secondChoice([...def.HLight.alphaSubOptions], "Alphabet"); 
-            // const secondSelection = await vscUtils.showInterface([...def.HLight.alphaSubOptions], "Choose Alphabet") as def.HLSelect;
-            if (!result) return;//     if (!secondSelection) return;  // this.printSelectionHighLight(secondSelection);
-            const [secondSelection, junk] = result;
-            return [firstSelection, secondSelection as def.HLSelect];
-        }
-
-        if (firstSelection === def.nukeText as def.HLSelect) {
-            return await this.secondChoice([...def.HLight.nucleotideSubOptions], def.nukeText);
-        }
-        
-        if (firstSelection === def.clearText as def.HLSelect) {
-            await this.clearHighLightOverlays();
-            return;
-        }
-
-        // TODO: Limit the language choices based on getCurrAlpha() from HoverOver
-
-        // this.printSelectionHighLight(firstSelection, lang);
-        return [firstSelection, "Ambiguous"];
-    }
 
     public async hLColorChoice(): Promise<Neons | string | undefined> {
         const colorChoice = await vscUtils.showInterface([       
@@ -240,8 +237,8 @@ export class BioNotation{
         }
     }
             
-    public async patternChoice(selection: def.HLSelect, alpha: string): Promise<string| undefined> {
-        if(selection === def.kmerText as def.HLSelect)
+    public async patternChoice(selection: menu.HLSelect, alpha: string): Promise<string| undefined> {
+        if(selection === menu.kmerText as menu.HLSelect)
             return await vscUtils.showInputBox("Enter a kmer/Codon/pattern","ATG, GCT, etc.");
         
         if(alpha === "Nucleotide Categories" || alpha === "Aminos" || alpha === "Amino Properties"){
@@ -279,8 +276,8 @@ export class BioNotation{
     }
 
     private extractAlphabet(selection: string){
-        return this.arrIsSubOfString(selection, def.hoverAlpha);
-        // return def.hoverAlpha.find(eachAlpha => selection.includes(eachAlpha)); //Works for small len arrays not the best for larger data
+        return this.arrIsSubOfString(selection, menu.hoverAlpha);
+        // return menu.hoverAlpha.find(eachAlpha => selection.includes(eachAlpha)); //Works for small len arrays not the best for larger data
     }
 
     public async toggleAlphabet(){
@@ -294,7 +291,7 @@ export class BioNotation{
         const selection = await vscUtils.showInterface(dropDownOptions, "Ambiguous\tNucleotides\tAminos");
         const alpha = this.extractAlphabet(selection!);
          
-        await hoverOver.switchAlphabets(alpha as def.HoverAlphabet);
+        await hoverOver.switchAlphabets(alpha as menu.HoverAlphabet);
         
         this.print(`BioNotation registered alphabet as: ${alpha}`);
 

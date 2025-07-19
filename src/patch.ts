@@ -20,8 +20,6 @@ export class PatchColors{
     private print = vscUtils.print;
     private workspaceConfig = vscUtils.editorConfig();
     private currCustomization = vscUtils.currCustomization;
-    
-
 
     constructor(private context: vscode.ExtensionContext, private meta: FileMeta) {
         this.print(`PatchColors initialized with context: ${this.context.extensionPath}`);
