@@ -73,6 +73,7 @@ export const extCodonMap : Record<string,string[]> = {
 export const rareCodonMap : Record<string,string[]> = {
     'O': ["TAG"],
     'U': ["TGA"],
+    'W': ["TGG"],
     'M': ["ATA" ], /*RARE*/
 };
 
@@ -102,7 +103,9 @@ export const ambigMap : Record<AmbigCodon, Record<string,number[]>> = {
     
     "ATA": {'I': [1, 4, 6, 9, 10, 11, 12, 14, 15, 16, 22, 23,
                     24, 25, 26, 27, 28, 29, 30, 31, 32, 33], 
-            'M': [2, 3, 5, 13, 21]}, 
+            'M': [2, 3, 5, 13, 21],
+            
+        }, 
         //freqs
         // 22 and 5
     
@@ -165,7 +168,8 @@ export const ambigMap : Record<AmbigCodon, Record<string,number[]>> = {
     "TGA": {'*': [1, 6, 11, 12, 15, 16, 22, 23, 26, 29, 30, 32], 
             'W': [2, 3,  4,  5,  9, 13, 14, 21, 24, 27, 28, 31, 33], 
             'C': [10],
-            'G': [25]},   
+            'G': [25]
+        },   
         //freqs
         // 12 13 1 1
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

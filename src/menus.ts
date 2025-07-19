@@ -35,23 +35,27 @@ export const HLight = { //HighLightOptions
 
         "B: B Drift:            Asx: Asn or Asp: N or D",
         "Z: Z Drift:            Glx: Gln or Glu: Q or E",
-        "J: J Drift:            (Iso)leucine: Leu or Ile: L or I"
+        "J: J Drift:            (Iso)leucine: Leu or Ile: L or I",
+        
+        "Ext: Extended Codes:   X, B, Z, J"
     ] as const,
 
     nucleotideSubOptions: [
-        "R: Purines:        A or G",
-        "Y: Pyrimidine      C or T/U",
-        "S: Strong Bonds    C or G",
-        "W: Weak Bonds      A or T/U",
-        "K: Ketone Group    G or T/U",
-        "M: Amino Group     A or C",
+        "R: Purines:          A or G",
+        "Y: Pyrimidine:       C or T/U",
+        "S: Strong Bonds:     C or G",
+        "W: Weak Bonds:       A or T/U",
+        "K: Ketone Group:     G or T/U",
+        "M: Amino Group:      A or C",
         
-        "N: All Nucleotides A, C, G, or T/U",
+        "N: All Nucleotides:  A, C, G, or T/U",
 
-        "B: Not A           C, G, or T/U",
-        "D: Not C           A, G, or T/U",
-        "H: Not G           A, C, or T/U",
-        "V: Not T/U         A, C, or G"
+        "B: Not A:            C, G, or T/U",
+        "D: Not C:            A, G, or T/U",
+        "H: Not G:            A, C, or T/U",
+        "V: Not T/U:          A, C, or G",
+
+        "Ext: Extended Codes: N, R, Y, S, W, K, M, B, D, H, V"
     ] as const,
     
 };

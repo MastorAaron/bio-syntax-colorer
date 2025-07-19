@@ -185,7 +185,7 @@ export const aminoInfoMap : Record<aminos,Array<string>>= {
     'Z':["Glx: Gln or Glu"], 
     'X':["Any Amino Acid"],
 
-    '*':["Stop Codon","*"],
+    '*':["Stop Codon","Stop Codon"],
     '-':["Gap","-"]
 }
 
@@ -225,7 +225,7 @@ export const aminoPropertyRegExMap : Record<typesAA,string>= {
     'R': "[HPWYF]",
     '+': "[KRHO]",
     '-': "[ED]",
-}
+    }
 
 export const aminoRegExMap : Record<aaAmbig,string>= {
     'B': "[BND]",
@@ -235,12 +235,13 @@ export const aminoRegExMap : Record<aaAmbig,string>= {
 }
 
 export const nukeRegExMap : Record<ntExtd,string>= {
+    'U': "[UT]",
+    'T': "[TU]",
+
     'N': "[NRYSWKMBDHVACGTU-]",
 
     'R': "[RAG]",
     'Y': "[YTCU]",
-    'U': "[UT]",
-    'T': "[TU]",
 
     'S': "[SGC]",
     'W': "[WTAU]",
@@ -252,6 +253,7 @@ export const nukeRegExMap : Record<ntExtd,string>= {
     'D': "[DAGTURW]",
     'H': "[HACTUYWM]",
     'V': "[VACGRSM]",
+
 }
 
 export const fileTypes = ["aTitle","qTitle"] as const

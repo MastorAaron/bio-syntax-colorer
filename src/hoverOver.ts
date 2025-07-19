@@ -6,8 +6,8 @@ import { RegExBuilder } from "./regExBuilder";
 import { Position } from "vscode";
 import * as menu from "./menus";
 
-
-import { universalCodonMap, condensedAmbig, ambigMap, AmbigCodon, tableIndex, rareCodonMap  } from "./codons";
+import { universalCodonMap, condensedAmbig, ambigMap, 
+    AmbigCodon, tableIndex, rareCodonMap  } from "./codons";
 const path = require('path');
 
 export class HoverObj{ 
@@ -73,8 +73,6 @@ export class HoverObj{
             return this.onHover(description, pos);
     }
 
-
-
     public isAmbig(codon: string){
         for(const each of condensedAmbig){
             if(this.codonMatch(this.normalizeCodon(each), codon)){
@@ -84,56 +82,11 @@ export class HoverObj{
         return false;
     }
     
-    public provideCodonInfo(doc : vscode.TextDocument, pos: Position){
-        const editor = this.getTextEditor();
-        if(editor && editor.selection && !editor.selection.isEmpty){
-            const selectedText = doc.getText(editor.selection);
-            if(selectedText.length === 3 && /^[ACGTURYKMSWBDHVN]+$/i.test(selectedText)){
-                // const codon = selectedText.toUpperCase().replace(/T/g, "U");
-                const codon = selectedText.toUpperCase();
-                if (codon === "NNN") {
-                    return this.onHover("⚠ Input is fully ambiguous (NNN) — cannot resolve amino acid", pos);
-                }
-                const amino = this.resolveUniversalCodon(codon, doc.fileName);
-                if(amino){
-                    return this.onHover(`🛡️ Universal Codon\nAmino Acid: ${amino}`,pos);
-                }
-                const possibles = this.resolveAmbiguousCodon(codon);
-                if (possibles.length > 0) {
-                    const joined = possibles.join('\n');
-                    return this.onHover(`⚠ Ambiguous Codon\nPossible Amino Acids:\n${joined}`, pos);
-                }
-
-                const rare = this.resolveRareCodon(codon);
-                if (rare.length > 0) {
-                    const joined = rare.join(', ');
-                    return this.onHover(`⚗ Rare Codon\nTypically maps to: ${joined}`, pos);
-                }
-            }
-        } 
-
+    private isRare(amino : string){
+        return amino; 
     }
 
-    public registerProvider(): void {
-        vscode.languages.registerHoverProvider('fasta', {
-            provideHover: (doc : vscode.TextDocument, pos: Position): vscode.Hover | undefined => { // provideHover(document, position/*, token*/) {//Token should only be used for async hovers which allow cancellation of hover logic
-                try{
-                    if (this.currAlpha === "Nucleotides" /*|| boolUtils.isFna(fileName)*/) {
-                        const codonHover = this.provideCodonInfo(doc, pos);
-                        if (codonHover) return codonHover;
-                    }
-                    return this.provideLetterInfo(doc,pos);
-                }catch(err){
-                    this.print("Error in hoverOver.ts: " + err);
-                    
-                    if (process.env.NODE_ENV === 'development') {
-                        console.error("Error: Not in AminoMap", err);
-                    }
-                    return;
-                }
-            }
-        });
-    }
+
 
     public async setAlphabet(selection: menu.HoverAlphabet){
         this.currAlpha = selection;
@@ -142,8 +95,21 @@ export class HoverObj{
             selection,
             vscode.ConfigurationTarget.Workspace
             );
-        this.print(`BioNotation alphabet mode set to: ${selection}`);
+        // this.print(`BioNotation alphabet mode set to: ${selection}`);
+        this.printSelectionAlpha(selection);
     }
+
+     private printSelectionAlpha(selection : string){
+            if(selection === "Ambiguous"){
+                this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
+            }else if(selection === "Nucleotides"){
+                this.print("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
+            }else if(selection === "Aminos"){
+                this.print("Protein:   BioNotation registered letters as Amino Acids on toggle.");
+            }else{
+                this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
+            }
+        }
 
     public async switchAlphabets(selection: menu.HoverAlphabet) {
         if (selection === "Ambiguous" || selection === "Nucleotides" || selection === "Aminos") {
@@ -183,11 +149,11 @@ export class HoverObj{
      * Resolves a 3-letter codon to a universal amino acid symbol using universalCodonMap.
      * Returns null if codon is ambiguous or not found.
      */
-    public resolveUniversalCodon(codon: string, fileName: string): string | null {
+    public resolveUniversalCodon(codon: string): string | null {
             for (const [amino, codons] of Object.entries(universalCodonMap)) {
                 for (const rule of codons) {
                     if (this.codonMatch(rule, codon)) {
-                        return amino;
+                        return this.expand(amino);
                     }
                 }
             }
@@ -201,27 +167,92 @@ export class HoverObj{
         vscUtils.print(`Testing ${literal} against pattern = ${normalPat}`);
         return regex.test(literal);
     }
-
+    
     private isWildcardCodon(codon: string): boolean {
         const cleaned = codon.toUpperCase();
-        return /[NBDHV]/.test(cleaned) && cleaned !== "NNN";
+        return /[NBDHVRY]/.test(cleaned) && cleaned !== "NNN";
     }
 
     private fillAmbigEntries(ambigEntry: Record<string, number[]>, results : string[]){
         const tableCount = tableIndex.length;
             for (const [amino, indexes] of Object.entries(ambigEntry)) {
-                const percent = Math.round((indexes.length / tableCount) * 100);
-                results.push(`${amino} (${indexes.length}/${tableCount} tables → ${percent}%)`);
+                if(indexes.length === 0){
+                    results.push(`Maps to ${this.expand(amino)} under certain contexts`);
+                }else{
+                    const percent = Math.round((indexes.length / tableCount) * 100);
+                    results.push(`${this.expand(amino)} (${indexes.length}/${tableCount} tables → ${percent}%)`);
+                }
             }
         }
 
-    public resolveAmbiguousCodon(codon: string): string[] {
-        const results: string[] = [];
-        
-        const isWild = this.isWildcardCodon(codon);
-        if (isWild) {
-            results.push("⚠ Wildcard Codon (contains extended alphabet)\n— matches may be broader than usual");
+    public registerProvider(): void {
+        vscode.languages.registerHoverProvider('fasta', {
+            provideHover: (doc : vscode.TextDocument, pos: Position): vscode.Hover | undefined => { // provideHover(document, position/*, token*/) {//Token should only be used for async hovers which allow cancellation of hover logic
+                try{
+                    if (this.currAlpha === "Nucleotides" || boolUtils.isFna(doc.fileName)) {
+                        const codonHover = this.provideCodonInfo(doc, pos);
+                        if (codonHover) return codonHover;
+                    }
+                    return this.provideLetterInfo(doc,pos);
+                }catch(err){
+                    this.print("Error in hoverOver.ts: " + err);
+                    
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error("Error: Not in AminoMap", err);
+                    }
+                    return;
+                }
+            }
+        });
+    }
+
+    public provideCodonInfo(doc : vscode.TextDocument, pos: Position){
+    const editor = this.getTextEditor();
+    if(editor && editor.selection && !editor.selection.isEmpty){
+        const selectedText = doc.getText(editor.selection);
+        if(selectedText.length === 3 && /^[ACGTURYKMSWBDHVN]+$/i.test(selectedText)){
+            // const codon = selectedText.toUpperCase().replace(/T/g, "U");
+            const codon = selectedText.toUpperCase();
+            if (codon === "NNN") {
+                return this.onHover("⚠ Input is fully ambiguous (NNN) — cannot resolve amino acid", pos);
+            }
+            
+            const blocks: string[] = [];
+            const isWild = this.isWildcardCodon(codon)
+            if (isWild) {
+                blocks.push("⚠ Contains Extended Alphabet\n— matches may be broader than usual");
+            }
+
+            const rare = this.resolveRareCodon(codon, isWild);
+            if(rare.length > 0){
+                const canonical = rare.map(r => r.toLowerCase());
+                if (canonical.includes('w') || canonical.includes('trp') || canonical.includes('tryptophan')) {
+                    blocks.push(`⚗ Rare Codon`);
+                }else{
+                    blocks.push(`⚗ Rare Codon\nContextually maps to: ${rare.join(',\n')}`);
+                }
+            }
+           
+            const univAmino = this.resolveUniversalCodon(codon);
+            if(univAmino){ 
+                blocks.push(`⛨ Universal Codon\nAmino Acid: ${univAmino}`);
+                return this.onHover(blocks.join('\n'), pos);
+            }
+            
+            const ambigPossibles = this.resolveAmbiguousCodon(codon, isWild);
+            if(ambigPossibles.length > 0)  blocks.push(`⚠ Ambiguous Codon\nPossible Amino Acids:\n${ambigPossibles.join(',\n')}`);
+            
+            
+            if (blocks.length > 0) return this.onHover(blocks.join('\n\n'), pos);
+
+            // Fallback: No hits
+            return this.onHover("⚠ Unknown codon — no match found", pos);
+            }
         }
+    } 
+
+    public resolveAmbiguousCodon(codon: string, isWild: boolean): string[] {
+        const results: string[] = [];
 
         for (const key of Object.keys(ambigMap)) {
             const shouldMatch = isWild
@@ -245,6 +276,28 @@ export class HoverObj{
         // return [...new Set(matches)];
     } 
 
+    public expand(amino: string): string{
+        return def.aminoInfoMap[amino as def.aminos][1];
+    }
+
+    public resolveRareCodon(codon: string, isWild: boolean): string[] {
+        const results: string[] = [];
+        
+       for (const [amino, patterns] of Object.entries(rareCodonMap)) {
+            for (const pattern of patterns) {
+                const shouldMatch = isWild
+                ? this.codonMatch(codon, pattern)   // user input is the pattern
+                : this.codonMatch(pattern, codon);  // pattern is the pattern
+
+                if (shouldMatch)  {
+                    results.push(this.expand(amino)); // No need to deduplicate unless maps overlap
+                }
+            }
+        }
+        return [...new Set(results)];
+    }
+}
+
     // public resolveAmbiguousCodonORI(codon: string): string[] {
     //     const results: string[] = [];
         
@@ -265,28 +318,6 @@ export class HoverObj{
     //     // return [...new Set(matches)];
     // }
 
-    public resolveRareCodon(codon: string): string[] {
-        const results: string[] = [];
-        
-        const isWild = this.isWildcardCodon(codon);
-        if (isWild) {
-            results.push("⚠ Wildcard Codon (contains extended alphabet)\n— matches may be broader than usual");
-        }
-
-       for (const [amino, patterns] of Object.entries(rareCodonMap)) {
-            for (const pattern of patterns) {
-                 const shouldMatch = isWild
-                ? this.codonMatch(codon, pattern)   // user input is the pattern
-                : this.codonMatch(pattern, codon);  // pattern is the pattern
-
-                if (shouldMatch)  {
-                    results.push(amino); // No need to deduplicate unless maps overlap
-                }
-            }
-        }
-        return [...new Set(results)];
-    }
-}
 //     public resolveUniversalCodon(codon: string, fileName: string, Map: Record<string, string[]>): string | null {
 //         const literal = codon.toUpperCase().replace(/T/g, "U"); // literal input, not regex
 //         // const normalized = this.normalizeCodon(codon);

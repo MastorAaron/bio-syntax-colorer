@@ -24,10 +24,16 @@ export class LangGenerator extends RuleWriter{
     }
 
     // export type alphabet = "Nucleotides" | "Aminos" | "Ambiguous" | "Aminos Properties" | "Nucleotide Categories";
-    public genRegEx(letter: string, alphabet: string): string {
+    public genRegEx(letter: string, alphabet: string): RegExp {
+        if(letter == 'E'){
+            if (alphabet === "Nucleotide Categories")       return new RegExp("[NRYSWKMBDHV]", "gi");
+            if (alphabet === "Amino Properties")            return new RegExp("[XBZJ]", "gi");
+        }
+
         const reg = this.regi.regExSwitch(letter, alphabet);
             if (!reg) throw new Error(`Unknown alphabet: ${alphabet}`);
-        return reg;
+
+        return new RegExp(reg, "gi");
     }
     
     public genRegBlockEx(letter : string | menu.HoverAlphabet, tokenType=""): string {

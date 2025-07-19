@@ -144,19 +144,6 @@ export class BioNotation{
             [...phredTypes], "Choose or Type Highlight Category") as menu.HLSelect;
 
     }
-    
-    private printSelectionAlpha(selection : string){
-        if(selection === "Ambiguous"){
-            this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by toggle.");
-        }else if(selection === "Nucleotides"){
-            this.print("DNA/RNA:   BioNotation registered letters as Nucleotides on toggle.");
-        }else if(selection === "Aminos"){
-            this.print("Protein:   BioNotation registered letters as Amino Acids on toggle.");
-        }else{
-            this.print("Ambiguous: BioNotation registered letters as either Nucleotides or Amino Acids by Default.");
-        }
-    }
- 
 
     private async secondChoice(options : string[], lang : string) : Promise<[menu.HLSelect, string] | undefined>{
         const secondSelection = await vscUtils.showInterface(options, `Choose ${lang} Highlight`) as menu.HLSelect;
@@ -189,12 +176,10 @@ export class BioNotation{
             let [secondSelection, lang] = result;
             //Distinguish Amino Properties
             if(this.arrIsSubOfString(secondSelection[0], ['B','J','Z','X'])){
-            // if(secondSelection[0] ==  'B' || secondSelection[0] ==  'J' || secondSelection[0] ==  'Z'|| secondSelection[0] ==  'X'){
                 lang = "Aminos";
             }
             hoverOver.setAlphabet("Aminos");
             return [secondSelection, lang as menu.HLSelect];
-            
         }
         
         if (firstSelection === menu.nukeText as menu.HLSelect) {
@@ -224,7 +209,8 @@ export class BioNotation{
 
             "Complementary Colors of Text Colors",
             "Use Text Color as Highlight Color"
-    ], "Choose Highlight Category") as def.ColorHex;
+    ], 
+        "Choose Highlight Category") as def.ColorHex;
         if(colorChoice.includes("Neon")){
             return themeUtils.highLightColors(colorChoice);
         }else if(colorChoice.includes("Comple")){
@@ -236,14 +222,15 @@ export class BioNotation{
 
         }
     }
-            
-    public async patternChoice(selection: menu.HLSelect, alpha: string): Promise<string| undefined> {
+
+    public async patternChoice(selection: menu.HLSelect, alpha: string): Promise<string | undefined> {
         if(selection === menu.kmerText as menu.HLSelect)
             return await vscUtils.showInputBox("Enter a kmer/Codon/pattern","ATG, GCT, etc.");
         
         if(alpha === "Nucleotide Categories" || alpha === "Aminos" || alpha === "Amino Properties"){
-            return selection[0];
+            return selection[0]; //return first character of the menu's item
         }
+        this.print(`[Pattern Choice] INVALID: ${selection}`);
         return undefined;
     }   
    
@@ -257,8 +244,9 @@ export class BioNotation{
         const pattern = await this.patternChoice(selection, alpha);
             if (!pattern) return;
 
-        const regExBody = this.langGen.genRegEx(pattern, alpha);
-        const regEx = new RegExp(regExBody, "gi");
+        
+        const regEx = this.langGen.genRegEx(pattern, alpha);
+        
         const color = await this.hLColorChoice();
             if (!color) return;
 
