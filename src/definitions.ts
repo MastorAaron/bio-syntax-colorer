@@ -1,4 +1,11 @@
+import { HoverAlphabet } from "./menus";
+import { boolUtils } from "./booleans";
+import { FilePath } from "./fileMeta";
+
 export type ColorHex = `#${string}`;
+export type Lang  = "fasta" | "fastq";
+
+
 
 export type TagCategory = "version" | "userRule" | "highLightRule" | undefined;
 
@@ -140,8 +147,27 @@ export const nukeInfoMap : Record<nukes,Array<string>>= {
     'V':["A, C, or G (not T/U)","V"],
     
     '-':["Gap","-"],
-
 }
+
+
+
+// Symbol	Description	Bases represented	Complement
+// A	    Adenine	        A – – –	            V
+// C	    Cytosine	    – C – –	            H
+// G	    Guanine	        – – G –	            D
+// T	    Thymine	        – – – T	            B
+// W	    Weak	        A – – T	            S
+// S	    Strong	        – C G –	            W
+// M	    aMino	        A C – –	            K
+// K	    Keto	        – – G T	            M
+// R	    puRine	        A – G –	            Y
+// Y	    pYrimidine	    – C – T	            R
+// B	    not A	        – C G T	            A
+// D	    not C	        A – G T	            C
+// H	    not G	        A C – T	            G
+// V	    not T	        A C G –	            T
+// N	    any Nucleotide	A C G T	            Z
+// Z	    Zero	        – – – –	            N
 
 // + is Basic Amino Acids
 // - is Acidic Amino Acids
@@ -153,7 +179,7 @@ export const aminoInfoMap : Record<aminos,Array<string>>= {
     'H':["His","Histidine","Positively Charged","pKa = 6.0"],
     
     'P':["Pro","Proline","Nonpolar","Aliphatic"],
-    'W':[ "Trp", "Tryptophan", "Aromatic", "Hydrophobic" ],
+    'W':[ "Trp", "Tryptophan", "Aromatic", "Hydrophobic", "Rare Amino Acid" ],
     'Y':["Tyr","Tyrosine","Aromatic","Hydrophobic","pKa = 10.0"],
     'F':["Phe","Phenylalanine","Aromatic","Hydrophobic"],
     
@@ -189,34 +215,46 @@ export const aminoInfoMap : Record<aminos,Array<string>>= {
     '-':["Gap","-"]
 }
 
-export const conflictInfoMap : Record<nukes,string>= {
-    'A':"Adenine OR Alanine", 
-    'C':"Cytosine OR Cysteine", 
-    'G':"Guanine OR Glycine", 
-    'T':"Thymine OR Threonine", 
-    'U':"Uracil OR Selenocysteine\n(Rare Amino Acid)", 
-    
-    'N':"Any Nuke or Asparagine", 
 
-    'R':"Arginine OR Purine", 
-    'Y':"Tyrosine OR Pyrimidine", 
-
-    'S':"Serine OR Strong",
-    'W':"Tryptophan OR Weak",
-    
-    'K':"Lysine OR Ketone",
-    'M':"Methionine OR Amino",
-    
-    'B':"Asx: Asn or Asp OR not A",
-    'D':"Aspartate OR not C", 
-    'H':"Histidine OR not G",
-    'V':"Valine OR not T/U",
-    
-    '-': "Gap or Minus Sign"
+export const symInfoMap : Record<string,string[]>= {
+    '@'  : ["Header"],
+    '>'  : ["Header"],
+    '*'  : ["Stop Codon"],
+    'Stop'  : ["Stop Codon"],
+    '-'  : ["Gap or Minus Sign"],
+    "Gap"  : ["Gap or Minus Sign"],
+    '+'  : ["Optional Sequence_ID line"],
+    "low": ["Phred Score: Low Quality Read Score"],
+    "mid": ["Phred Score: Medium Quality Read Score"],
+   "high": ["Phred Score: High Quality Read Score"]
 }
 
-// export type Alphabet =  ;
 
+export const conflictInfoMap : Record<nukes,string[]>= {
+    'A':["Adenine OR Alanine"], 
+    'C':["Cytosine OR Cysteine"], 
+    'G':["Guanine OR Glycine"], 
+    'T':["Thymine OR Threonine"], 
+    'U':["Uracil OR Selenocysteine","(Rare Amino Acid)"], 
+    
+    'N':["Any Nuke or Asparagine"], 
+
+    'R':["Arginine OR Purine"], 
+    'Y':["Tyrosine OR Pyrimidine"], 
+
+    'S':["Serine OR Strong"],
+    'W':["Tryptophan OR Weak"],
+    
+    'K':["Lysine OR Ketone"],
+    'M':["Methionine OR Amino"],
+    
+    'B':["Asx: Asn or Asp OR not A"],
+    'D':["Aspartate OR not C"], 
+    'H':["Histidine OR not G"],
+    'V':["Valine OR not T/U"],
+    
+    '-':["Gap or Minus Sign"]
+}
 
 export const aminoPropertyRegExMap : Record<typesAA,string>= {
     'N': "[LIMVAPIG]",
@@ -254,6 +292,32 @@ export const nukeRegExMap : Record<ntExtd,string>= {
     'H': "[HACTUYWM]",
     'V': "[VACGRSM]",
 
+}
+
+export function getDescription(letter: string, currAlpha: HoverAlphabet, file : FilePath, directName :boolean=false): string{
+    return arrayToStr(getInfoMap(letter, currAlpha, file, directName));
+}
+
+export function getInfoMap(letter: string, currAlpha: HoverAlphabet, fileName: string, directName: boolean=false): Array<string | nukes | aminos>{
+    if (currAlpha === "Nucleotides" || boolUtils.isFna(fileName)) {
+        return nukeInfoMap[letter as nukes] || letter;
+    } 
+    if (currAlpha === "Aminos" ||  boolUtils.isFaa(fileName)) {
+        return aminoInfoMap[letter as aa] || letter;
+    } // Mixed mode, show raw or dual-name
+
+    const conflicting = conflictInfoMap[letter as nukes];
+        if (conflicting) return (directName && conflicting.length > 1)? [conflicting[0]]: conflicting;
+
+    const nuke = nukeInfoMap[letter as nukes];
+        if (nuke) return nuke;
+
+    const amino = aminoInfoMap[letter as aminos];
+        if (amino) return (directName && amino.length > 1)? [amino[1]]: amino;
+
+    const sym = symInfoMap[letter as symStrs];
+        if (sym) return sym;
+    return [letter];
 }
 
 export const fileTypes = ["aTitle","qTitle"] as const
@@ -300,7 +364,12 @@ export function arrayToArrStr(strArr : string[]): string{
     return newStr;
 }
 
-export const tokenStripMap : Record<string,Record<string,string[]>>= {
+export function arrIsSubOfString(selection: string, arr: string[]){
+    return arr.find(each => selection.includes(each)); //Works for small len arrays not the best for larger data
+}
+
+
+export const tokenStripMap : Record<Lang,Record<string,string[]>>= {
     "fasta":{ 
         "title": ['>'] ,
         "nt"   : ['A','C','G','T','U','N','R','Y','B','D','H','V','K','M','S','W'],
@@ -313,6 +382,19 @@ export const tokenStripMap : Record<string,Record<string,string[]>>= {
         "quality": ["low","mid","high"]
     } 
 }
+
+
+
+export function lookUpTitle(lang: string,alpha: string){
+        if(lang === "fasta"){
+            return '>'
+        }
+        if(lang === "fastq"){
+            return '@'
+        }
+        return ""
+    }
+
 
 // export const phredRangesMap : Record<string,Record<string,string[]>>= {
 //     "Sanger":{

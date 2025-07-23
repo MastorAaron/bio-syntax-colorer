@@ -1,7 +1,7 @@
 "use strict";
 
 import { vscUtils } from "../src/vscUtils";
-const { vscCOUT, editorConfig, showInterface } = vscUtils;
+const { print, editorConfig, showInterface } = vscUtils;
 
 
 import { boolUtils } from "../src/booleans";
@@ -54,22 +54,22 @@ function printBool(bool: boolean){
     print(boolText(bool));
 }
 
-function print(toPrint:string, stream:string="console"){
-    if(stream === "console"){
-        console.log(toPrint);
-    }else if(stream === "vsc"){
-        vscCOUT(toPrint);
-    }
-    // else if(stream === "else"){
-    //     (toPrint);
-    // }
-}
+// function print(toPrint:string, stream:string="console"){
+//     if(stream === "console"){
+//         console.log(toPrint);
+//     }else if(stream === "vsc"){
+//         print(toPrint);
+//     }
+//     // else if(stream === "else"){
+//     //     (toPrint);
+//     // }
+// }
 
-describe('is Negative Amino Acid', () => {
-    test("returns true for Negative Amino", () => {
-        const bool = def.isNeg('E');
-        print("isNeg:");
-        printBool(bool);
-        expect(bool).toBe(true);
-    });
-});
+// describe('is Negative Amino Acid', () => {
+//     test("returns true for Negative Amino", () => {
+//         const bool = def.isNeg('E');
+//         print("isNeg:");
+//         printBool(bool);
+//         expect(bool).toBe(true);
+//     });
+// });

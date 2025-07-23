@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import * as def from "./definitions";
+import {Lang} from "./definitions";
 import * as fs from "fs";
 import * as path from "path";
 // import { getPatcherInstance, PatchColors } from "./patch";
@@ -19,7 +19,7 @@ export const DECONFILE_REGEX = new RegExp(`^${THEME_REGEX}-deconstruct\\.json$`)
 
 export type RuleType  = "syntaxes" | "palettes" | "decon";
 export type LangFile  = `${Lang}.tmLanguage.json`;
-export type Lang  = "fasta" | "fastq" | "else";
+
 export type ColorFile = `${Lang}-colors-${Theme}.json`;
 export type DeconFile = `${Theme}-deconstruct.json`; // type StripFile = `${string}-stripped.json` ;
 export type JsonFile = LangFile | ColorFile | DeconFile; //| StripFile;
@@ -109,7 +109,7 @@ export class FileMeta {
     } 
     
     public genNewColorFile(theme: Theme): FileMeta{
-        const newFile = `${this.lang}-colors-${theme}.json`
+        const newFile = `${this.lang}-colors-${theme.toLowerCase()}.json`
         vscUtils.print(`File Meta created for : ${newFile}`);
         const newMeta = new FileMeta(newFile as ColorFile, this.context);
         return newMeta;
@@ -141,7 +141,7 @@ export class FileMeta {
     }
 
     public genColorPath(){
-        return `${this.lang}-colors-${this.theme}.json` as ColorFile;
+        return `${this.lang}-colors-${this.theme!.toLowerCase()}.json` as ColorFile;
     }
     
     public genDeconFile(){

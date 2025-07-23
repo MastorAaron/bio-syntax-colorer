@@ -6,14 +6,17 @@ import { version } from "../package.json";
 
 import { boolUtils } from "./booleans";
 import * as def from "./definitions";
+import HoverOver from './hoverOver';
 
 import { vscUtils, themeUtils } from "./vscUtils";
 import { FileMeta, FilePath, JsonFile, ColorFile } from "./fileMeta";
+import { DEFAULT_PHRED, PhredType } from "./phredHandler";
+import { HoverObj } from "./hoverOver";
 
 
 // import hoverOver from "./hoverOver";
 
-const DEFAULT_PALETTE = "fasta-colors.json";
+const DEFAULT_PALETTE = "fasta-colors-warm.json";
 
 export class PatchColors{
     // private static readonly DEFAULT_PALETTE = DEFAULT_PALETTE ;
@@ -56,49 +59,27 @@ export class PatchColors{
         
         return tagged;                          //Print FileName or Palette Name instead
     }
-
-    // public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
-    //     const colorPath = path.isAbsolute(filename)
-    //     ? filename
-    //     : path.join(this.context.extensionPath, "palettes", path.basename(filename));
-
     
-    //     // path.join(context.extensionPath, "fasta-colors.json")
-    //     return this.loadColorsFromPath(colorPath as PaletteFilePath);
-    // }
-
-    public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
+    public async loadColors(filename = DEFAULT_PALETTE as ColorFile): Promise<def.ColorRule[]>{
         // path.join(context.extensionPath, "fasta-colors.json")
-        return this.loadColorsFromPath(this.meta.fullFilePath as FilePath);
+        return await this.loadColorsFromPath(this.meta.fullFilePath as FilePath);
     }
 
-    public loadColorsFromPath(colorPath: FilePath): def.ColorRule[]{
+  
+
+    public async loadColorsFromPath(colorPath: FilePath): Promise<def.ColorRule[]>{
         if (!fs.existsSync(colorPath)) {
             throw new Error(`Color file not found: ${colorPath}`);
         }
         const colors = JSON.parse(fs.readFileSync(colorPath, "utf8"));
         const rules = colors.tokenColors as def.ColorRule[];
-        this.print(`Loaded colors from ${colorPath}: ${colors.tokenColors.length} rules`);
+
+        this.print(`Loaded colors from ${colorPath}: ${rules.length} rules`);
         
-        return rules;
+        const activeDoc = vscUtils.getActiveFileType();
+        const isFastq = activeDoc && boolUtils.isFastqFile(activeDoc.fileName);
+            return rules;
     }
-
-
-    // public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
-    //     if (!boolUtils.isValidRule(rule)){ 
-    //         this.print("Invalid rule provided for editing.");
-    //         return rule;
-    //     }
-    //     const updatedRule: def.ColorRule = {
-    //         ...rule,   
-    //         settings: {
-    //             ...rule.settings,
-    //             foreground: newColor
-    //         }
-    //     }
-    //     return updatedRule;
-    // }
-   
     
     public mergeRules(newRules : def.ColorRule[]){
         const customization = this.currCustomization(vscUtils.globalConfig());
@@ -128,7 +109,6 @@ export class PatchColors{
         palette.tokenColors = Array.isArray(palette.tokenColors) ? palette.tokenColors : [];
         return palette.tokenColors;
     }
-
     
     private async applyCustomTokens(customization: Record<string,unknown>): Promise<void> {
         const config = this.workspaceConfig;
@@ -142,9 +122,9 @@ export class PatchColors{
         this.print("Custom token colors applied.");
     }
 
-    public async patchTokenColors(fileName : string= DEFAULT_PALETTE): Promise<void> {
+    public async patchTokenColors(fileName : ColorFile = DEFAULT_PALETTE): Promise<void> {
         try{
-            let rules    = this.loadColors(fileName);
+            let rules    = await this.loadColors(fileName);
             let tagged   = this.tagColorsGenRules(rules)
             this.print(`Tagged rules: ${fileName}`);//TODO: this prints Tagged rules: [object Object], X 34 not great 
             const merged = this.mergeRules(tagged);
@@ -188,7 +168,56 @@ export class PatchColors{
             newConfig,
             vscode.ConfigurationTarget.Workspace
         );
+
+        // ✅ NEW: Also try to remove global if it matches or includes our tags
+        const globalConfig = vscUtils.globalConfig();
+        const globalCustomization = vscUtils.currCustomization(globalConfig);
+
+        if (Array.isArray(globalCustomization.textMateRules)) {
+            const stillTagged = globalCustomization.textMateRules.some(rule =>
+                boolUtils.isAlreadyTagged(rule)
+            );
+
+            if (stillTagged) {
+                await globalConfig.update(
+                    "tokenColorCustomizations",
+                    undefined,
+                    vscode.ConfigurationTarget.Global
+                );
+                this.print("BioNotation cleared from global settings.");
+            }
+
+    }
     }
 }
 
 let patcherInstance: PatchColors;
+
+
+    // public loadColors(filename = DEFAULT_PALETTE): def.ColorRule[]{
+    //     const colorPath = path.isAbsolute(filename)
+    //     ? filename
+    //     : path.join(this.context.extensionPath, "palettes", path.basename(filename));
+
+    
+    //     // path.join(context.extensionPath, "fasta-colors.json")
+    //     return this.loadColorsFromPath(colorPath as PaletteFilePath);
+    // }
+
+    
+
+    // public editColorRule(rule: def.ColorRule, newColor: def.colorHex): def.ColorRule {
+    //     if (!boolUtils.isValidRule(rule)){ 
+    //         this.print("Invalid rule provided for editing.");
+    //         return rule;
+    //     }
+    //     const updatedRule: def.ColorRule = {
+    //         ...rule,   
+    //         settings: {
+    //             ...rule.settings,
+    //             foreground: newColor
+    //         }
+    //     }
+    //     return updatedRule;
+    // }
+   

@@ -3,13 +3,14 @@ import * as def from "../src/definitions";
 import hoverOver from '../src/hoverOver';
 import { boolUtils } from '../src/booleans';
 import { vscUtils } from '../src/vscUtils';
+import * as menu from "../src/menus"
 // const { vscUtils } = require('../src/vscUtils');
 // const { BioNotation } = require('../src/extension');
 import { BioNotation } from '../src/extension';
 import {  } from '../src/vscUtils';
 
 
-const { vscCOUT, editorConfig, showInterface, mockContext} = vscUtils;
+const { print, editorConfig, showInterface, mockContext} = vscUtils;
 
 
 // jest.mock('vscode', () => ({
@@ -43,7 +44,7 @@ const { vscCOUT, editorConfig, showInterface, mockContext} = vscUtils;
 //     const realUtils = jest.requireActual('../src/vscUtils');
 //     return {
 //         vscUtils: {
-//             vscCOUT: jest.fn(),
+//             print: jest.fn(),
 //             showInterface: realUtils.vscUtils.showInterface,
 //             editorConfig: jest.fn(),
 //             globalConfig: jest.fn(() => ({
@@ -59,7 +60,7 @@ const { vscCOUT, editorConfig, showInterface, mockContext} = vscUtils;
 //For testing components of function
 // jest.mock('../src/vscUtils', () => ({
 //     vscUtils: {
-//         vscCOUT: jest.fn(),
+//         print: jest.fn(),
 //         showInterface: jest.fn(),
 //         editorConfig: jest.fn(),
 //         globalConfig: jest.fn(() => ({
@@ -96,19 +97,19 @@ describe('isFastaFile', () => {
     });
 });
 
-function print(toPrint:string, stream:string="console"){
-    if(stream === "console"){
-        console.log(toPrint);
-    }else if(stream === "vsc"){
-        vscCOUT(toPrint);
-    }
-    // else if(stream === "else"){
-    //     (toPrint);
-    // }
-}
+// function print(toPrint:string, stream:string="console"){
+//     if(stream === "console"){
+//         console.log(toPrint);
+//     }else if(stream === "vsc"){
+//         print(toPrint);
+//     }
+//     // else if(stream === "else"){
+//     //     (toPrint);
+//     // }
+// }
 
 function handleCurrAlpha(expectStr: string, time: string){
-    const currAlpha: def.alphabet = hoverOver.getCurrAlpha();
+    const currAlpha: menu.HoverAlphabet = hoverOver.getCurrAlpha();
     print(`${time}: ${currAlpha}`);
     expect(currAlpha).toBe(expectStr);
 }
@@ -140,17 +141,17 @@ function handleCurrAlpha(expectStr: string, time: string){
 //     //Forcing Reset
 //     test('handles Aminos selection', async () => {
 //         await testChangeOfAlpha("Aminos");        
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("Protein"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("Protein"));
 //     });
 
 //     test('handles Nucleotides selection', async () => {
 //         await testChangeOfAlpha("Nucleotides");
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("DNA/RNA"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("DNA/RNA"));
 //     });
 
 //     test('handles Ambigious selection', async () => {
 //         await testChangeOfAlpha("Ambigious");
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("Ambigious"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("Ambigious"));
 //     });
 
 // });
@@ -185,21 +186,21 @@ function handleCurrAlpha(expectStr: string, time: string){
 //     //Persistent States
 //     test('handles Aminos selection', async () => {
 //         await persistentChangeOfAlpha("Ambigious", "Aminos");        
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("Protein"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("Protein"));
 //     });
 
 //     test('handles Nucleotides selection', async () => {
 //         await persistentChangeOfAlpha("Aminos","Nucleotides");   
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("DNA/RNA"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("DNA/RNA"));
 //     });
 
 //     test('handles Ambigious selection', async () => {
 //         await persistentChangeOfAlpha("Nucleotides","Ambigious");   
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("Ambigious"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("Ambigious"));
 //     });
 //     test('handles Ambigious selection', async () => {
 //         await persistentChangeOfAlpha("Nucleotides","Ambigious");   
-//         expect(vscUtils.vscCOUT).toHaveBeenCalledWith(expect.stringContaining("Ambigious"));
+//         expect(vscUtils.print).toHaveBeenCalledWith(expect.stringContaining("Ambigious"));
 //     });
 // });
 
@@ -217,7 +218,7 @@ describe('Actual toggleAlphabet', () => {
     let bioNotation:  BioNotation;
 
     test('handles realTime Selection', async () => {
-        bioNotation = new BioNotation(vscUtils.mockContext());
+        bioNotation = new BioNotation(vscUtils.mockContext(), "fasta-colors-warm.json");
 
         await bioNotation.toggleAlphabet();
     });

@@ -8,15 +8,19 @@ export class boolUtils{
         return pattern.test(fileName);
     }
 
-    static isValidColor(color: string): boolean {
+    static isValidColor(color: string): color is def.ColorHex {
         // Simple regex to check if color is in hex format
         return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(color);
     }
 
-
     static isFastaFile(fileName: string): boolean {
         return this.testForFile(fileName, ["fa","fna","faa","fasta","fastq"]);
     }
+    
+    static isFastqFile(fileName: string): boolean {
+        return this.testForFile(fileName, ["fna","faa","fastq"]);
+    }
+
     static isOriFastaFile(fileName: string): boolean {
         return /\.(fa|fna|faa|fasta|fastq)$/i.test(fileName);
     }
@@ -56,7 +60,7 @@ export class boolUtils{
 
 
     static isSequenceFile(fileName: string): boolean {
-        return this.isFastaFile(fileName) || this.isGenBankFile(fileName) || this.isGFFFile(fileName) || this.isBEDFile(fileName);
+        return this.isFastaFile(fileName) || this.isFastqFile(fileName) || this.isGenBankFile(fileName) || this.isGFFFile(fileName) || this.isBEDFile(fileName);
     }
 
     static isAnnotationFile(fileName: string): boolean {

@@ -22,6 +22,16 @@ const faHeaderCR: any = {
     }
 }
 
+function isColorRule(obj: any): obj is def.ColorRule {
+    return (
+        obj &&
+        typeof obj.name === 'string' &&
+        typeof obj.scope === 'string' &&
+        typeof obj.settings === 'object' &&
+        typeof obj.settings.foreground === 'string'
+    );
+}
+
 const faHeaderPR: any =  {
     "name": "fasta.title",
     "match": "^>.*"
@@ -29,7 +39,7 @@ const faHeaderPR: any =  {
 describe("PatchColors Tagging", () => {
     describe('test forObjs', () => {
         test("Should be ColorRule", () => {
-            expect(faHeaderCR.toBe(typeof def.ColorRule));
+            expect(isColorRule(faHeaderCR)).toBe(true);
         });
     });
 });

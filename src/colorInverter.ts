@@ -72,13 +72,13 @@ export class colorMath{
     }
 
     private static sanitizeHexStr(hexStr: string): string{
-        hexStr = hexStr.replace(/^#/, "").trim();
-        if (!/^[0-9a-fA-F]{6}$/.test(hexStr)) {
+        const stripped  = hexStr.replace(/^#/, "").trim();
+        if (!/^[0-9a-fA-F]{6}$/.test(stripped)) {
             const err = `Invalid hex color: '${hexStr}'`;
             vscUtils.print(err);
             throw new Error(err);
         }
-        return hexStr;
+        return stripped ;
     }
 
     //Color: (HLS) Hue, Luminance and Saturation //NOTE: adapted from Python's Color Library

@@ -1,4 +1,3 @@
-
 export const stdCodonMap : Record<string,string[]> = {
     'A': ["GCN"],
     'C': ["TGY"],

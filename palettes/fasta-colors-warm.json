@@ -4,7 +4,7 @@
     "tokenColors": [
         {
       "name": "FASTA Header",
-      "scope":"fasta.title",
+      "scope":"source.fasta.title",
       "settings":{
         "foreground":"#E6DB74",
         "fontStyle":"bold"
@@ -12,9 +12,33 @@
         },
         {
             "name": "FASTQ Header",
-            "scope":"fastq.title",
+            "scope":"source.fastq.title.seqID",
             "settings":{
                 "foreground":"#726C38",
+                "fontStyle":"bold"
+            }
+        }, 
+            {
+            "name": "FASTQ Header",
+            "scope":"source.fastq.title.plusLine",
+            "settings":{
+                "foreground":"#CE9178",
+                "fontStyle":"bold"
+            }
+        },
+        {
+            "name": "FASTQ Header Words",
+            "scope":"source.fastq.title.alpha",
+            "settings":{
+                "foreground":"#726C38",
+                "fontStyle":"bold"
+            }
+        }, 
+        {
+            "name": "FASTQ Header Numbers",
+            "scope":"source.fastq.title.num",
+            "settings":{
+                "foreground":"#D4D4D4",
                 "fontStyle":"bold"
             }
         },
@@ -22,8 +46,7 @@
             "name": "Adenine OR Alanine", 
             "scope": "source.fasta.ntA", 
             "settings": {
-                "foreground": "#3ED132",
-                "background": "#B8B8B8"
+                "foreground": "#3ED132"
             }
         }, 
         {
@@ -230,24 +253,45 @@
             }
         }, 
         {
-            "name": "Low Quality Read Score",
-            "scope": "source.fastq.quality.low",
+            "name": "Low Phred+33 Read Score",
+            "scope": "source.fastq.phred33.low",
             "settings":{
                 "foreground": "#CD7F32" 
             }
         },
         {
-            "name": "Medium Quality Read Score",
-            "scope": "source.fastq.quality.mid",
+            "name": "Medium Phred+33 Read Score",
+            "scope": "source.fastq.phred33.mid",
             "settings":{
                 "foreground": "#C0C0C0" 
             }
         },
         {
-            "name": "High Quality Read Score",
-            "scope": "source.fastq.quality.high",
+            "name": "High Phred+33 Read Score",
+            "scope": "source.fastq.phred33.high",
             "settings":{
                 "foreground": "#FFD700" 
+            }
+        },        
+        {
+            "name": "Low Phred+64 Read Score",
+            "scope": "source.fastq.phred64.low",
+            "settings":{
+                "foreground": "#BF211E" 
+            }
+        },
+        {
+            "name": "Medium Phred+64 Read Score",
+            "scope": "source.fastq.phred64.mid",
+            "settings":{
+                "foreground": "#F9DC5C" 
+            }
+        },
+        {
+            "name": "High Phred+64 Read Score",
+            "scope": "source.fastq.phred64.high",
+            "settings":{
+                "foreground": "#04E762" 
             }
         }
     ]

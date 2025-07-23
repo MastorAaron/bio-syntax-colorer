@@ -11,8 +11,8 @@ interface TokenCustomization {
 
 export const dev : boolean = true;
 
-export const DARK_FG : def.ColorHex = "#D4D4D4";
-export const LIGHT_FG: def.ColorHex = "#57606C";
+export const DARK_VISIBLE_FG : def.ColorHex = "#D4D4D4";
+export const LIGHT_VISIBLE_FG: def.ColorHex = "#57606C";
 
 export const NeonYellow    : def.ColorHex = "#FFFF33";
 export const NeonGreen     : def.ColorHex = "#39FF14";
@@ -36,7 +36,14 @@ export const themeUtils = {
     },
     
     defaultTextColor(): def.ColorHex {
-        return this.isDark() ? DARK_FG : LIGHT_FG;
+        return this.isDark() ? DARK_VISIBLE_FG : LIGHT_VISIBLE_FG;
+    },
+
+    defaultColorPair(): [def.ColorHex, def.ColorHex] {
+        const first = this.isDark() ? DARK_VISIBLE_FG : LIGHT_VISIBLE_FG;
+        const second = this.isLight() ? DARK_VISIBLE_FG : LIGHT_VISIBLE_FG;
+
+        return [first,second];
     },
 
     highLightColors(color : string): def.ColorHex {
@@ -54,6 +61,8 @@ export const themeUtils = {
         }
     }
 };
+
+
 export namespace vscUtils{
     export function vscCOUT(...args: unknown[]): void {
         const formatted = args.map(arg => {
@@ -66,7 +75,12 @@ export namespace vscUtils{
             }
         }).join(" ");
 
-        vscode.window.showInformationMessage(formatted);
+        if (process.env.NODE_ENV !== "test") {
+            vscode.window.showInformationMessage(formatted);
+        }else{
+            console.log("[VSCCOUT]", formatted);
+        }
+
     }
 
     // export const vscUtils = {
@@ -108,6 +122,18 @@ export namespace vscUtils{
     export function editorConfig(): vscode.WorkspaceConfiguration{
         return vscode.workspace.getConfiguration("editor") || {};
     }
+
+    export function getActiveFileType(){
+        return vscode.window.activeTextEditor?.document;
+    }
+
+    export async function updateFlag(flag : string, bool : any){
+        await vscode.workspace.getConfiguration().update(flag, bool, vscode.ConfigurationTarget.Workspace);
+    } 
+
+    export async function getFlagVal<temp>(flag : string){
+        return vscode.workspace.getConfiguration().get<temp>(flag) as temp;
+    } 
     
     export function currCustomization(config : vscode.WorkspaceConfiguration): TokenCustomization {
         return config.get("tokenColorCustomizations") || {};

@@ -1,12 +1,10 @@
 {
     "comments": {
-        "lineComment": ">", 
-        "blockComment": ["(", ")"]
+        "lineComment": ">"
     },
     "brackets": [
         ["{", "}"],
         ["[", "]"],
         ["(", ")"]
-    ],
-    "wordPattern": "[A-Za-z*.-]+"
+    ]
 }

@@ -78,7 +78,7 @@ export class HighLightOverlay{
         return ranges;
     }
 
-    private defineHighLight(pattern: string, color: string){
+    private defineHighLight(pattern: string, bgColor: string, fgColor: string){
         let highLightType = this.highLightTypes.get(pattern);
        
         if (highLightType) {
@@ -86,7 +86,8 @@ export class HighLightOverlay{
         }
 
         highLightType = vscode.window.createTextEditorDecorationType({
-            backgroundColor: color,
+            backgroundColor: bgColor,
+            color: fgColor,
             borderRadius: "1px",
             // hoverMessage: new vscode.MarkdownString("Reuse command to clear highlight.")
         });
@@ -94,15 +95,16 @@ export class HighLightOverlay{
         return highLightType;
     }
 
-    private extractColor(color : string, token : string ): ColorHex{
+    private extractColor(color : string, token : string ): [ColorHex,ColorHex]{
         if(color === "Comple" || color === "Text"){
             const pair = this.tokenColorMap.get(token.toUpperCase());
             if(!pair){
-                return themeUtils.defaultTextColor() as ColorHex; 
+                const [bgColor, fgColor] = themeUtils.defaultColorPair(); 
+                return [bgColor, fgColor]; 
             }  
             color = (color === "Text")? pair[0] : pair[1];
         }  
-        return color as ColorHex;
+        return [color as ColorHex, themeUtils.defaultTextColor()];
     }
 
     public applyHighLight(patternOrRegEx: string | RegExp, color: string){
@@ -113,9 +115,9 @@ export class HighLightOverlay{
         const raw = (typeof patternOrRegEx === "string") ? patternOrRegEx : patternOrRegEx.source;
         const firstLetter = raw.replace(/[^A-Za-z]/g, "").charAt(0).toUpperCase();
 
-        const resolvedColor = this.extractColor(color, firstLetter);
+        const [resolvedColor, fgColor] = this.extractColor(color, firstLetter);
         const ranges = this.extractMatchRanges(patternOrRegEx, doc);
-        const highLightType = this.defineHighLight(patternOrRegEx.toString(), resolvedColor);
+        const highLightType = this.defineHighLight(patternOrRegEx.toString(), resolvedColor, fgColor);
 
         editor.setDecorations(highLightType, ranges);
         this.activehighLights.set(patternOrRegEx.toString(), ranges);

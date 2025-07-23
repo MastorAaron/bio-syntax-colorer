@@ -1,0 +1,51 @@
+{
+    "patterns": [
+      { "include": "#keywords" }
+    ],
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "scopeName": "source.fastq",
+  "fileTypes": [ "fastq", "faa" , "fna" ],
+  "name": "FASTQ",
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "source.fastq.title.alpha",
+          "match": "^@([a-zA-Z]+)"
+        },
+        {
+          "name": "source.fastq.title.num",
+          "match": "^@.*?(\\d+)"
+        },
+        {
+          "name": "source.fastq.plusLine",
+          "match": "^\\+.*"
+        },
+        {
+          "name": "source.fastq.phred33.low",
+          "match": "[!-4]+"
+        },
+        {
+          "name": "source.fastq.phred33.mid",
+          "match": "[5->]+"
+        },
+        {
+          "name": "source.fastq.phred33.high",
+          "match": "[?-J]+"
+        },   
+        {
+          "name": "source.fastq.phred64.low",
+          "match": "[;-S]+"
+        },
+        {
+          "name": "source.fastq.phred64.mid",
+          "match": "[T-\\]]+"
+        },
+        {
+          "name": "source.fastq.phred64.high",
+          "match": "[^-h]+"
+        }     
+      ]
+    }
+  }
+}
